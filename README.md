@@ -1,21 +1,29 @@
-# Manga Tracker Cloud Sync
+# Manga Tracker Cloud + Manual Latest Check
 
-เพิ่ม:
-- Login / Sign up ด้วยอีเมล
-- Login ด้วย Google ถ้าตั้งค่า Provider ใน Supabase
-- Cloud Sync ผ่าน Supabase Database
-- Upload รูปปกจากมือถือผ่าน Supabase Storage
+เพิ่มจากเวอร์ชันก่อน:
+- หน้า Collection เป็น grid รูป + ชื่อ
+- กดมังงะเพื่อดูรายละเอียด
+- ปุ่มแก้ไขอยู่ในหน้ารายละเอียด
+- ปุ่ม “เช็กตอนล่าสุดจากเว็บ” ในหน้ารายละเอียด
+- เริ่มรองรับ go-manga.com ก่อน
 
-## ตั้งค่า Supabase
+## วิธีใช้ฟีเจอร์เช็กตอนล่าสุด
 
-1. สร้าง Project ที่ supabase.com
-2. ไปที่ SQL Editor
-3. คัดลอกโค้ดจาก `supabase/setup.sql` ไปรัน
-4. ไปที่ Project Settings > API
-5. เอา Project URL และ anon public key ไปใส่ใน Vercel Environment Variables:
-   - NEXT_PUBLIC_SUPABASE_URL
-   - NEXT_PUBLIC_SUPABASE_ANON_KEY
-6. Redeploy
+1. เปิดรายละเอียดมังงะ
+2. ต้องมี `ลิงก์เว็บที่อ่าน` เป็น URL จาก `go-manga.com`
+3. กด “เช็กตอนล่าสุดจากเว็บ”
+4. ถ้าระบบเจอเลขตอนล่าสุด จะอัปเดต `latest_chapter` ใน Supabase ให้อัตโนมัติ
 
-## Google Login
-ต้องเปิด Google Provider ใน Supabase Auth ก่อน ถ้ายังไม่เปิด ใช้ email/password ได้เลย
+## สำคัญ
+
+- ไม่ต้องรัน SQL ใหม่
+- ใช้ Supabase เดิมได้เลย
+- ข้อมูลเดิมไม่หาย เพราะไม่ได้แก้โครงสร้าง database
+- ถ้าเว็บเปลี่ยนโครงสร้าง หรือบล็อกการดึง HTML ฟีเจอร์เช็กตอนอาจใช้ไม่ได้กับบางเรื่อง
+
+## Deploy
+
+อัปโหลดไฟล์ทั้งหมดทับ GitHub repo เดิม แล้ว Vercel จะ redeploy อัตโนมัติ
+Environment Variables เดิมใช้ต่อได้:
+- NEXT_PUBLIC_SUPABASE_URL
+- NEXT_PUBLIC_SUPABASE_ANON_KEY
