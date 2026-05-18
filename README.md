@@ -22,3 +22,10 @@
 - ก่อนและหลัง Login เห็นทั้ง Tier List และ Collection
 - Tier List อยู่ซ้าย / Collection อยู่ขวา
 - คืนปุ่มเช็กตอนล่าสุดในหน้ารายละเอียดและผูกฟังก์ชันกลับเข้ากับ checkLatest
+
+
+## guest-load-fix
+- แก้ Guest Mode ให้โหลดข้อมูล public จาก Supabase ได้
+- ถ้า Guest ยังไม่เห็นข้อมูล ให้รัน policy public select ใน Supabase:
+  drop policy if exists "Public can preview manga" on public.manga_items;
+  create policy "Public can preview manga" on public.manga_items for select to anon using (true);
