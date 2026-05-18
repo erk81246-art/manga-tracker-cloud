@@ -1,36 +1,11 @@
-# Manga Tracker Guest Mode
+# Manga Tracker Guest Tier Only
 
-เวอร์ชันนี้เพิ่ม Guest Mode ก่อน Login:
-- คนไม่ล็อกอินดู Collection ได้
-- ดู Tier List ได้
-- กดดูรายละเอียดพื้นฐานได้
-- ไม่เห็น/ไม่ใช้ปุ่มเปิดเว็บอ่าน
-- ไม่เห็นจำนวนตอนล่าสุด/อ่านถึง
-- เช็กตอนล่าสุดไม่ได้
-- เพิ่ม/แก้ไข/ลบ/เปลี่ยน Tier ไม่ได้
+เวอร์ชันนี้ปรับ Guest Mode:
+- ก่อน Login เห็นเฉพาะหน้า Tier List
+- ก่อน Login กดดูรายละเอียดพื้นฐานได้
+- ก่อน Login ไม่เห็น/ไม่เข้า Collection
+- ก่อน Login เปิดเว็บอ่าน เช็กตอน เพิ่ม แก้ไข ลบ ไม่ได้
+- หลัง Login ใช้งานทุกอย่างเหมือนเดิม
 
-หลัง Login ใช้งานเต็มเหมือนเดิม
-
-## สำคัญ: ต้องเปิด Public Read ใน Supabase
-
-เพราะตอนนี้ Supabase ใช้ RLS ถ้าไม่เปิด policy นี้ Guest จะมองไม่เห็นข้อมูล
-
-ไปที่ Supabase > SQL Editor แล้วรันไฟล์:
-
-supabase/guest_read_policy.sql
-
-หรือรันคำสั่งนี้:
-
-```sql
-create policy if not exists "Public can preview manga"
-on public.manga_items for select
-to anon
-using (true);
-```
-
-คำสั่งนี้ไม่ลบข้อมูลเดิม แต่จะทำให้คนที่เข้าเว็บโดยไม่ Login อ่านข้อมูลในตาราง manga_items ได้
-ตัวแอพจะซ่อนลิงก์อ่านและจำนวนตอนใน UI สำหรับ Guest
-
-## Deploy
-อัปโหลดไฟล์ทั้งหมดทับ repo เดิม แล้ว Vercel จะ redeploy
-ไม่ต้องแก้ Environment Variables
+ใช้ Supabase database เดิมได้เลย
+ไม่ต้องรัน SQL ใหม่ ถ้าเคยเปิด guest read policy แล้ว
