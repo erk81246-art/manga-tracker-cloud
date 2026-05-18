@@ -1,7 +1,7 @@
 "use client";
 
 import React,{useEffect,useMemo,useState}from"react";
-import{AnimatePresence,motion}from"framer-motion";
+import { AnimatePresence, motion, useMotionValue, useTransform } from "framer-motion";
 import{Bell,BookOpen,Cloud,ExternalLink,Image as ImageIcon,Layers,LogOut,Pencil,Plus,RefreshCw,Save,Search,Star,Trash2,Upload,User,X}from"lucide-react";
 import{supabase,isSupabaseReady}from"@/lib/supabase";
 import type{User as SupabaseUser}from"@supabase/supabase-js";
