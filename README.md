@@ -17,3 +17,7 @@
 - iPad/Desktop master-detail: กดรูปแล้วรายละเอียดอยู่ด้านขวา
 - Detail modal แบบ hero พร้อม background blur เบา ๆ
 - Guest เห็นเฉพาะ preview และต้อง login เพื่อใช้งานเต็ม
+
+
+## fix2
+- แก้ DetailModal ให้รับ onCheckLatest/isGuest กลับมาเพื่อ build ผ่านและไม่เสียฟีเจอร์เช็กตอนล่าสุด

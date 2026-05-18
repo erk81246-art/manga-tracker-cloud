@@ -36,15 +36,20 @@ function DetailModal({
   onEdit,
   onDelete,
   onTierChange,
+  onCheckLatest,
+  isGuest,
   locked = false,
 }: {
   item: MangaItem;
   onClose: () => void;
   onEdit: (item: MangaItem) => void;
-  onDelete: (id: string) => void;
-  onTierChange: (id: string, tier: MangaTier) => void;
+  onDelete: (id: string) => void | Promise<void>;
+  onTierChange: (id: string, tier: MangaTier) => void | Promise<void>;
+  onCheckLatest?: (item: MangaItem) => void | Promise<void>;
+  isGuest?: boolean;
   locked?: boolean;
 }) {
+  locked = locked || Boolean(isGuest);
   const hasUpdate = chapterNumber(item.latest_chapter) > chapterNumber(item.read_chapter);
   const newCount = Math.max(0, chapterNumber(item.latest_chapter) - chapterNumber(item.read_chapter));
   const dragY = useMotionValue(0);
