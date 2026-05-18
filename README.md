@@ -37,3 +37,7 @@
 - Guest เปิดเว็บอ่านไม่ได้
 - Guest เช็กตอนล่าสุดไม่ได้
 - Guest แก้ไข/ลบ/จัด Tier ไม่ได้
+
+
+## guest-viewonly-fix2
+- แก้ locked reference ที่หลุดนอก DetailModal เพื่อให้ build ผ่าน
