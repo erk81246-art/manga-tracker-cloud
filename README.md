@@ -21,3 +21,9 @@
 
 ## fix2
 - แก้ DetailModal ให้รับ onCheckLatest/isGuest กลับมาเพื่อ build ผ่านและไม่เสียฟีเจอร์เช็กตอนล่าสุด
+
+
+## fix3
+- แก้ tab Collection/Tier List ให้ไม่เพี้ยนบนมือถือ
+- ลดขอบบน modal/detail sheet ให้สวยขึ้น
+- คืนปุ่มเช็กตอนล่าสุดในหน้ารายละเอียด
