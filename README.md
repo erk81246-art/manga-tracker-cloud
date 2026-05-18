@@ -9,3 +9,11 @@
 
 ใช้ Supabase database เดิมได้เลย
 ไม่ต้องรัน SQL ใหม่ ถ้าเคยเปิด guest read policy แล้ว
+
+
+## Premium UI update
+- Swipe down เพื่อปิดหน้ารายละเอียดบนมือถือ
+- Floating action button ใหม่
+- iPad/Desktop master-detail: กดรูปแล้วรายละเอียดอยู่ด้านขวา
+- Detail modal แบบ hero พร้อม background blur เบา ๆ
+- Guest เห็นเฉพาะ preview และต้อง login เพื่อใช้งานเต็ม
