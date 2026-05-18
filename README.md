@@ -29,3 +29,11 @@
 - ถ้า Guest ยังไม่เห็นข้อมูล ให้รัน policy public select ใน Supabase:
   drop policy if exists "Public can preview manga" on public.manga_items;
   create policy "Public can preview manga" on public.manga_items for select to anon using (true);
+
+
+## guest-viewonly
+- Guest Mode ดูได้อย่างเดียว
+- Guest ไม่เห็นตอนล่าสุด/อ่านถึง
+- Guest เปิดเว็บอ่านไม่ได้
+- Guest เช็กตอนล่าสุดไม่ได้
+- Guest แก้ไข/ลบ/จัด Tier ไม่ได้
