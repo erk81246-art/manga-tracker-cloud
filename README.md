@@ -27,3 +27,9 @@
 - แก้ tab Collection/Tier List ให้ไม่เพี้ยนบนมือถือ
 - ลดขอบบน modal/detail sheet ให้สวยขึ้น
 - คืนปุ่มเช็กตอนล่าสุดในหน้ารายละเอียด
+
+
+## tabs-check-latest-return
+- ก่อนและหลัง Login แสดงทั้ง Tier List และ Collection
+- สลับแท็บเป็น Tier List ด้านซ้าย / Collection ด้านขวา
+- คืนปุ่มเช็กตอนล่าสุดในหน้ารายละเอียด
