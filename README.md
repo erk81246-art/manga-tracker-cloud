@@ -1,16 +1,17 @@
-# Manga Tracker Phase 2 Profile
+# Manga Tracker Multi-site + iPad Landscape
 
-เพิ่มจาก Phase 1:
-- เอา "แหล่งอ่านหลัก" ออกจากหน้ารายละเอียดของแต่ละเรื่อง
-- เพิ่ม Profile Card หลัง Login
-- เพิ่ม nickname / avatar / theme
-- เพิ่ม Splash Loading Screen แบบ Manga ID Card
-- เพิ่ม Mini Stats ใน profile card: Collection / New / S Tier
-- เพิ่มหน้าแก้ไข Profile
-- ใช้ Supabase database เดิมได้ ข้อมูลมังงะเดิมไม่หาย
+เพิ่มจากเวอร์ชันเดิม:
+- เช็กตอนล่าสุดจาก Go-Manga ด้วย parser เดิม
+- รองรับเว็บอื่นด้วย generic parser เบื้องต้น
+- ถ้าเว็บอื่นดึงไม่ได้ แอพจะแจ้งว่าต้องทำ parser เฉพาะเว็บนั้น
+- ปรับหน้า Collection ให้รองรับ iPad แนวนอน / จอกว้าง
+- Collection แสดงจำนวนคอลัมน์มากขึ้นบน iPad และ desktop
+- Tier List แสดงรูปได้มากขึ้นในแนวนอน
+- Detail modal และ Edit modal กว้างขึ้นบน iPad
 
-ต้องรัน SQL เพิ่ม 1 ครั้ง:
-`supabase/phase2_profiles.sql`
+## วิธีอัปเดต
 
-Deploy:
 อัปโหลดไฟล์ทั้งหมดทับ repo เดิม แล้ว Vercel จะ redeploy
+
+ไม่ต้องรัน SQL ใหม่  
+ใช้ Supabase database เดิมได้เลย
