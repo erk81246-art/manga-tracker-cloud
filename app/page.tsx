@@ -1028,20 +1028,22 @@ export default function App() {
           )}
 
           {user && (
-            <div className="mb-3 flex items-center justify-between gap-2 md:mb-4">
-              <button onClick={() => setMenuOpen(true)} className="flex items-center gap-2 rounded-2xl bg-zinc-950 px-4 py-3 text-sm font-bold text-white shadow-sm">
-                <Menu size={18} /> เมนู
-              </button>
-              <p className="text-sm font-bold text-zinc-400">ทั้งหมด {stats.total} เรื่อง</p>
-            </div>
-            <div className={`desktop-topbar mb-4 gap-3 ${isWideLandscape ? "grid grid-cols-[1fr_220px]" : "hidden"} xl:grid xl:grid-cols-[1fr_240px]`}>
+            <>
+              <div className="mb-3 flex items-center justify-between gap-2 md:mb-4">
+                <button onClick={() => setMenuOpen(true)} className="flex items-center gap-2 rounded-2xl bg-zinc-950 px-4 py-3 text-sm font-bold text-white shadow-sm">
+                  <Menu size={18} /> เมนู
+                </button>
+                <p className="text-sm font-bold text-zinc-400">ทั้งหมด {stats.total} เรื่อง</p>
+              </div>
+              <div className={`desktop-topbar mb-4 gap-3 ${isWideLandscape ? "grid grid-cols-[1fr_220px]" : "hidden"} xl:grid xl:grid-cols-[1fr_240px]`}>
               <Card className="p-5">
                 <p className="text-sm font-bold text-zinc-400">Good evening,</p>
                 <h2 className="mt-1 text-2xl font-black text-zinc-950">{user.email?.split("@")[0] || "Reader"}</h2>
                 <p className="mt-1 text-sm text-zinc-500">ค้นหา จัดการ และเช็กตอนใหม่จากที่นี่</p>
               </Card>
               <SourceIconBar isGuest={!user} sources={readingSources} onAddSource={addReadingSource} onDeleteSource={deleteReadingSource} />
-            </div>
+              </div>
+            </>
           )}
 
           {syncing && <p className="mb-3 rounded-2xl bg-white p-3 text-center text-sm text-zinc-500">กำลัง sync ข้อมูล...</p>}
