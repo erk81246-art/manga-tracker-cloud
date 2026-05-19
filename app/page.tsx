@@ -11,6 +11,7 @@ import {
   Image as ImageIcon,
   Layers,
   LogOut,
+  Menu,
   Pencil,
   Plus,
   RefreshCw,
@@ -228,6 +229,77 @@ function SourceIconBar({
       </Card>
 
       <AnimatePresence>
+
+        {menuOpen && (
+          <motion.div
+            className="fixed inset-0 z-[70] bg-black/40"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setMenuOpen(false)}
+          >
+            <motion.aside
+              className="h-full w-[min(86vw,340px)] overflow-y-auto rounded-r-[2rem] bg-zinc-950 p-4 text-white shadow-2xl"
+              initial={{ x: -360 }}
+              animate={{ x: 0 }}
+              exit={{ x: -360 }}
+              transition={{ type: "spring", stiffness: 260, damping: 28 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="mb-5 flex items-start justify-between gap-3">
+                <div>
+                  <p className="flex items-center gap-1 text-xs font-semibold text-zinc-400">
+                    <Cloud size={14} /> {user ? "Sync" : "Manga"}
+                  </p>
+                  <h2 className="mt-1 text-3xl font-black leading-tight">Library</h2>
+                </div>
+                <button onClick={() => setMenuOpen(false)} className="rounded-2xl bg-white/10 p-3 text-white">
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div className="rounded-[1.5rem] bg-white/10 p-4">
+                <p className="text-xs text-zinc-400">ทั้งหมด</p>
+                <p className="text-4xl font-black">{stats.total}</p>
+                {user && <p className="mt-1 text-xs font-semibold text-zinc-400">Favorite {stats.favorites || 0}</p>}
+              </div>
+
+              <div className="mt-4 grid grid-cols-1 gap-2 rounded-[1.5rem] bg-white/10 p-1">
+                <button onClick={() => { setTab("collection"); setMenuOpen(false); }} className={`flex items-center justify-center gap-2 rounded-[1.2rem] px-3 py-3 text-sm font-bold ${tab === "collection" ? "bg-white text-zinc-950" : "text-zinc-400"}`}>
+                  <BookOpen size={16} /> Collection
+                </button>
+                <button onClick={() => { setTab("tier"); setMenuOpen(false); }} className={`flex items-center justify-center gap-2 rounded-[1.2rem] px-3 py-3 text-sm font-bold ${tab === "tier" ? "bg-white text-zinc-950" : "text-zinc-400"}`}>
+                  <Layers size={16} /> Tier
+                </button>
+              </div>
+
+              {tab === "collection" && (
+                <div className="mt-5 space-y-2">
+                  <p className="px-1 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">FILTER</p>
+                  {filters.map(([key, label]) => (
+                    <button key={key} onClick={() => { setFilter(key); setMenuOpen(false); }} className={`w-full rounded-[1.2rem] px-4 py-3 text-left text-sm font-bold ${filter === key ? "bg-white text-zinc-950" : "bg-white/10 text-zinc-300"}`}>
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              <div className="mt-5 space-y-2">
+                {user && (
+                  <button onClick={() => { openAdd(); setMenuOpen(false); }} className="flex w-full items-center justify-center gap-2 rounded-[1.2rem] bg-white px-4 py-3 font-bold text-zinc-950">
+                    <Plus size={18} /> เพิ่มมังงะ
+                  </button>
+                )}
+                {user && (
+                  <button onClick={logout} className="flex w-full items-center justify-center gap-2 rounded-[1.2rem] bg-white/10 px-4 py-3 font-bold text-white">
+                    <LogOut size={18} /> Logout
+                  </button>
+                )}
+              </div>
+            </motion.aside>
+          </motion.div>
+        )}
+
         {open && (
           <motion.div className="fixed inset-0 z-[60] flex items-end bg-black/40 p-3 md:items-center md:justify-center md:p-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
             <motion.div className="w-full rounded-[2rem] bg-white p-4 shadow-xl md:max-w-md" initial={{ y: 40 }} animate={{ y: 0 }} exit={{ y: 40 }}>
@@ -707,6 +779,7 @@ export default function App() {
   const [selectedItem, setSelectedItem] = useState<MangaItem | null>(null);
   const [syncing, setSyncing] = useState(false);
   const [sourcesOpen, setSourcesOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [isWideLandscape, setIsWideLandscape] = useState(false);
   const [readingSources, setReadingSources] = useState(defaultReadingSources);
 
@@ -944,18 +1017,8 @@ export default function App() {
 
   return (
     <main className="min-h-screen bg-zinc-100 text-zinc-950 xl:p-6">
-      <div className={`app-shell mx-auto grid gap-4 ${isWideLandscape ? "max-w-7xl grid-cols-[200px_1fr] px-0 pb-4 pt-0" : "max-w-md px-4 pb-28 pt-3 sm:max-w-xl md:max-w-3xl"} xl:max-w-7xl xl:grid-cols-[220px_1fr] xl:px-0 xl:pt-0`}>
-        <Sidebar
-          user={user}
-          stats={stats}
-          filter={filter}
-          setFilter={setFilter}
-          tab={tab}
-          setTab={setTab}
-          onAdd={openAdd}
-          onLogout={logout}
-          isWideLandscape={isWideLandscape}
-        />
+      <div className={`app-shell mx-auto grid max-w-md gap-4 px-4 pb-28 pt-3 sm:max-w-xl md:max-w-3xl ${isWideLandscape ? "max-w-7xl px-0 pb-4 pt-0" : ""} xl:max-w-7xl xl:px-0 xl:pt-0`}>
+        
 
         <section className="min-w-0">
           {!user && (
@@ -965,6 +1028,12 @@ export default function App() {
           )}
 
           {user && (
+            <div className="mb-3 flex items-center justify-between gap-2 md:mb-4">
+              <button onClick={() => setMenuOpen(true)} className="flex items-center gap-2 rounded-2xl bg-zinc-950 px-4 py-3 text-sm font-bold text-white shadow-sm">
+                <Menu size={18} /> เมนู
+              </button>
+              <p className="text-sm font-bold text-zinc-400">ทั้งหมด {stats.total} เรื่อง</p>
+            </div>
             <div className={`desktop-topbar mb-4 gap-3 ${isWideLandscape ? "grid grid-cols-[1fr_220px]" : "hidden"} xl:grid xl:grid-cols-[1fr_240px]`}>
               <Card className="p-5">
                 <p className="text-sm font-bold text-zinc-400">Good evening,</p>

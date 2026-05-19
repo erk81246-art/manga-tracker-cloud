@@ -1,10 +1,9 @@
-# Manga Tracker Sidebar Polish
+# Manga Tracker Drawer Menu
 
-ปรับให้ sidebar แนวนอนดูสมดุลขึ้น:
-- sidebar กว้างขึ้นเล็กน้อย
-- เปลี่ยนหัวข้อเป็น Library
-- ย่อ Sync ให้ไม่ตัดบรรทัด
-- ปรับ padding/card/button ให้เตี้ยและบาลานซ์ขึ้น
-- Filter buttons เรียบร้อยขึ้น
-- แนวตั้งไม่แตะ
+เปลี่ยนจาก sidebar ถาวรเป็น drawer:
+- หน้าหลักไม่มีแถบซ้ายถาวรแล้ว
+- มีปุ่ม "เมนู" กดแล้วแถบด้านข้างเลื่อนออกมา
+- พื้นที่มังงะเต็มจอขึ้นมาก
+- Drawer มีจำนวนทั้งหมด, Collection/Tier, Filter, เพิ่มมังงะ, Logout
+- แนวตั้งยังใช้ bottom bar ได้
 - ไม่ต้องรัน SQL ใหม่
