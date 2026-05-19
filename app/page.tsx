@@ -614,17 +614,18 @@ function Sidebar({
 }: {
   user: SupabaseUser | null;
   stats: { total: number; updated: number; reading: number; finished: number; paused: number; favorites?: number };
-  filter: "all" | "updated" | MangaStatus;
-  setFilter: (filter: "all" | "updated" | MangaStatus) => void;
+  filter: "all" | "updated" | "favorites" | MangaStatus;
+  setFilter: (filter: "all" | "updated" | "favorites" | MangaStatus) => void;
   tab: "collection" | "tier";
   setTab: (tab: "collection" | "tier") => void;
   onAdd: () => void;
   onLogout: () => void;
   isWideLandscape: boolean;
 }) {
-  const filters: Array<["all" | "updated" | MangaStatus, string]> = [
+  const filters: Array<["all" | "updated" | "favorites" | MangaStatus, string]> = [
     ["all", "ทั้งหมด"],
     ["updated", "มีตอนใหม่"],
+    ["favorites", "Favorite"],
     ["reading", "กำลังอ่าน"],
     ["waiting", "รอ"],
     ["finished", "จบแล้ว"],
@@ -632,14 +633,14 @@ function Sidebar({
   ];
 
   return (
-    <aside className={`app-sidebar rounded-[2rem] bg-zinc-950 p-3 text-white shadow-sm ${isWideLandscape ? "sticky top-4 block h-[calc(100vh-2rem)] overflow-y-auto" : "hidden"} xl:sticky xl:top-6 xl:block xl:h-[calc(100vh-3rem)] xl:overflow-y-auto`}>
+    <aside className={`app-sidebar rounded-[2rem] bg-zinc-950 p-3 text-white shadow-sm ${isWideLandscape ? "sticky top-4 block h-[calc(100vh-2rem)] w-[150px] overflow-y-auto" : "hidden"} xl:sticky xl:top-6 xl:block xl:h-[calc(100vh-3rem)] xl:w-[190px] xl:overflow-y-auto`}>
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="flex items-center gap-1 text-sm font-semibold text-zinc-400">
             <Cloud size={14} />
             {user ? "Cloud Sync เปิดอยู่" : "Manga Tracker"}
           </p>
-          <h1 className="mt-1 text-base font-black leading-tight">คลังมังงะ</h1>
+          <h1 className="mt-1 text-sm font-black leading-tight">คลังมังงะ</h1>
         </div>
         <div className="flex gap-2 xl:hidden">
           {user && (
@@ -653,7 +654,7 @@ function Sidebar({
         </div>
       </div>
 
-      <div className="mt-4 rounded-3xl bg-white/10 p-3">
+      <div className="mt-4 rounded-2xl bg-white/10 p-3">
         <p className="text-xs text-zinc-400">ทั้งหมด</p>
         <p className="text-2xl font-black">{stats.total}</p>
       </div>
@@ -698,7 +699,7 @@ export default function App() {
   const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [query, setQuery] = useState("");
-  const [filter, setFilter] = useState<"all" | "updated" | MangaStatus>("all");
+  const [filter, setFilter] = useState<"all" | "updated" | "favorites" | MangaStatus>("all");
   const [tab, setTab] = useState<"collection" | "tier">("tier");
   const [form, setForm] = useState<Omit<MangaItem, "id" | "user_id">>(emptyForm);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -811,10 +812,10 @@ export default function App() {
       items.filter((item) => {
         const matchesQuery = item.title.toLowerCase().includes(query.toLowerCase());
         const hasUpdate = chapterNumber(item.latest_chapter) > chapterNumber(item.read_chapter);
-        const matchesFilter = filter === "all" || (filter === "updated" && hasUpdate) || item.status === filter;
+        const matchesFilter = filter === "all" || (filter === "updated" && hasUpdate) || (filter === "favorites" && favoriteIds.includes(item.id)) || item.status === filter;
         return matchesQuery && matchesFilter;
       }),
-    [items, query, filter]
+    [items, query, filter, favoriteIds]
   );
 
   const stats = useMemo(
@@ -931,9 +932,10 @@ export default function App() {
     setSelectedItem(null);
   }
 
-  const filters: Array<["all" | "updated" | MangaStatus, string]> = [
+  const filters: Array<["all" | "updated" | "favorites" | MangaStatus, string]> = [
     ["all", "ทั้งหมด"],
     ["updated", "มีตอนใหม่"],
+    ["favorites", "Favorite"],
     ["reading", "กำลังอ่าน"],
     ["waiting", "รอ"],
     ["finished", "จบแล้ว"],
@@ -942,7 +944,7 @@ export default function App() {
 
   return (
     <main className="min-h-screen bg-zinc-100 text-zinc-950 xl:p-6">
-      <div className={`app-shell mx-auto grid gap-4 ${isWideLandscape ? "max-w-7xl grid-cols-[170px_1fr] px-0 pb-4 pt-0" : "max-w-md px-4 pb-28 pt-3"} xl:max-w-7xl xl:grid-cols-[170px_1fr] xl:px-0 xl:pt-0`}>
+      <div className={`app-shell mx-auto grid gap-4 ${isWideLandscape ? "max-w-7xl grid-cols-[150px_1fr] px-0 pb-4 pt-0" : "max-w-md px-4 pb-28 pt-3"} xl:max-w-7xl xl:grid-cols-[190px_1fr] xl:px-0 xl:pt-0`}>
         <Sidebar
           user={user}
           stats={stats}
