@@ -576,7 +576,7 @@ function Sidebar({
   ];
 
   return (
-    <aside className="hidden rounded-[2rem] bg-zinc-950 p-3 text-white shadow-sm xl:block xl:sticky xl:top-6 xl:h-[calc(100vh-3rem)] xl:overflow-y-auto">
+    <aside className={`app-sidebar rounded-[2rem] bg-zinc-950 p-3 text-white shadow-sm ${isWideLandscape ? "sticky top-4 block h-[calc(100vh-2rem)] overflow-y-auto" : "hidden"} xl:sticky xl:top-6 xl:block xl:h-[calc(100vh-3rem)] xl:overflow-y-auto`}>
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="flex items-center gap-1 text-sm font-semibold text-zinc-400">
@@ -649,6 +649,7 @@ export default function App() {
   const [selectedItem, setSelectedItem] = useState<MangaItem | null>(null);
   const [syncing, setSyncing] = useState(false);
   const [sourcesOpen, setSourcesOpen] = useState(false);
+  const [isWideLandscape, setIsWideLandscape] = useState(false);
 
   useEffect(() => {
     if (!supabase) {
@@ -669,6 +670,23 @@ export default function App() {
     if (user) setTab("collection");
     else setTab("tier");
   }, [user]);
+
+
+  useEffect(() => {
+    function updateLayoutMode() {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      setIsWideLandscape(width >= 900 && width > height);
+    }
+
+    updateLayoutMode();
+    window.addEventListener("resize", updateLayoutMode);
+    window.addEventListener("orientationchange", updateLayoutMode);
+    return () => {
+      window.removeEventListener("resize", updateLayoutMode);
+      window.removeEventListener("orientationchange", updateLayoutMode);
+    };
+  }, []);
 
   useEffect(() => {
     async function loadCloud() {
@@ -807,7 +825,7 @@ export default function App() {
 
   return (
     <main className="min-h-screen bg-zinc-100 text-zinc-950 xl:p-6">
-      <div className="mx-auto grid max-w-md gap-4 px-4 pb-28 pt-3 xl:max-w-7xl xl:grid-cols-[170px_1fr] xl:px-0 xl:pt-0">
+      <div className={`app-shell mx-auto grid gap-4 ${isWideLandscape ? "max-w-7xl grid-cols-[170px_1fr] px-0 pb-4 pt-0" : "max-w-md px-4 pb-28 pt-3"} xl:max-w-7xl xl:grid-cols-[170px_1fr] xl:px-0 xl:pt-0`}>
         <Sidebar
           user={user}
           stats={stats}
@@ -827,7 +845,7 @@ export default function App() {
           )}
 
           {user && (
-            <div className="mb-4 hidden gap-3 xl:grid xl:grid-cols-[1fr_210px] lg:grid-cols-[1fr_240px]">
+            <div className={`desktop-topbar mb-4 gap-3 ${isWideLandscape ? "grid grid-cols-[1fr_220px]" : "hidden"} xl:grid xl:grid-cols-[1fr_240px]`}>
               <Card className="p-5">
                 <p className="text-sm font-bold text-zinc-400">Good evening,</p>
                 <h2 className="mt-1 text-xl font-black text-zinc-950">{user.email?.split("@")[0] || "Reader"}</h2>
@@ -839,7 +857,7 @@ export default function App() {
 
           {syncing && <p className="mb-3 rounded-2xl bg-white p-3 text-center text-sm text-zinc-500">กำลัง sync ข้อมูล...</p>}
 
-          <div className="sticky top-0 z-20 -mx-4 bg-zinc-100/90 px-4 py-3 backdrop-blur xl:top-6 xl:mx-0 xl:rounded-[2rem] xl:bg-white xl:px-3 xl:shadow-sm">
+          <div className={`app-sticky-bar sticky z-20 bg-zinc-100/90 px-4 py-3 backdrop-blur ${isWideLandscape ? "top-4 mx-0 rounded-[2rem] bg-white px-3 shadow-sm" : "top-0 -mx-4"} xl:top-6 xl:mx-0 xl:rounded-[2rem] xl:bg-white xl:px-3 xl:shadow-sm`}>
             <div className="hidden rounded-3xl bg-white p-1 shadow-sm">
               <button onClick={() => user && setTab("collection")} disabled={!user} className={`flex flex-1 items-center justify-center gap-2 rounded-2xl px-2 py-2 text-xs font-bold ${tab === "collection" ? "bg-zinc-950 text-white" : "text-zinc-500"}`}>
                 <BookOpen size={16} /> Collection
@@ -910,7 +928,7 @@ export default function App() {
         </section>
       </div>
 
-      <div className="fixed bottom-4 left-1/2 z-30 flex w-[calc(100%-2rem)] max-w-md -translate-x-1/2 items-center justify-between gap-2 rounded-[2rem] bg-zinc-950 p-2 text-white shadow-xl xl:hidden">
+      <div className={`mobile-bottom-nav fixed bottom-4 left-1/2 z-30 w-[calc(100%-2rem)] max-w-md -translate-x-1/2 items-center justify-between gap-2 rounded-[2rem] bg-zinc-950 p-2 text-white shadow-xl ${isWideLandscape ? "hidden" : "flex"} xl:hidden`}>
         <button onClick={() => setTab("collection")} className={`flex flex-1 flex-col items-center justify-center rounded-3xl px-2 py-2 text-[11px] font-bold ${tab === "collection" ? "bg-white text-zinc-950" : "text-zinc-400"}`}>
           <BookOpen size={18} />
           Collection
