@@ -1,12 +1,14 @@
-# Manga Tracker Dashboard Layout Safe
+# Manga Tracker Responsive Sources
 
-เวอร์ชันแก้ build:
-- ปรับ layout เป็น dashboard บน iPad/Desktop
-- Header สีดำกลายเป็น sidebar ซ้ายบนจอกว้าง
-- Main area มี greeting + source bar + search + grid
-- เอาแหล่งอ่านหลักกลับมาเฉพาะหน้า main
+เวอร์ชันแก้ build แบบปลอดภัย:
+- ใช้โค้ดฐานจากเวอร์ชันที่ build ผ่าน
+- เพิ่มแหล่งอ่านหลักในหน้า main
 - ไม่ใส่แหล่งอ่านหลักในหน้ารายละเอียด
+- มือถือ/แนวตั้งยังเรียงลงล่างเหมือนเดิม
+- iPad/จอกว้างขยายพื้นที่และวาง greeting + source bar แบบ 2 คอลัมน์
 - ไม่ต้องรัน SQL ใหม่
-- ใช้ Supabase เดิม ข้อมูลเดิมไม่หาย
+- ข้อมูลเดิมไม่หาย
 
-อัปโหลดไฟล์ทั้งหมดทับ repo เดิม แล้ว Vercel จะ redeploy
+หมายเหตุ:
+เวอร์ชันนี้ยังไม่ทำ sidebar dashboard เต็มแบบภาพร่าง เพื่อเลี่ยง JSX พัง
+ถ้าจะทำ sidebar เต็ม ควร rewrite App return ใหม่ทั้งก้อนในรอบถัดไป
