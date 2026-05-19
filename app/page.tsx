@@ -7,6 +7,7 @@ import {
   BookOpen,
   Cloud,
   ExternalLink,
+  Heart,
   Image as ImageIcon,
   Layers,
   LogOut,
@@ -38,6 +39,12 @@ type MangaItem = {
   tier: MangaTier;
   note: string;
   user_id?: string;
+};
+
+type UserFavorite = {
+  user_id: string;
+  manga_id: string;
+  created_at?: string;
 };
 
 const STORAGE_KEY = "manga-tracker-items-v2";
@@ -284,10 +291,12 @@ function MangaTile({
   item,
   onOpen,
   small = false,
+  isFavorite = false,
 }: {
   item: MangaItem;
   onOpen: (item: MangaItem) => void;
   small?: boolean;
+  isFavorite?: boolean;
 }) {
   const hasUpdate = chapterNumber(item.latest_chapter) > chapterNumber(item.read_chapter);
 
@@ -310,7 +319,7 @@ function MangaTile({
         )}
 
         {hasUpdate && <div className="absolute right-1.5 top-1.5 rounded-full bg-rose-500 px-1.5 py-0.5 text-[10px] font-black text-white">NEW</div>}
-        <div className="absolute left-1.5 top-1.5 rounded-full bg-black/70 px-2 py-0.5 text-[10px] font-black text-white">{item.tier}</div>
+        <div className="absolute left-1.5 top-1.5 rounded-full bg-black/70 px-2 py-0.5 text-[10px] font-black text-white">{item.tier}</div>{isFavorite && <div className="absolute bottom-1.5 right-1.5 rounded-full bg-rose-500 p-1 text-white"><Heart size={12} fill="currentColor" /></div>}
       </div>
       <p className="mt-1.5 line-clamp-2 text-xs font-bold leading-tight text-zinc-800">{item.title || "ไม่มีชื่อเรื่อง"}</p>
     </motion.button>
@@ -325,6 +334,8 @@ function DetailModal({
   onTierChange,
   onCheckLatest,
   isGuest = false,
+  isFavorite = false,
+  onToggleFavorite,
 }: {
   item: MangaItem;
   onClose: () => void;
@@ -333,6 +344,8 @@ function DetailModal({
   onTierChange: (id: string, tier: MangaTier) => void;
   onCheckLatest: (item: MangaItem) => Promise<void>;
   isGuest?: boolean;
+  isFavorite?: boolean;
+  onToggleFavorite?: (item: MangaItem) => void;
 }) {
   const [checking, setChecking] = useState(false);
   const [message, setMessage] = useState("");
@@ -375,7 +388,18 @@ function DetailModal({
           <div className="min-w-0 flex-1">
             <div className="flex items-start justify-between gap-2">
               <h1 className="text-2xl font-black leading-tight text-zinc-950">{item.title || "ไม่มีชื่อเรื่อง"}</h1>
-              <span className="rounded-full bg-zinc-950 px-3 py-1 text-sm font-black text-white">{item.tier}</span>
+              <div className="flex shrink-0 items-center gap-2">
+                {!isGuest && (
+                  <button
+                    onClick={() => onToggleFavorite?.(item)}
+                    className={`rounded-full p-2 ${isFavorite ? "bg-rose-100 text-rose-600" : "bg-zinc-100 text-zinc-500"}`}
+                    title={isFavorite ? "เลิก Favorite" : "Favorite"}
+                  >
+                    <Heart size={18} fill={isFavorite ? "currentColor" : "none"} />
+                  </button>
+                )}
+                <span className="rounded-full bg-zinc-950 px-3 py-1 text-sm font-black text-white">{item.tier}</span>
+              </div>
             </div>
 
             <div className="mt-3 flex flex-wrap gap-2">
@@ -589,7 +613,7 @@ function Sidebar({
   isWideLandscape,
 }: {
   user: SupabaseUser | null;
-  stats: { total: number; updated: number; reading: number; finished: number; paused: number };
+  stats: { total: number; updated: number; reading: number; finished: number; paused: number; favorites?: number };
   filter: "all" | "updated" | MangaStatus;
   setFilter: (filter: "all" | "updated" | MangaStatus) => void;
   tab: "collection" | "tier";
@@ -671,6 +695,7 @@ function Sidebar({
 export default function App() {
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [items, setItems] = useState<MangaItem[]>([]);
+  const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<"all" | "updated" | MangaStatus>("all");
@@ -757,6 +782,19 @@ export default function App() {
     loadCloud();
   }, [user]);
 
+
+  useEffect(() => {
+    async function loadFavorites() {
+      if (!supabase || !user) {
+        setFavoriteIds([]);
+        return;
+      }
+      const { data, error } = await supabase.from("user_favorites").select("manga_id");
+      if (!error && data) setFavoriteIds(data.map((row: any) => row.manga_id));
+    }
+    loadFavorites();
+  }, [user]);
+
   useEffect(() => {
     if (!supabase && loaded) localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
   }, [items, loaded]);
@@ -786,8 +824,9 @@ export default function App() {
       reading: items.filter((item) => item.status === "reading").length,
       finished: items.filter((item) => item.status === "finished").length,
       paused: items.filter((item) => item.status === "paused").length,
+      favorites: favoriteIds.length,
     }),
-    [items]
+    [items, favoriteIds]
   );
 
   const openAdd = () => {
@@ -842,6 +881,26 @@ export default function App() {
   async function changeTier(id: string, tier: MangaTier) {
     setItems((prev) => prev.map((item) => (item.id === id ? { ...item, tier } : item)));
     if (supabase && user) await supabase.from("manga_items").update({ tier }).eq("id", id);
+  }
+
+
+  async function toggleFavorite(item: MangaItem) {
+    if (!supabase || !user) {
+      alert("ต้อง Login ก่อนถึงจะ Favorite ได้");
+      return;
+    }
+
+    const isFavorite = favoriteIds.includes(item.id);
+
+    if (isFavorite) {
+      const { error } = await supabase.from("user_favorites").delete().eq("manga_id", item.id);
+      if (error) return alert(error.message);
+      setFavoriteIds((prev) => prev.filter((id) => id !== item.id));
+    } else {
+      const { error } = await supabase.from("user_favorites").insert({ user_id: user.id, manga_id: item.id });
+      if (error) return alert(error.message);
+      setFavoriteIds((prev) => [...prev, item.id]);
+    }
   }
 
   async function checkLatest(item: MangaItem) {
@@ -947,7 +1006,7 @@ export default function App() {
               <div className="mt-4 grid grid-cols-3 gap-x-3 gap-y-5 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-7 xl:grid-cols-6 2xl:grid-cols-7">
                 <AnimatePresence>
                   {filtered.map((item) => (
-                    <MangaTile key={item.id} item={item} onOpen={setSelectedItem} />
+                    <MangaTile key={item.id} item={item} onOpen={setSelectedItem} isFavorite={favoriteIds.includes(item.id)} />
                   ))}
                 </AnimatePresence>
               </div>
@@ -975,7 +1034,7 @@ export default function App() {
                     </div>
                     <div className="grid grid-cols-4 gap-2 sm:grid-cols-5 md:grid-cols-6 md:grid-cols-7 lg:grid-cols-8 xl:grid-cols-10">
                       {tierItems.map((item) => (
-                        <MangaTile key={item.id} item={item} onOpen={setSelectedItem} small />
+                        <MangaTile key={item.id} item={item} onOpen={setSelectedItem} small isFavorite={favoriteIds.includes(item.id)} />
                       ))}
                       {tierItems.length === 0 && <p className="col-span-4 text-sm text-zinc-400">ยังไม่มีเรื่องใน Tier นี้</p>}
                     </div>
@@ -1001,10 +1060,16 @@ export default function App() {
           เว็บอ่าน
         </button>
         {user && (
-          <button onClick={openAdd} className="flex flex-1 flex-col items-center justify-center rounded-3xl bg-white px-2 py-2 text-[11px] font-black text-zinc-950">
-            <Plus size={20} />
-            เพิ่ม
-          </button>
+          <>
+            <button onClick={openAdd} className="flex flex-1 flex-col items-center justify-center rounded-3xl bg-white px-2 py-2 text-[11px] font-black text-zinc-950">
+              <Plus size={20} />
+              เพิ่ม
+            </button>
+            <button onClick={logout} className="flex flex-1 flex-col items-center justify-center rounded-3xl px-2 py-2 text-[11px] font-bold text-zinc-400">
+              <LogOut size={18} />
+              Logout
+            </button>
+          </>
         )}
       </div>
 
@@ -1071,6 +1136,8 @@ export default function App() {
             onTierChange={changeTier}
             onCheckLatest={checkLatest}
             isGuest={!user}
+            isFavorite={selectedItem ? favoriteIds.includes(selectedItem.id) : false}
+            onToggleFavorite={toggleFavorite}
           />
         )}
         {openForm && (

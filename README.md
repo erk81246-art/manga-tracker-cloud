@@ -1,12 +1,13 @@
-# Manga Tracker Custom Sources
+# Manga Tracker Follow System
 
 เพิ่ม:
-- เพิ่มเว็บอ่านหลักเองได้จากปุ่มแหล่งอ่านหลัก
-- ลบเว็บอ่านได้
-- เก็บรายการเว็บใน localStorage ของเครื่อง
-- ไม่ต้องรัน SQL ใหม่
-- ไม่กระทบข้อมูลมังงะเดิม
+- ทุก account ที่ login เห็น manga_items ทั้งหมดร่วมกัน
+- ปุ่ม Favorite/Follow ในหน้ารายละเอียดแต่ละเรื่อง
+- Favorite แยกตามบัญชี ไม่เหมือนกัน
+- แสดง badge หัวใจบนปกเรื่องที่ favorite
+- เพิ่มปุ่ม Logout ใน bottom bar แนวตั้ง
+- ต้องรัน SQL เพิ่ม 1 ครั้ง: `supabase/follow_system.sql`
 
 หมายเหตุ:
-เว็บที่เพิ่มจะ sync เฉพาะเครื่อง/เบราว์เซอร์นั้นก่อน
-ถ้าจะให้ sync ทุกอุปกรณ์ ค่อยเพิ่ม Supabase table ในรอบถัดไป
+ตอนนี้ Favorite sync ผ่าน Supabase แล้ว
+ส่วนเว็บอ่านหลักที่เพิ่มเองยังเก็บใน localStorage ของเครื่อง
