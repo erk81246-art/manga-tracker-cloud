@@ -1,12 +1,12 @@
-# Manga Tracker iPad Dashboard
+# Manga Tracker Portrait Bottom Nav Fix
 
-แก้ให้ iPad เข้าโหมด dashboard:
-- iPad แนวตั้ง/แนวนอนใช้ sidebar ซ้าย + content ขวา
-- Sidebar ลดขนาดลงมาก เหลือ compact
-- แสดงจำนวนเรื่องทั้งหมดเท่านั้น
-- Main area กว้างขึ้นและ grid แน่นขึ้น
-- แหล่งอ่านหลักยังเป็นปุ่มเดียวเปิด modal
-- Guest เห็น Tier List ได้
+แก้ breakpoint:
+- iPad แนวตั้งจะใช้ layout แบบ bottom bar แล้ว
+- dashboard/sidebar จะใช้เฉพาะจอกว้างระดับ xl เช่น iPad แนวนอน/desktop
+- ซ่อนกล่องใหญ่ด้านบนในแนวตั้ง
+- bottom bar มี Collection / Tier / เว็บอ่าน / เพิ่ม
 - ไม่ต้องรัน SQL ใหม่
+- ข้อมูลเดิมไม่หาย
 
-อัปโหลดทับ repo เดิมแล้ว deploy ได้เลย
+สำคัญ:
+หลังอัปโหลดทับ GitHub แล้วต้องรอ Vercel deploy ใหม่ และ refresh แบบล้าง cache บน iPad

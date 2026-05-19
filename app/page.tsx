@@ -576,7 +576,7 @@ function Sidebar({
   ];
 
   return (
-    <aside className="rounded-[2rem] bg-zinc-950 p-3 text-white shadow-sm md:sticky md:top-4 md:h-[calc(100vh-2rem)] md:overflow-y-auto">
+    <aside className="hidden rounded-[2rem] bg-zinc-950 p-3 text-white shadow-sm xl:block xl:sticky xl:top-6 xl:h-[calc(100vh-3rem)] xl:overflow-y-auto">
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="flex items-center gap-1 text-sm font-semibold text-zinc-400">
@@ -585,7 +585,7 @@ function Sidebar({
           </p>
           <h1 className="mt-1 text-base font-black leading-tight">คลังมังงะ</h1>
         </div>
-        <div className="flex gap-2 md:hidden">
+        <div className="flex gap-2 xl:hidden">
           {user && (
             <button onClick={onLogout} className="rounded-2xl bg-white/10 p-3 text-white">
               <LogOut size={20} />
@@ -648,6 +648,7 @@ export default function App() {
   const [openForm, setOpenForm] = useState(false);
   const [selectedItem, setSelectedItem] = useState<MangaItem | null>(null);
   const [syncing, setSyncing] = useState(false);
+  const [sourcesOpen, setSourcesOpen] = useState(false);
 
   useEffect(() => {
     if (!supabase) {
@@ -805,8 +806,8 @@ export default function App() {
   ];
 
   return (
-    <main className="min-h-screen bg-zinc-100 text-zinc-950 md:p-4">
-      <div className="mx-auto grid max-w-md gap-4 px-4 pb-24 pt-5 md:max-w-7xl md:grid-cols-[150px_1fr] lg:grid-cols-[170px_1fr] md:px-0 md:pt-0">
+    <main className="min-h-screen bg-zinc-100 text-zinc-950 xl:p-6">
+      <div className="mx-auto grid max-w-md gap-4 px-4 pb-28 pt-3 xl:max-w-7xl xl:grid-cols-[170px_1fr] xl:px-0 xl:pt-0">
         <Sidebar
           user={user}
           stats={stats}
@@ -826,7 +827,7 @@ export default function App() {
           )}
 
           {user && (
-            <div className="mb-4 grid gap-3 md:grid-cols-[1fr_210px] lg:grid-cols-[1fr_240px]">
+            <div className="mb-4 hidden gap-3 xl:grid xl:grid-cols-[1fr_210px] lg:grid-cols-[1fr_240px]">
               <Card className="p-5">
                 <p className="text-sm font-bold text-zinc-400">Good evening,</p>
                 <h2 className="mt-1 text-xl font-black text-zinc-950">{user.email?.split("@")[0] || "Reader"}</h2>
@@ -838,8 +839,8 @@ export default function App() {
 
           {syncing && <p className="mb-3 rounded-2xl bg-white p-3 text-center text-sm text-zinc-500">กำลัง sync ข้อมูล...</p>}
 
-          <div className="sticky top-0 z-20 -mx-4 bg-zinc-100/90 px-4 py-3 backdrop-blur md:top-4 md:mx-0 md:rounded-[2rem] md:bg-white md:px-3 md:shadow-sm">
-            <div className="flex rounded-3xl bg-white p-1 shadow-sm md:hidden">
+          <div className="sticky top-0 z-20 -mx-4 bg-zinc-100/90 px-4 py-3 backdrop-blur xl:top-6 xl:mx-0 xl:rounded-[2rem] xl:bg-white xl:px-3 xl:shadow-sm">
+            <div className="hidden rounded-3xl bg-white p-1 shadow-sm">
               <button onClick={() => user && setTab("collection")} disabled={!user} className={`flex flex-1 items-center justify-center gap-2 rounded-2xl px-2 py-2 text-xs font-bold ${tab === "collection" ? "bg-zinc-950 text-white" : "text-zinc-500"}`}>
                 <BookOpen size={16} /> Collection
               </button>
@@ -849,7 +850,7 @@ export default function App() {
             </div>
 
             {tab === "collection" && (
-              <div className="mt-3 flex items-center gap-2 rounded-3xl bg-white px-4 py-3 shadow-sm md:mt-0 md:bg-zinc-50 md:shadow-none">
+              <div className="mt-3 flex items-center gap-2 rounded-3xl bg-white px-4 py-3 shadow-sm xl:mt-0 xl:bg-zinc-50 xl:shadow-none">
                 <Search size={18} className="text-zinc-400" />
                 <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="ค้นหาชื่อมังงะ..." className="w-full bg-transparent text-sm outline-none" />
               </div>
@@ -858,7 +859,7 @@ export default function App() {
 
           {tab === "collection" ? (
             <>
-              <div className="mb-4 mt-4 flex gap-2 overflow-x-auto pb-1 md:hidden">
+              <div className="mb-4 mt-4 flex gap-2 overflow-x-auto pb-1 xl:hidden">
                 {filters.map(([key, label]) => (
                   <button key={key} onClick={() => setFilter(key)} className={`shrink-0 rounded-full px-4 py-2 text-sm font-bold ${filter === key ? "bg-zinc-950 text-white" : "bg-white text-zinc-500"}`}>
                     {label}
@@ -909,11 +910,81 @@ export default function App() {
         </section>
       </div>
 
-      {user&&<button onClick={openAdd} className="fixed bottom-5 left-1/2 z-30 flex -translate-x-1/2 items-center gap-2 rounded-full bg-zinc-950 px-6 py-4 font-bold text-white shadow-xl md:hidden">
-        <Plus size={20} /> เพิ่มมังงะ
-      </button>}
+      <div className="fixed bottom-4 left-1/2 z-30 flex w-[calc(100%-2rem)] max-w-md -translate-x-1/2 items-center justify-between gap-2 rounded-[2rem] bg-zinc-950 p-2 text-white shadow-xl xl:hidden">
+        <button onClick={() => setTab("collection")} className={`flex flex-1 flex-col items-center justify-center rounded-3xl px-2 py-2 text-[11px] font-bold ${tab === "collection" ? "bg-white text-zinc-950" : "text-zinc-400"}`}>
+          <BookOpen size={18} />
+          Collection
+        </button>
+        <button onClick={() => setTab("tier")} className={`flex flex-1 flex-col items-center justify-center rounded-3xl px-2 py-2 text-[11px] font-bold ${tab === "tier" ? "bg-white text-zinc-950" : "text-zinc-400"}`}>
+          <Layers size={18} />
+          Tier
+        </button>
+        <button onClick={() => setSourcesOpen(true)} className="flex flex-1 flex-col items-center justify-center rounded-3xl px-2 py-2 text-[11px] font-bold text-zinc-400">
+          <ExternalLink size={18} />
+          เว็บอ่าน
+        </button>
+        {user && (
+          <button onClick={openAdd} className="flex flex-1 flex-col items-center justify-center rounded-3xl bg-white px-2 py-2 text-[11px] font-black text-zinc-950">
+            <Plus size={20} />
+            เพิ่ม
+          </button>
+        )}
+      </div>
 
       <AnimatePresence>
+
+        {sourcesOpen && (
+          <motion.div
+            className="fixed inset-0 z-[60] flex items-end bg-black/40 p-3 md:items-center md:justify-center md:p-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="w-full rounded-[2rem] bg-white p-4 shadow-xl md:max-w-md"
+              initial={{ y: 40 }}
+              animate={{ y: 0 }}
+              exit={{ y: 40 }}
+            >
+              <div className="mb-4 flex items-center justify-between">
+                <div>
+                  <h2 className="text-xl font-black">แหล่งอ่านหลัก</h2>
+                  <p className="text-sm text-zinc-500">{!user ? "Login ก่อนถึงจะเปิดเว็บอ่านได้" : "เลือกเว็บที่ต้องการเปิด"}</p>
+                </div>
+                <button onClick={() => setSourcesOpen(false)} className="rounded-full bg-zinc-100 p-2 text-zinc-600">
+                  <X size={20} />
+                </button>
+              </div>
+              <div className="space-y-2">
+                {readingSources.map((src) => (
+                  <a
+                    key={src.name}
+                    href={src.url}
+                    onClick={(e) => {
+                      if (!user) {
+                        e.preventDefault();
+                        alert("Login ก่อนถึงจะเปิดเว็บอ่านได้");
+                      }
+                    }}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center gap-3 rounded-3xl bg-zinc-950 p-3 text-white active:scale-[0.99]"
+                  >
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white text-xs font-black text-zinc-950">
+                      {src.short}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-black">{src.name}</p>
+                      <p className="truncate text-xs text-white/60">{src.url}</p>
+                    </div>
+                    <ExternalLink size={18} className="text-white/70" />
+                  </a>
+                ))}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+
         {selectedItem && (
           <DetailModal
             item={selectedItem}
