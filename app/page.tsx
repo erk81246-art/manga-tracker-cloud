@@ -556,6 +556,7 @@ function Sidebar({
   setTab,
   onAdd,
   onLogout,
+  isWideLandscape,
 }: {
   user: SupabaseUser | null;
   stats: { total: number; updated: number; reading: number; finished: number; paused: number };
@@ -565,6 +566,7 @@ function Sidebar({
   setTab: (tab: "collection" | "tier") => void;
   onAdd: () => void;
   onLogout: () => void;
+  isWideLandscape: boolean;
 }) {
   const filters: Array<["all" | "updated" | MangaStatus, string]> = [
     ["all", "ทั้งหมด"],
@@ -835,6 +837,7 @@ export default function App() {
           setTab={setTab}
           onAdd={openAdd}
           onLogout={logout}
+          isWideLandscape={isWideLandscape}
         />
 
         <section className="min-w-0">
