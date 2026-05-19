@@ -169,7 +169,10 @@ function AuthBox() {
   );
 }
 
+
 function SourceIconBar({ isGuest = false }: { isGuest?: boolean }) {
+  const [open, setOpen] = useState(false);
+
   function guard(e: React.MouseEvent<HTMLAnchorElement>) {
     if (isGuest) {
       e.preventDefault();
@@ -178,29 +181,72 @@ function SourceIconBar({ isGuest = false }: { isGuest?: boolean }) {
   }
 
   return (
-    <Card className="p-3">
-      <div className="mb-2 flex items-center justify-between px-1">
-        <p className="text-sm font-black text-zinc-800">แหล่งอ่านหลัก</p>
-        <p className="text-xs font-semibold text-zinc-400">{isGuest ? "Login เพื่อเปิดเว็บ" : "เปิดหน้าเว็บหลัก"}</p>
-      </div>
-      <div className="flex gap-2 overflow-x-auto pb-1">
-        {readingSources.map((src) => (
-          <a
-            key={src.name}
-            href={src.url}
-            onClick={guard}
-            target="_blank"
-            rel="noreferrer"
-            className="min-w-[96px] rounded-2xl bg-zinc-950 px-3 py-3 text-center text-white active:scale-95"
+    <>
+      <Card className="p-4">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <p className="text-sm font-black text-zinc-800">แหล่งอ่านหลัก</p>
+            <p className="text-xs font-semibold text-zinc-400">Go / Slow / Dark</p>
+          </div>
+          <button
+            onClick={() => setOpen(true)}
+            className="rounded-2xl bg-zinc-950 px-4 py-3 text-sm font-bold text-white active:scale-95"
           >
-            <div className="mx-auto mb-1 flex h-9 w-9 items-center justify-center rounded-xl bg-white text-xs font-black text-zinc-950">
-              {src.short}
-            </div>
-            <p className="truncate text-[11px] font-bold">{src.name}</p>
-          </a>
-        ))}
-      </div>
-    </Card>
+            เปิดรายการ
+          </button>
+        </div>
+      </Card>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            className="fixed inset-0 z-[60] flex items-end bg-black/40 p-3 md:items-center md:justify-center md:p-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="w-full rounded-[2rem] bg-white p-4 shadow-xl md:max-w-md"
+              initial={{ y: 40 }}
+              animate={{ y: 0 }}
+              exit={{ y: 40 }}
+            >
+              <div className="mb-4 flex items-center justify-between">
+                <div>
+                  <h2 className="text-xl font-black">แหล่งอ่านหลัก</h2>
+                  <p className="text-sm text-zinc-500">{isGuest ? "Login ก่อนถึงจะเปิดเว็บอ่านได้" : "เลือกเว็บที่ต้องการเปิด"}</p>
+                </div>
+                <button onClick={() => setOpen(false)} className="rounded-full bg-zinc-100 p-2 text-zinc-600">
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div className="space-y-2">
+                {readingSources.map((src) => (
+                  <a
+                    key={src.name}
+                    href={src.url}
+                    onClick={guard}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center gap-3 rounded-3xl bg-zinc-950 p-3 text-white active:scale-[0.99]"
+                  >
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white text-xs font-black text-zinc-950">
+                      {src.short}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-black">{src.name}</p>
+                      <p className="truncate text-xs text-white/60">{src.url}</p>
+                    </div>
+                    <ExternalLink size={18} className="text-white/70" />
+                  </a>
+                ))}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 }
 
@@ -248,6 +294,7 @@ function DetailModal({
   onDelete,
   onTierChange,
   onCheckLatest,
+  isGuest = false,
 }: {
   item: MangaItem;
   onClose: () => void;
@@ -255,6 +302,7 @@ function DetailModal({
   onDelete: (id: string) => void;
   onTierChange: (id: string, tier: MangaTier) => void;
   onCheckLatest: (item: MangaItem) => Promise<void>;
+  isGuest?: boolean;
 }) {
   const [checking, setChecking] = useState(false);
   const [message, setMessage] = useState("");
@@ -327,11 +375,11 @@ function DetailModal({
         <div className="mt-4 rounded-3xl bg-zinc-50 p-4">
           <button
             onClick={handleCheckLatest}
-            disabled={checking || !item.source_url}
+            disabled={checking || !item.source_url || isGuest}
             className="flex w-full items-center justify-center gap-2 rounded-2xl bg-zinc-950 px-4 py-3 text-sm font-bold text-white disabled:opacity-50"
           >
             <RefreshCw size={16} className={checking ? "animate-spin" : ""} />
-            {checking ? "กำลังเช็ก..." : "เช็กตอนล่าสุดจากเว็บ"}
+            {isGuest ? "Login เพื่อเช็กตอนล่าสุด" : checking ? "กำลังเช็ก..." : "เช็กตอนล่าสุดจากเว็บ"}
           </button>
           {message && <p className="mt-2 text-center text-xs font-semibold text-zinc-500">{message}</p>}
         </div>
@@ -342,7 +390,8 @@ function DetailModal({
             {tiers.map((tier) => (
               <button
                 key={tier}
-                onClick={() => onTierChange(item.id, tier)}
+                onClick={() => !isGuest && onTierChange(item.id, tier)}
+                disabled={isGuest}
                 className={`h-10 min-w-10 rounded-2xl text-sm font-black ${item.tier === tier ? "bg-zinc-950 text-white" : "bg-white text-zinc-500"}`}
               >
                 {tier}
@@ -352,17 +401,25 @@ function DetailModal({
         </div>
 
         <div className="mt-4 flex gap-2">
-          {item.source_url && (
-            <a href={item.source_url} target="_blank" rel="noreferrer" className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-zinc-100 px-4 py-3 text-sm font-bold text-zinc-700">
-              <ExternalLink size={16} /> เปิดเว็บ
-            </a>
+          {isGuest ? (
+            <div className="w-full rounded-2xl bg-zinc-100 px-4 py-3 text-center text-sm font-bold text-zinc-500">
+              Login เพื่อเปิดเว็บอ่าน / แก้ไข / ลบ
+            </div>
+          ) : (
+            <>
+              {item.source_url && (
+                <a href={item.source_url} target="_blank" rel="noreferrer" className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-zinc-100 px-4 py-3 text-sm font-bold text-zinc-700">
+                  <ExternalLink size={16} /> เปิดเว็บ
+                </a>
+              )}
+              <button onClick={() => onEdit(item)} className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-zinc-950 px-4 py-3 text-sm font-bold text-white">
+                <Pencil size={16} /> แก้ไข
+              </button>
+              <button onClick={() => onDelete(item.id)} className="rounded-2xl border border-zinc-200 px-4 py-3 text-rose-600">
+                <Trash2 size={18} />
+              </button>
+            </>
           )}
-          <button onClick={() => onEdit(item)} className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-zinc-950 px-4 py-3 text-sm font-bold text-white">
-            <Pencil size={16} /> แก้ไข
-          </button>
-          <button onClick={() => onDelete(item.id)} className="rounded-2xl border border-zinc-200 px-4 py-3 text-rose-600">
-            <Trash2 size={18} />
-          </button>
         </div>
       </motion.div>
     </motion.div>
@@ -519,16 +576,16 @@ function Sidebar({
   ];
 
   return (
-    <aside className="rounded-[2rem] bg-zinc-950 p-5 text-white shadow-sm lg:sticky lg:top-6 lg:h-[calc(100vh-3rem)] lg:overflow-y-auto">
+    <aside className="rounded-[2rem] bg-zinc-950 p-4 text-white shadow-sm xl:sticky xl:top-6 xl:h-[calc(100vh-3rem)] xl:overflow-y-auto">
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="flex items-center gap-1 text-sm font-semibold text-zinc-400">
             <Cloud size={14} />
             {user ? "Cloud Sync เปิดอยู่" : "Manga Tracker"}
           </p>
-          <h1 className="mt-1 text-3xl font-black leading-tight">คลังมังงะของฉัน</h1>
+          <h1 className="mt-1 text-xl font-black leading-tight">คลังมังงะ</h1>
         </div>
-        <div className="flex gap-2 lg:hidden">
+        <div className="flex gap-2 xl:hidden">
           {user && (
             <button onClick={onLogout} className="rounded-2xl bg-white/10 p-3 text-white">
               <LogOut size={20} />
@@ -540,36 +597,22 @@ function Sidebar({
         </div>
       </div>
 
-      <div className="mt-5 grid grid-cols-2 gap-3">
-        <div className="rounded-3xl bg-white/10 p-4">
-          <p className="text-xs text-zinc-400">ทั้งหมด</p>
-          <p className="text-2xl font-black">{stats.total}</p>
-        </div>
-        <div className="rounded-3xl bg-white/10 p-4">
-          <p className="text-xs text-zinc-400">มีตอนใหม่</p>
-          <p className="text-2xl font-black">{stats.updated}</p>
-        </div>
-        <div className="rounded-3xl bg-white/10 p-4">
-          <p className="text-xs text-zinc-400">กำลังอ่าน</p>
-          <p className="text-2xl font-black">{stats.reading}</p>
-        </div>
-        <div className="rounded-3xl bg-white/10 p-4">
-          <p className="text-xs text-zinc-400">อ่านจบ</p>
-          <p className="text-2xl font-black">{stats.finished}</p>
-        </div>
+      <div className="mt-5 rounded-3xl bg-white/10 p-4">
+        <p className="text-xs text-zinc-400">ทั้งหมด</p>
+        <p className="text-3xl font-black">{stats.total}</p>
       </div>
 
-      <div className="mt-5 grid grid-cols-2 gap-2 rounded-3xl bg-white/10 p-1">
-        <button onClick={() => setTab("collection")} className={`flex items-center justify-center gap-2 rounded-2xl px-3 py-3 text-sm font-bold ${tab === "collection" ? "bg-white text-zinc-950" : "text-zinc-400"}`}>
+      <div className="mt-5 grid grid-cols-1 gap-2 rounded-3xl bg-white/10 p-1">
+        <button onClick={() => user && setTab("collection")} disabled={!user} className={`flex items-center justify-center gap-2 rounded-2xl px-3 py-2.5 text-sm font-bold ${tab === "collection" ? "bg-white text-zinc-950" : "text-zinc-400"}`}>
           <BookOpen size={16} /> Collection
         </button>
-        <button onClick={() => setTab("tier")} className={`flex items-center justify-center gap-2 rounded-2xl px-3 py-3 text-sm font-bold ${tab === "tier" ? "bg-white text-zinc-950" : "text-zinc-400"}`}>
+        <button onClick={() => setTab("tier")} className={`flex items-center justify-center gap-2 rounded-2xl px-3 py-2.5 text-sm font-bold ${tab === "tier" ? "bg-white text-zinc-950" : "text-zinc-400"}`}>
           <Layers size={16} /> Tier
         </button>
       </div>
 
       {tab === "collection" && (
-        <div className="mt-5 hidden space-y-2 lg:block">
+        <div className="mt-5 hidden space-y-2 xl:block">
           <p className="px-1 text-xs font-bold uppercase tracking-widest text-zinc-500">Filter</p>
           {filters.map(([key, label]) => (
             <button key={key} onClick={() => setFilter(key)} className={`w-full rounded-2xl px-4 py-3 text-left text-sm font-bold ${filter === key ? "bg-white text-zinc-950" : "bg-white/10 text-zinc-300"}`}>
@@ -579,7 +622,7 @@ function Sidebar({
         </div>
       )}
 
-      <div className="mt-5 hidden space-y-2 lg:block">
+      <div className="mt-5 hidden space-y-2 xl:block">
         <button onClick={onAdd} className="flex w-full items-center justify-center gap-2 rounded-2xl bg-white px-4 py-3 font-bold text-zinc-950">
           <Plus size={18} /> เพิ่มมังงะ
         </button>
@@ -599,7 +642,7 @@ export default function App() {
   const [loaded, setLoaded] = useState(false);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<"all" | "updated" | MangaStatus>("all");
-  const [tab, setTab] = useState<"collection" | "tier">("collection");
+  const [tab, setTab] = useState<"collection" | "tier">("tier");
   const [form, setForm] = useState<Omit<MangaItem, "id" | "user_id">>(emptyForm);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [openForm, setOpenForm] = useState(false);
@@ -620,15 +663,21 @@ export default function App() {
     return () => listener.subscription.unsubscribe();
   }, []);
 
+
+  useEffect(() => {
+    if (user) setTab("collection");
+    else setTab("tier");
+  }, [user]);
+
   useEffect(() => {
     async function loadCloud() {
-      if (!supabase || !user) return;
+      if (!supabase) return;
       setSyncing(true);
       const { data, error } = await supabase.from("manga_items").select("*").order("created_at", { ascending: false });
       if (!error && data) setItems(data as MangaItem[]);
       setSyncing(false);
     }
-    if (user) loadCloud();
+    loadCloud();
   }, [user]);
 
   useEffect(() => {
@@ -756,8 +805,8 @@ export default function App() {
   ];
 
   return (
-    <main className="min-h-screen bg-zinc-100 text-zinc-950 lg:p-6">
-      <div className="mx-auto grid max-w-md gap-4 px-4 pb-24 pt-5 lg:max-w-7xl lg:grid-cols-[280px_1fr] lg:px-0 lg:pt-0">
+    <main className="min-h-screen bg-zinc-100 text-zinc-950 xl:p-6">
+      <div className="mx-auto grid max-w-md gap-4 px-4 pb-24 pt-5 xl:max-w-7xl xl:grid-cols-[190px_1fr] xl:px-0 xl:pt-0">
         <Sidebar
           user={user}
           stats={stats}
@@ -777,30 +826,30 @@ export default function App() {
           )}
 
           {user && (
-            <div className="mb-4 grid gap-3 md:grid-cols-[1fr_340px]">
+            <div className="mb-4 grid gap-3 md:grid-cols-[1fr_220px]">
               <Card className="p-5">
                 <p className="text-sm font-bold text-zinc-400">Good evening,</p>
                 <h2 className="mt-1 text-2xl font-black text-zinc-950">{user.email?.split("@")[0] || "Reader"}</h2>
                 <p className="mt-1 text-sm text-zinc-500">ค้นหา จัดการ และเช็กตอนใหม่จากที่นี่</p>
               </Card>
-              <SourceIconBar />
+              <SourceIconBar isGuest={!user} />
             </div>
           )}
 
           {syncing && <p className="mb-3 rounded-2xl bg-white p-3 text-center text-sm text-zinc-500">กำลัง sync ข้อมูล...</p>}
 
-          <div className="sticky top-0 z-20 -mx-4 bg-zinc-100/90 px-4 py-3 backdrop-blur lg:top-6 lg:mx-0 lg:rounded-[2rem] lg:bg-white lg:px-3 lg:shadow-sm">
-            <div className="flex rounded-3xl bg-white p-1 shadow-sm lg:hidden">
-              <button onClick={() => setTab("collection")} className={`flex flex-1 items-center justify-center gap-2 rounded-2xl px-3 py-3 text-sm font-bold ${tab === "collection" ? "bg-zinc-950 text-white" : "text-zinc-500"}`}>
+          <div className="sticky top-0 z-20 -mx-4 bg-zinc-100/90 px-4 py-3 backdrop-blur xl:top-6 xl:mx-0 xl:rounded-[2rem] xl:bg-white xl:px-3 xl:shadow-sm">
+            <div className="flex rounded-3xl bg-white p-1 shadow-sm xl:hidden">
+              <button onClick={() => user && setTab("collection")} disabled={!user} className={`flex flex-1 items-center justify-center gap-2 rounded-2xl px-3 py-2.5 text-sm font-bold ${tab === "collection" ? "bg-zinc-950 text-white" : "text-zinc-500"}`}>
                 <BookOpen size={16} /> Collection
               </button>
-              <button onClick={() => setTab("tier")} className={`flex flex-1 items-center justify-center gap-2 rounded-2xl px-3 py-3 text-sm font-bold ${tab === "tier" ? "bg-zinc-950 text-white" : "text-zinc-500"}`}>
+              <button onClick={() => setTab("tier")} className={`flex flex-1 items-center justify-center gap-2 rounded-2xl px-3 py-2.5 text-sm font-bold ${tab === "tier" ? "bg-zinc-950 text-white" : "text-zinc-500"}`}>
                 <Layers size={16} /> Tier List
               </button>
             </div>
 
             {tab === "collection" && (
-              <div className="mt-3 flex items-center gap-2 rounded-3xl bg-white px-4 py-3 shadow-sm lg:mt-0 lg:bg-zinc-50 lg:shadow-none">
+              <div className="mt-3 flex items-center gap-2 rounded-3xl bg-white px-4 py-3 shadow-sm xl:mt-0 xl:bg-zinc-50 xl:shadow-none">
                 <Search size={18} className="text-zinc-400" />
                 <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="ค้นหาชื่อมังงะ..." className="w-full bg-transparent text-sm outline-none" />
               </div>
@@ -809,7 +858,7 @@ export default function App() {
 
           {tab === "collection" ? (
             <>
-              <div className="mb-4 mt-4 flex gap-2 overflow-x-auto pb-1 lg:hidden">
+              <div className="mb-4 mt-4 flex gap-2 overflow-x-auto pb-1 xl:hidden">
                 {filters.map(([key, label]) => (
                   <button key={key} onClick={() => setFilter(key)} className={`shrink-0 rounded-full px-4 py-2 text-sm font-bold ${filter === key ? "bg-zinc-950 text-white" : "bg-white text-zinc-500"}`}>
                     {label}
@@ -817,7 +866,7 @@ export default function App() {
                 ))}
               </div>
 
-              <div className="mt-4 grid grid-cols-3 gap-x-3 gap-y-5 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7">
+              <div className="mt-4 grid grid-cols-3 gap-x-3 gap-y-5 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-6 2xl:grid-cols-7">
                 <AnimatePresence>
                   {filtered.map((item) => (
                     <MangaTile key={item.id} item={item} onOpen={setSelectedItem} />
@@ -846,7 +895,7 @@ export default function App() {
                         <p className="text-sm text-zinc-500">{tierItems.length} เรื่อง</p>
                       </div>
                     </div>
-                    <div className="grid grid-cols-4 gap-2 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-7 xl:grid-cols-9">
+                    <div className="grid grid-cols-4 gap-2 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-9">
                       {tierItems.map((item) => (
                         <MangaTile key={item.id} item={item} onOpen={setSelectedItem} small />
                       ))}
@@ -860,9 +909,9 @@ export default function App() {
         </section>
       </div>
 
-      <button onClick={openAdd} className="fixed bottom-5 left-1/2 z-30 flex -translate-x-1/2 items-center gap-2 rounded-full bg-zinc-950 px-6 py-4 font-bold text-white shadow-xl lg:hidden">
+      {user&&<button onClick={openAdd} className="fixed bottom-5 left-1/2 z-30 flex -translate-x-1/2 items-center gap-2 rounded-full bg-zinc-950 px-6 py-4 font-bold text-white shadow-xl xl:hidden">
         <Plus size={20} /> เพิ่มมังงะ
-      </button>
+      </button>}
 
       <AnimatePresence>
         {selectedItem && (
@@ -873,6 +922,7 @@ export default function App() {
             onDelete={deleteItem}
             onTierChange={changeTier}
             onCheckLatest={checkLatest}
+            isGuest={!user}
           />
         )}
         {openForm && (

@@ -1,16 +1,13 @@
-# Manga Tracker Dashboard Rewrite
+# Manga Tracker Dashboard Fix 2
 
-เวอร์ชัน B: rewrite layout ใหม่แบบปลอดภัย
+แก้ตาม feedback:
+- แหล่งอ่านหลักเป็นปุ่มเดียว กดแล้วเปิด modal รายชื่อเว็บ
+- Guest เห็น Tier List ได้ โดยโหลดข้อมูล public จาก Supabase
+- Guest เปิดเว็บอ่าน / เช็กตอนล่าสุด / แก้ไข / ลบไม่ได้
+- Sidebar ซ้ายเล็กลง เหลือจำนวนทั้งหมด
+- ตัดกล่อง มีตอนใหม่ / กำลังอ่าน / อ่านจบ ออกจาก sidebar
+- iPad แนวตั้งกลับมาเป็น layout แนวตั้งเพื่อสัดส่วนไม่แปลก
+- Dashboard sidebar ใช้เฉพาะจอกว้างมากขึ้น
+- ไม่ต้องรัน SQL ใหม่ ถ้าเคยรัน public preview policy แล้ว
 
-สิ่งที่เปลี่ยน:
-- มือถือ/แนวตั้ง: ยังเป็น layout เรียงลงล่าง
-- iPad/Desktop: sidebar ซ้าย + content ขวา
-- Sidebar มี stats, tab, filter, add, logout
-- Main มี greeting, search, source bar, manga grid
-- แหล่งอ่านหลักกลับมาเฉพาะหน้า main
-- หน้ารายละเอียดไม่มีแหล่งอ่านหลัก
-- ใช้ Supabase เดิม
-- ไม่ต้องรัน SQL ใหม่
-
-วิธีใช้:
-อัปโหลดไฟล์ทั้งหมดทับ repo เดิมใน GitHub แล้ว Vercel จะ redeploy
+อัปโหลดไฟล์ทั้งหมดทับ repo เดิม แล้ว Vercel จะ deploy
