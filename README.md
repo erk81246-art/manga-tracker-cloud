@@ -1,11 +1,13 @@
-# Manga Tracker Guest Tier Only
+# Manga Tracker Phase 1
 
-เวอร์ชันนี้ปรับ Guest Mode:
-- ก่อน Login เห็นเฉพาะหน้า Tier List
-- ก่อน Login กดดูรายละเอียดพื้นฐานได้
-- ก่อน Login ไม่เห็น/ไม่เข้า Collection
-- ก่อน Login เปิดเว็บอ่าน เช็กตอน เพิ่ม แก้ไข ลบ ไม่ได้
-- หลัง Login ใช้งานทุกอย่างเหมือนเดิม
+Phase 1 update:
+- Compact Collection UI เดิมยังอยู่
+- Detail modal เดิมยังอยู่
+- Guest Mode: ก่อน login เห็นเฉพาะ Tier List
+- เพิ่ม Reading Sources Bar: Go-Manga / Slow-Manga / Dark-Manga
+- Guest กดเปิดเว็บอ่านไม่ได้ ต้อง Login ก่อน
+- เพิ่ม visual polish เบา ๆ: gradient background, lazy-load cover images, source icon cards
+- ใช้ Supabase database เดิมได้ ไม่ต้องรัน SQL ใหม่ถ้ารัน guest policy ไปแล้ว
 
-ใช้ Supabase database เดิมได้เลย
-ไม่ต้องรัน SQL ใหม่ ถ้าเคยเปิด guest read policy แล้ว
+Deploy:
+อัปโหลดไฟล์ทั้งหมดทับ repo เดิม แล้ว Vercel จะ redeploy ให้เอง
