@@ -1,12 +1,13 @@
-# Manga Tracker Portrait Bottom Nav Fix
+# Manga Tracker Orientation Dashboard
 
-แก้ breakpoint:
-- iPad แนวตั้งจะใช้ layout แบบ bottom bar แล้ว
-- dashboard/sidebar จะใช้เฉพาะจอกว้างระดับ xl เช่น iPad แนวนอน/desktop
-- ซ่อนกล่องใหญ่ด้านบนในแนวตั้ง
-- bottom bar มี Collection / Tier / เว็บอ่าน / เพิ่ม
+แก้ iPad แนวนอน:
+- iPad แนวตั้งยังใช้ bottom bar แบบเดิม
+- iPad แนวนอนจะสลับเป็น dashboard/sidebar จริง
+- ใช้ CSS orientation media query ไม่พึ่ง xl breakpoint อย่างเดียว
+- Desktop ยังใช้ dashboard เหมือนเดิม
 - ไม่ต้องรัน SQL ใหม่
 - ข้อมูลเดิมไม่หาย
 
-สำคัญ:
-หลังอัปโหลดทับ GitHub แล้วต้องรอ Vercel deploy ใหม่ และ refresh แบบล้าง cache บน iPad
+หลัง deploy:
+- เปิด iPad แนวนอนแล้ว refresh
+- ถ้าใช้ PWA แล้วยังไม่เปลี่ยน ให้ลบ icon แล้ว Add to Home Screen ใหม่

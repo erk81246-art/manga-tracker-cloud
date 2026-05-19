@@ -2,3 +2,51 @@
 @tailwind components;
 @tailwind utilities;
 *{box-sizing:border-box}html,body{margin:0;background:#f4f4f5;color:#09090b;-webkit-tap-highlight-color:transparent}button,input,textarea,select{font:inherit}.line-clamp-2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+
+
+/* iPad landscape dashboard mode */
+@media (orientation: landscape) and (min-width: 900px) and (max-width: 1279px) {
+  .app-shell {
+    max-width: 1180px !important;
+    grid-template-columns: 160px minmax(0, 1fr) !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 1rem !important;
+  }
+
+  .app-sidebar {
+    display: block !important;
+    position: sticky !important;
+    top: 1rem !important;
+    height: calc(100vh - 2rem) !important;
+    overflow-y: auto !important;
+  }
+
+  .desktop-topbar {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 220px !important;
+  }
+
+  .mobile-bottom-nav {
+    display: none !important;
+  }
+
+  .app-sticky-bar {
+    top: 1rem !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    border-radius: 2rem !important;
+    background: white !important;
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;
+  }
+}
+
+/* keep portrait clean and centered */
+@media (orientation: portrait) and (max-width: 1279px) {
+  .app-shell {
+    max-width: 28rem !important;
+  }
+}
