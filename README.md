@@ -1,8 +1,9 @@
-# Real iPad + Favorite Filter Fix
+# Manga Tracker iPad Polish
 
-แก้จริงจากโค้ดปัจจุบัน:
-- เพิ่ม Filter: Favorite
-- Filter Favorite ใช้งานกับ favoriteIds ของบัญชีตัวเอง
-- ลด sidebar บน iPad landscape เหลือ 150px
-- Desktop ใช้ sidebar กว้าง 190px
-- ไม่ต้องรัน SQL ใหม่ ถ้ารัน follow_system.sql แล้ว
+แก้:
+- iPad แนวตั้งกว้างขึ้น ไม่ถูกบีบเป็นขนาดมือถือ
+- grid ใน iPad แนวตั้งแสดงหลายคอลัมน์ขึ้น
+- sidebar แนวนอนกว้างขึ้นและข้อความสมดุลขึ้น
+- ข้อความ Cloud Sync สั้นลง
+- Desktop ยังใช้งานเหมือนเดิม
+- ไม่ต้องรัน SQL ใหม่

@@ -159,11 +159,11 @@ function AuthBox() {
           className="w-full rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-3 outline-none focus:border-zinc-950"
         />
 
-        <button onClick={handleSubmit} disabled={busy} className="w-full rounded-2xl bg-zinc-950 px-2 py-2 text-xs font-bold text-white disabled:opacity-50">
+        <button onClick={handleSubmit} disabled={busy} className="w-full rounded-2xl bg-zinc-950 px-3 py-2.5 text-sm font-bold text-white disabled:opacity-50">
           {busy ? "กำลังทำงาน..." : mode === "login" ? "Login" : "Sign up"}
         </button>
 
-        <button onClick={googleLogin} className="w-full rounded-2xl border border-zinc-200 bg-white px-2 py-2 text-xs font-bold text-zinc-800">
+        <button onClick={googleLogin} className="w-full rounded-2xl border border-zinc-200 bg-white px-3 py-2.5 text-sm font-bold text-zinc-800">
           Login ด้วย Google
         </button>
 
@@ -633,14 +633,14 @@ function Sidebar({
   ];
 
   return (
-    <aside className={`app-sidebar rounded-[2rem] bg-zinc-950 p-3 text-white shadow-sm ${isWideLandscape ? "sticky top-4 block h-[calc(100vh-2rem)] w-[150px] overflow-y-auto" : "hidden"} xl:sticky xl:top-6 xl:block xl:h-[calc(100vh-3rem)] xl:w-[190px] xl:overflow-y-auto`}>
+    <aside className={`app-sidebar rounded-[2rem] bg-zinc-950 p-3 text-white shadow-sm ${isWideLandscape ? "sticky top-4 block h-[calc(100vh-2rem)] w-[180px] overflow-y-auto" : "hidden"} xl:sticky xl:top-6 xl:block xl:h-[calc(100vh-3rem)] xl:w-[210px] xl:overflow-y-auto`}>
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="flex items-center gap-1 text-sm font-semibold text-zinc-400">
+          <p className="flex items-center gap-1 text-xs font-semibold text-zinc-400">
             <Cloud size={14} />
-            {user ? "Cloud Sync เปิดอยู่" : "Manga Tracker"}
+            {user ? "Cloud Sync" : "Manga Tracker"}
           </p>
-          <h1 className="mt-1 text-sm font-black leading-tight">คลังมังงะ</h1>
+          <h1 className="mt-1 text-lg font-black leading-tight">คลังมังงะ</h1>
         </div>
         <div className="flex gap-2 xl:hidden">
           {user && (
@@ -660,10 +660,10 @@ function Sidebar({
       </div>
 
       <div className="mt-4 grid grid-cols-1 gap-2 rounded-3xl bg-white/10 p-1">
-        <button onClick={() => user && setTab("collection")} disabled={!user} className={`flex items-center justify-center gap-2 rounded-2xl px-2 py-2 text-xs font-bold ${tab === "collection" ? "bg-white text-zinc-950" : "text-zinc-400"}`}>
+        <button onClick={() => user && setTab("collection")} disabled={!user} className={`flex items-center justify-center gap-2 rounded-2xl px-3 py-2.5 text-sm font-bold ${tab === "collection" ? "bg-white text-zinc-950" : "text-zinc-400"}`}>
           <BookOpen size={16} /> Collection
         </button>
-        <button onClick={() => setTab("tier")} className={`flex items-center justify-center gap-2 rounded-2xl px-2 py-2 text-xs font-bold ${tab === "tier" ? "bg-white text-zinc-950" : "text-zinc-400"}`}>
+        <button onClick={() => setTab("tier")} className={`flex items-center justify-center gap-2 rounded-2xl px-3 py-2.5 text-sm font-bold ${tab === "tier" ? "bg-white text-zinc-950" : "text-zinc-400"}`}>
           <Layers size={16} /> Tier
         </button>
       </div>
@@ -672,7 +672,7 @@ function Sidebar({
         <div className="mt-4 hidden space-y-2 md:block">
           <p className="px-1 text-xs font-bold uppercase tracking-widest text-zinc-500">Filter</p>
           {filters.map(([key, label]) => (
-            <button key={key} onClick={() => setFilter(key)} className={`w-full rounded-2xl px-3 py-2.5 text-left text-xs font-bold ${filter === key ? "bg-white text-zinc-950" : "bg-white/10 text-zinc-300"}`}>
+            <button key={key} onClick={() => setFilter(key)} className={`w-full rounded-2xl px-3 py-2.5 text-left text-sm font-bold ${filter === key ? "bg-white text-zinc-950" : "bg-white/10 text-zinc-300"}`}>
               {label}
             </button>
           ))}
@@ -680,11 +680,11 @@ function Sidebar({
       )}
 
       <div className="mt-4 hidden space-y-2 md:block">
-        <button onClick={onAdd} className="flex w-full items-center justify-center gap-2 rounded-2xl bg-white px-2 py-2 text-xs font-bold text-zinc-950">
+        <button onClick={onAdd} className="flex w-full items-center justify-center gap-2 rounded-2xl bg-white px-3 py-2.5 text-sm font-bold text-zinc-950">
           <Plus size={18} /> เพิ่มมังงะ
         </button>
         {user && (
-          <button onClick={onLogout} className="flex w-full items-center justify-center gap-2 rounded-2xl bg-white/10 px-2 py-2 text-xs font-bold text-white">
+          <button onClick={onLogout} className="flex w-full items-center justify-center gap-2 rounded-2xl bg-white/10 px-3 py-2.5 text-sm font-bold text-white">
             <LogOut size={18} /> Logout
           </button>
         )}
@@ -944,7 +944,7 @@ export default function App() {
 
   return (
     <main className="min-h-screen bg-zinc-100 text-zinc-950 xl:p-6">
-      <div className={`app-shell mx-auto grid gap-4 ${isWideLandscape ? "max-w-7xl grid-cols-[150px_1fr] px-0 pb-4 pt-0" : "max-w-md px-4 pb-28 pt-3"} xl:max-w-7xl xl:grid-cols-[190px_1fr] xl:px-0 xl:pt-0`}>
+      <div className={`app-shell mx-auto grid gap-4 ${isWideLandscape ? "max-w-7xl grid-cols-[180px_1fr] px-0 pb-4 pt-0" : "max-w-md px-4 pb-28 pt-3 sm:max-w-xl md:max-w-3xl"} xl:max-w-7xl xl:grid-cols-[210px_1fr] xl:px-0 xl:pt-0`}>
         <Sidebar
           user={user}
           stats={stats}
@@ -979,10 +979,10 @@ export default function App() {
 
           <div className={`app-sticky-bar sticky z-20 bg-zinc-100/90 px-4 py-3 backdrop-blur ${isWideLandscape ? "top-4 mx-0 rounded-[2rem] bg-white px-3 shadow-sm" : "top-0 -mx-4"} xl:top-6 xl:mx-0 xl:rounded-[2rem] xl:bg-white xl:px-3 xl:shadow-sm`}>
             <div className="hidden rounded-3xl bg-white p-1 shadow-sm">
-              <button onClick={() => user && setTab("collection")} disabled={!user} className={`flex flex-1 items-center justify-center gap-2 rounded-2xl px-2 py-2 text-xs font-bold ${tab === "collection" ? "bg-zinc-950 text-white" : "text-zinc-500"}`}>
+              <button onClick={() => user && setTab("collection")} disabled={!user} className={`flex flex-1 items-center justify-center gap-2 rounded-2xl px-3 py-2.5 text-sm font-bold ${tab === "collection" ? "bg-zinc-950 text-white" : "text-zinc-500"}`}>
                 <BookOpen size={16} /> Collection
               </button>
-              <button onClick={() => setTab("tier")} className={`flex flex-1 items-center justify-center gap-2 rounded-2xl px-2 py-2 text-xs font-bold ${tab === "tier" ? "bg-zinc-950 text-white" : "text-zinc-500"}`}>
+              <button onClick={() => setTab("tier")} className={`flex flex-1 items-center justify-center gap-2 rounded-2xl px-3 py-2.5 text-sm font-bold ${tab === "tier" ? "bg-zinc-950 text-white" : "text-zinc-500"}`}>
                 <Layers size={16} /> Tier List
               </button>
             </div>
@@ -1005,7 +1005,7 @@ export default function App() {
                 ))}
               </div>
 
-              <div className="mt-4 grid grid-cols-3 gap-x-3 gap-y-5 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-7 xl:grid-cols-6 2xl:grid-cols-7">
+              <div className="mt-4 grid grid-cols-3 gap-x-3 gap-y-5 sm:grid-cols-4 md:grid-cols-7 lg:grid-cols-7 xl:grid-cols-6 2xl:grid-cols-7">
                 <AnimatePresence>
                   {filtered.map((item) => (
                     <MangaTile key={item.id} item={item} onOpen={setSelectedItem} isFavorite={favoriteIds.includes(item.id)} />
