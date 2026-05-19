@@ -1,9 +1,10 @@
-# Manga Tracker iPad Polish
+# Manga Tracker Sidebar Polish
 
-แก้:
-- iPad แนวตั้งกว้างขึ้น ไม่ถูกบีบเป็นขนาดมือถือ
-- grid ใน iPad แนวตั้งแสดงหลายคอลัมน์ขึ้น
-- sidebar แนวนอนกว้างขึ้นและข้อความสมดุลขึ้น
-- ข้อความ Cloud Sync สั้นลง
-- Desktop ยังใช้งานเหมือนเดิม
+ปรับให้ sidebar แนวนอนดูสมดุลขึ้น:
+- sidebar กว้างขึ้นเล็กน้อย
+- เปลี่ยนหัวข้อเป็น Library
+- ย่อ Sync ให้ไม่ตัดบรรทัด
+- ปรับ padding/card/button ให้เตี้ยและบาลานซ์ขึ้น
+- Filter buttons เรียบร้อยขึ้น
+- แนวตั้งไม่แตะ
 - ไม่ต้องรัน SQL ใหม่

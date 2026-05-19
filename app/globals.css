@@ -58,3 +58,14 @@
     max-width: 48rem !important;
   }
 }
+
+
+/* Sidebar polish for tablet/desktop landscape */
+@media (orientation: landscape) and (min-width: 900px) {
+  .app-sidebar {
+    border-radius: 2rem !important;
+  }
+  .app-sidebar button {
+    min-height: 2.35rem;
+  }
+}
