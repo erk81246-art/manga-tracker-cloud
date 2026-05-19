@@ -1,13 +1,12 @@
-# Manga Tracker Dashboard Layout
+# Manga Tracker Dashboard Layout Safe
 
-ปรับ UX/Layout ตามภาพร่าง:
-- iPad/Desktop เป็น dashboard แนวนอน
+เวอร์ชันแก้ build:
+- ปรับ layout เป็น dashboard บน iPad/Desktop
 - Header สีดำกลายเป็น sidebar ซ้ายบนจอกว้าง
-- Main area มี greeting, search, grid มังงะ
-- เอาแหล่งอ่านหลักกลับมาในหน้า main
-- Collection/Tier grid แสดงได้หลายคอลัมน์ขึ้น
-- ยังใช้ Supabase เดิม ข้อมูลเดิมไม่หาย
+- Main area มี greeting + source bar + search + grid
+- เอาแหล่งอ่านหลักกลับมาเฉพาะหน้า main
+- ไม่ใส่แหล่งอ่านหลักในหน้ารายละเอียด
 - ไม่ต้องรัน SQL ใหม่
+- ใช้ Supabase เดิม ข้อมูลเดิมไม่หาย
 
-วิธีใช้:
-อัปโหลดไฟล์ทั้งหมดทับ repo เดิมใน GitHub แล้ว Vercel จะ deploy ใหม่
+อัปโหลดไฟล์ทั้งหมดทับ repo เดิม แล้ว Vercel จะ redeploy
