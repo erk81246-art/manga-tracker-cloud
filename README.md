@@ -1,7 +1,7 @@
-# Manga Tracker Drawer Menu Fixed
+# Manga Tracker Drawer Menu Safe
 
-แก้ build error:
-- ครอบเมนูด้านบน + desktop topbar ด้วย Fragment ให้ JSX ถูกต้อง
-- หน้าหลักไม่มี sidebar ถาวร
-- กดปุ่มเมนูแล้ว drawer ด้านข้างค่อยเลื่อนออกมา
+แก้แบบปลอดภัย:
+- ไม่มี sidebar ถาวร
+- ปุ่มเมนูเปิด drawer ด้านข้าง
+- drawer อยู่ใน App scope จึงเห็น menuOpen
 - ไม่ต้องรัน SQL ใหม่
