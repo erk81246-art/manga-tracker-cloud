@@ -41,6 +41,7 @@ type MangaItem = {
 };
 
 const STORAGE_KEY = "manga-tracker-items-v2";
+const SOURCES_STORAGE_KEY = "manga-tracker-reading-sources-v1";
 
 const emptyForm: Omit<MangaItem, "id" | "user_id"> = {
   title: "",
@@ -62,7 +63,7 @@ const statusMap: Record<MangaStatus, { label: string; badge: string }> = {
 
 const tiers: MangaTier[] = ["S", "A", "B", "C", "D"];
 
-const readingSources = [
+const defaultReadingSources = [
   { name: "Go-Manga", short: "GO", url: "https://www.go-manga.com" },
   { name: "Slow-Manga", short: "SLOW", url: "https://www.slow-manga.com" },
   { name: "Dark-Manga", short: "DARK", url: "https://www.dark-manga.com" },
@@ -170,8 +171,21 @@ function AuthBox() {
 }
 
 
-function SourceIconBar({ isGuest = false }: { isGuest?: boolean }) {
+function SourceIconBar({
+  isGuest = false,
+  sources,
+  onAddSource,
+  onDeleteSource,
+}: {
+  isGuest?: boolean;
+  sources: typeof defaultReadingSources;
+  onAddSource: (source: { name: string; short: string; url: string }) => void;
+  onDeleteSource: (url: string) => void;
+}) {
   const [open, setOpen] = useState(false);
+  const [showAdd, setShowAdd] = useState(false);
+  const [name, setName] = useState("");
+  const [url, setUrl] = useState("");
 
   function guard(e: React.MouseEvent<HTMLAnchorElement>) {
     if (isGuest) {
@@ -180,18 +194,27 @@ function SourceIconBar({ isGuest = false }: { isGuest?: boolean }) {
     }
   }
 
+  function addSource() {
+    const cleanName = name.trim();
+    let cleanUrl = url.trim();
+    if (!cleanName || !cleanUrl) return;
+    if (!/^https?:\/\//i.test(cleanUrl)) cleanUrl = `https://${cleanUrl}`;
+    const short = cleanName.replace(/[^a-z0-9]/gi, "").slice(0, 5).toUpperCase() || "WEB";
+    onAddSource({ name: cleanName, short, url: cleanUrl });
+    setName("");
+    setUrl("");
+    setShowAdd(false);
+  }
+
   return (
     <>
       <Card className="p-4">
         <div className="flex items-center justify-between gap-3">
           <div>
             <p className="text-sm font-black text-zinc-800">แหล่งอ่านหลัก</p>
-            <p className="text-xs font-semibold text-zinc-400">Go / Slow / Dark</p>
+            <p className="text-xs font-semibold text-zinc-400">{sources.length} เว็บ</p>
           </div>
-          <button
-            onClick={() => setOpen(true)}
-            className="rounded-2xl bg-zinc-950 px-3 py-2.5 text-xs font-bold text-white active:scale-95"
-          >
+          <button onClick={() => setOpen(true)} className="rounded-2xl bg-zinc-950 px-3 py-2.5 text-xs font-bold text-white active:scale-95">
             เปิดรายการ
           </button>
         </div>
@@ -199,22 +222,12 @@ function SourceIconBar({ isGuest = false }: { isGuest?: boolean }) {
 
       <AnimatePresence>
         {open && (
-          <motion.div
-            className="fixed inset-0 z-[60] flex items-end bg-black/40 p-3 md:items-center md:justify-center md:p-6"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <motion.div
-              className="w-full rounded-[2rem] bg-white p-4 shadow-xl md:max-w-md"
-              initial={{ y: 40 }}
-              animate={{ y: 0 }}
-              exit={{ y: 40 }}
-            >
+          <motion.div className="fixed inset-0 z-[60] flex items-end bg-black/40 p-3 md:items-center md:justify-center md:p-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <motion.div className="w-full rounded-[2rem] bg-white p-4 shadow-xl md:max-w-md" initial={{ y: 40 }} animate={{ y: 0 }} exit={{ y: 40 }}>
               <div className="mb-4 flex items-center justify-between">
                 <div>
                   <h2 className="text-xl font-black">แหล่งอ่านหลัก</h2>
-                  <p className="text-sm text-zinc-500">{isGuest ? "Login ก่อนถึงจะเปิดเว็บอ่านได้" : "เลือกเว็บที่ต้องการเปิด"}</p>
+                  <p className="text-sm text-zinc-500">{isGuest ? "Login ก่อนถึงจะเปิดเว็บอ่านได้" : "เพิ่มเว็บอ่านเองได้"}</p>
                 </div>
                 <button onClick={() => setOpen(false)} className="rounded-full bg-zinc-100 p-2 text-zinc-600">
                   <X size={20} />
@@ -222,26 +235,43 @@ function SourceIconBar({ isGuest = false }: { isGuest?: boolean }) {
               </div>
 
               <div className="space-y-2">
-                {readingSources.map((src) => (
-                  <a
-                    key={src.name}
-                    href={src.url}
-                    onClick={guard}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="flex items-center gap-3 rounded-3xl bg-zinc-950 p-3 text-white active:scale-[0.99]"
-                  >
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white text-xs font-black text-zinc-950">
-                      {src.short}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="font-black">{src.name}</p>
-                      <p className="truncate text-xs text-white/60">{src.url}</p>
-                    </div>
-                    <ExternalLink size={18} className="text-white/70" />
-                  </a>
+                {sources.map((src) => (
+                  <div key={src.url} className="flex items-center gap-2">
+                    <a href={src.url} onClick={guard} target="_blank" rel="noreferrer" className="flex min-w-0 flex-1 items-center gap-3 rounded-3xl bg-zinc-950 p-3 text-white active:scale-[0.99]">
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white text-xs font-black text-zinc-950">
+                        {src.short}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="font-black">{src.name}</p>
+                        <p className="truncate text-xs text-white/60">{src.url}</p>
+                      </div>
+                      <ExternalLink size={18} className="text-white/70" />
+                    </a>
+                    {!isGuest && (
+                      <button onClick={() => onDeleteSource(src.url)} className="rounded-2xl bg-zinc-100 p-3 text-rose-600">
+                        <Trash2 size={16} />
+                      </button>
+                    )}
+                  </div>
                 ))}
               </div>
+
+              {!isGuest && (
+                <div className="mt-4 rounded-3xl bg-zinc-50 p-3">
+                  <button onClick={() => setShowAdd(!showAdd)} className="flex w-full items-center justify-center gap-2 rounded-2xl bg-zinc-950 px-4 py-3 text-sm font-bold text-white">
+                    <Plus size={16} /> เพิ่มเว็บอ่าน
+                  </button>
+                  {showAdd && (
+                    <div className="mt-3 space-y-2">
+                      <input value={name} onChange={(e) => setName(e.target.value)} placeholder="ชื่อเว็บ เช่น Manga ABC" className="w-full rounded-2xl border border-zinc-200 bg-white px-4 py-3 text-sm outline-none focus:border-zinc-950" />
+                      <input value={url} onChange={(e) => setUrl(e.target.value)} placeholder="URL เช่น https://example.com" className="w-full rounded-2xl border border-zinc-200 bg-white px-4 py-3 text-sm outline-none focus:border-zinc-950" />
+                      <button onClick={addSource} className="w-full rounded-2xl bg-zinc-900 px-4 py-3 text-sm font-bold text-white">
+                        บันทึกเว็บ
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
             </motion.div>
           </motion.div>
         )}
@@ -652,6 +682,7 @@ export default function App() {
   const [syncing, setSyncing] = useState(false);
   const [sourcesOpen, setSourcesOpen] = useState(false);
   const [isWideLandscape, setIsWideLandscape] = useState(false);
+  const [readingSources, setReadingSources] = useState(defaultReadingSources);
 
   useEffect(() => {
     if (!supabase) {
@@ -689,6 +720,31 @@ export default function App() {
       window.removeEventListener("orientationchange", updateLayoutMode);
     };
   }, []);
+
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(SOURCES_STORAGE_KEY);
+      if (saved) setReadingSources(JSON.parse(saved));
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem(SOURCES_STORAGE_KEY, JSON.stringify(readingSources));
+  }, [readingSources]);
+
+  function addReadingSource(source: { name: string; short: string; url: string }) {
+    setReadingSources((prev) => {
+      if (prev.some((item) => item.url === source.url)) {
+        return prev.map((item) => (item.url === source.url ? source : item));
+      }
+      return [...prev, source];
+    });
+  }
+
+  function deleteReadingSource(url: string) {
+    setReadingSources((prev) => prev.filter((item) => item.url !== url));
+  }
 
   useEffect(() => {
     async function loadCloud() {
@@ -854,7 +910,7 @@ export default function App() {
                 <h2 className="mt-1 text-xl font-black text-zinc-950">{user.email?.split("@")[0] || "Reader"}</h2>
                 <p className="mt-1 text-sm text-zinc-500">ค้นหา จัดการ และเช็กตอนใหม่จากที่นี่</p>
               </Card>
-              <SourceIconBar isGuest={!user} />
+              <SourceIconBar isGuest={!user} sources={readingSources} onAddSource={addReadingSource} onDeleteSource={deleteReadingSource} />
             </div>
           )}
 

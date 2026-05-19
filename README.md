@@ -1,8 +1,12 @@
-# Manga Tracker JS Landscape Dashboard Fixed
+# Manga Tracker Custom Sources
 
-แก้ build error:
-- ส่ง isWideLandscape เข้า Sidebar แล้ว
-- iPad แนวตั้งใช้ bottom bar
-- iPad แนวนอนใช้ dashboard/sidebar
+เพิ่ม:
+- เพิ่มเว็บอ่านหลักเองได้จากปุ่มแหล่งอ่านหลัก
+- ลบเว็บอ่านได้
+- เก็บรายการเว็บใน localStorage ของเครื่อง
 - ไม่ต้องรัน SQL ใหม่
-- ข้อมูลเดิมไม่หาย
+- ไม่กระทบข้อมูลมังงะเดิม
+
+หมายเหตุ:
+เว็บที่เพิ่มจะ sync เฉพาะเครื่อง/เบราว์เซอร์นั้นก่อน
+ถ้าจะให้ sync ทุกอุปกรณ์ ค่อยเพิ่ม Supabase table ในรอบถัดไป
