@@ -40,13 +40,6 @@ type MangaItem = {
   user_id?: string;
 };
 
-type Profile = {
-  id: string;
-  nickname: string;
-  avatar_url: string;
-  role?: string;
-};
-
 const STORAGE_KEY = "manga-tracker-items-v2";
 const SOURCES_STORAGE_KEY = "manga-tracker-reading-sources-v1";
 
@@ -88,201 +81,6 @@ function makeId() {
 
 function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return <div className={`rounded-3xl bg-white shadow-sm ${className}`}>{children}</div>;
-}
-
-
-function getProfileName(user: SupabaseUser | null, profile: Profile | null) {
-  return profile?.nickname || user?.email?.split("@")[0] || "Guest";
-}
-
-function ProfileSplash({
-  user,
-  profile,
-  show,
-}: {
-  user: SupabaseUser | null;
-  profile: Profile | null;
-  show: boolean;
-}) {
-  if (!show) return null;
-
-  const name = getProfileName(user, profile);
-  const initials = name.slice(0, 2).toUpperCase();
-
-  return (
-    <motion.div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-zinc-950 p-4 text-white"
-      initial={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.35 }}
-    >
-      <motion.div
-        className="relative flex h-[92vh] w-full max-w-md flex-col overflow-hidden rounded-[2.5rem] bg-zinc-900 shadow-2xl md:max-w-lg"
-        initial={{ scale: 0.96, y: 18 }}
-        animate={{ scale: 1, y: 0 }}
-        transition={{ type: "spring", stiffness: 120, damping: 18 }}
-      >
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-zinc-950/15 to-zinc-950" />
-
-        {profile?.avatar_url ? (
-          <img src={profile.avatar_url} alt={name} className="absolute inset-0 h-full w-full object-cover" />
-        ) : (
-          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-zinc-800 via-zinc-950 to-black text-8xl font-black">
-            {initials}
-          </div>
-        )}
-
-        <div className="relative mt-auto p-6">
-          <p className="text-xs font-black uppercase tracking-[0.35em] text-white/60">Loading Profile</p>
-          <h1 className="mt-2 text-4xl font-black leading-none">{name}</h1>
-          <p className="mt-2 text-sm font-semibold text-white/70">
-            {user ? "กำลังโหลด collection ของคุณ..." : "กำลังโหลด public tier list..."}
-          </p>
-
-          <div className="mt-5 h-2 overflow-hidden rounded-full bg-white/20">
-            <motion.div
-              className="h-full rounded-full bg-white"
-              initial={{ width: "0%" }}
-              animate={{ width: "100%" }}
-              transition={{ duration: 1.15, ease: "easeInOut" }}
-            />
-          </div>
-        </div>
-      </motion.div>
-    </motion.div>
-  );
-}
-
-function ProfileSetupModal({
-  user,
-  profile,
-  onClose,
-  onSaved,
-}: {
-  user: SupabaseUser | null;
-  profile: Profile | null;
-  onClose: () => void;
-  onSaved: (profile: Profile) => void;
-}) {
-  const [nickname, setNickname] = useState(profile?.nickname || user?.email?.split("@")[0] || "");
-  const [avatarUrl, setAvatarUrl] = useState(profile?.avatar_url || "");
-  const [uploading, setUploading] = useState(false);
-  const [saving, setSaving] = useState(false);
-
-  async function uploadAvatar(file: File | null) {
-    if (!file || !supabase || !user) return;
-    setUploading(true);
-    const ext = file.name.split(".").pop() || "jpg";
-    const path = `${user.id}/profile-${Date.now()}.${ext}`;
-
-    const { error } = await supabase.storage.from("manga-covers").upload(path, file, {
-      cacheControl: "3600",
-      upsert: true,
-    });
-
-    if (error) alert(error.message);
-    else {
-      const { data } = supabase.storage.from("manga-covers").getPublicUrl(path);
-      setAvatarUrl(data.publicUrl);
-    }
-
-    setUploading(false);
-  }
-
-  async function saveProfile() {
-    if (!supabase || !user || !nickname.trim()) return;
-    setSaving(true);
-
-    const payload = {
-      id: user.id,
-      nickname: nickname.trim(),
-      avatar_url: avatarUrl,
-      role: profile?.role || "user",
-    };
-
-    const { data, error } = await supabase.from("profiles").upsert(payload).select().single();
-
-    setSaving(false);
-
-    if (error) {
-      alert(error.message);
-      return;
-    }
-
-    onSaved(data as Profile);
-    onClose();
-  }
-
-  return (
-    <motion.div
-      className="fixed inset-0 z-[90] flex items-end bg-black/40 p-3 md:items-center md:justify-center md:p-6"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-    >
-      <motion.div
-        className="max-h-[92vh] w-full overflow-y-auto rounded-[2rem] bg-white p-4 shadow-xl md:max-w-md"
-        initial={{ y: 40 }}
-        animate={{ y: 0 }}
-        exit={{ y: 40 }}
-      >
-        <div className="mb-4 flex items-center justify-between">
-          <div>
-            <h2 className="text-xl font-black">ตั้งค่า Profile Card</h2>
-            <p className="text-sm text-zinc-500">รูปนี้จะขึ้นตอนโหลดเข้าแอพ</p>
-          </div>
-          <button onClick={onClose} className="rounded-full bg-zinc-100 p-2 text-zinc-600">
-            <X size={20} />
-          </button>
-        </div>
-
-        <div className="space-y-3">
-          <label className="block">
-            <span className="text-sm font-bold text-zinc-700">ชื่อเล่น</span>
-            <input
-              value={nickname}
-              onChange={(e) => setNickname(e.target.value)}
-              placeholder="เช่น Erk"
-              className="mt-1 w-full rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-3 outline-none focus:border-zinc-950"
-            />
-          </label>
-
-          <label className="block rounded-2xl border border-dashed border-zinc-300 bg-zinc-50 p-4 text-center">
-            <Upload className="mx-auto text-zinc-500" />
-            <span className="mt-2 block text-sm font-bold text-zinc-700">
-              {uploading ? "กำลังอัปโหลด..." : "เลือกรูปโปรไฟล์"}
-            </span>
-            <input type="file" accept="image/*" onChange={(e) => uploadAvatar(e.target.files?.[0] || null)} className="hidden" />
-          </label>
-
-          <label className="block">
-            <span className="text-sm font-bold text-zinc-700">หรือวางลิงก์รูป</span>
-            <input
-              value={avatarUrl}
-              onChange={(e) => setAvatarUrl(e.target.value)}
-              placeholder="https://..."
-              className="mt-1 w-full rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-3 outline-none focus:border-zinc-950"
-            />
-          </label>
-
-          {avatarUrl && (
-            <div className="aspect-[3/4] overflow-hidden rounded-3xl bg-zinc-100">
-              <img src={avatarUrl} alt="preview" className="h-full w-full object-cover" />
-            </div>
-          )}
-        </div>
-
-        <button
-          onClick={saveProfile}
-          disabled={saving}
-          className="mt-5 flex h-12 w-full items-center justify-center rounded-2xl bg-zinc-950 text-base font-bold text-white disabled:opacity-50"
-        >
-          <Save size={18} className="mr-2" />
-          {saving ? "กำลังบันทึก..." : "บันทึก Profile"}
-        </button>
-      </motion.div>
-    </motion.div>
-  );
 }
 
 function AuthBox() {
@@ -872,9 +670,6 @@ function Sidebar({
 
 export default function App() {
   const [user, setUser] = useState<SupabaseUser | null>(null);
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [showSplash, setShowSplash] = useState(true);
-  const [showProfileSetup, setShowProfileSetup] = useState(false);
   const [items, setItems] = useState<MangaItem[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [query, setQuery] = useState("");
@@ -889,33 +684,16 @@ export default function App() {
   const [isWideLandscape, setIsWideLandscape] = useState(false);
   const [readingSources, setReadingSources] = useState(defaultReadingSources);
 
-
-  async function loadProfile(currentUser: SupabaseUser | null) {
-    if (!supabase || !currentUser) {
-      setProfile(null);
-      return;
-    }
-
-    const { data } = await supabase.from("profiles").select("*").eq("id", currentUser.id).maybeSingle();
-
-    if (data) setProfile(data as Profile);
-    else {
-      setProfile(null);
-      setShowProfileSetup(true);
-    }
-  }
-
   useEffect(() => {
     if (!supabase) {
       const saved = localStorage.getItem(STORAGE_KEY);
       setItems(saved ? JSON.parse(saved) : []);
       setLoaded(true);
-      setTimeout(() => setShowSplash(false), 900);
       return;
     }
 
-    supabase.auth.getUser().then(async ({ data }) => { setUser(data.user); await loadProfile(data.user); setTimeout(() => setShowSplash(false), 1300); });
-    const { data: listener } = supabase.auth.onAuthStateChange(async (_event, session) => { setUser(session?.user || null); await loadProfile(session?.user || null); });
+    supabase.auth.getUser().then(({ data }) => setUser(data.user));
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => setUser(session?.user || null));
     setLoaded(true);
     return () => listener.subscription.unsubscribe();
   }, []);
@@ -1104,7 +882,7 @@ export default function App() {
   ];
 
   return (
-    <><AnimatePresence>{showSplash&&<ProfileSplash user={user} profile={profile} show={showSplash}/>}</AnimatePresence><main className="min-h-screen bg-zinc-100 text-zinc-950 xl:p-6">
+    <main className="min-h-screen bg-zinc-100 text-zinc-950 xl:p-6">
       <div className={`app-shell mx-auto grid gap-4 ${isWideLandscape ? "max-w-7xl grid-cols-[170px_1fr] px-0 pb-4 pt-0" : "max-w-md px-4 pb-28 pt-3"} xl:max-w-7xl xl:grid-cols-[170px_1fr] xl:px-0 xl:pt-0`}>
         <Sidebar
           user={user}
@@ -1130,7 +908,7 @@ export default function App() {
               <Card className="p-5">
                 <p className="text-sm font-bold text-zinc-400">Good evening,</p>
                 <h2 className="mt-1 text-xl font-black text-zinc-950">{user.email?.split("@")[0] || "Reader"}</h2>
-                <div className="mt-1 flex items-center justify-between gap-3"><p className="text-sm text-zinc-500">ค้นหา จัดการ และเช็กตอนใหม่จากที่นี่</p>{user&&<button onClick={()=>setShowProfileSetup(true)} className="rounded-xl bg-zinc-100 px-3 py-2 text-xs font-bold text-zinc-700">Profile</button>}</div>
+                <p className="mt-1 text-sm text-zinc-500">ค้นหา จัดการ และเช็กตอนใหม่จากที่นี่</p>
               </Card>
               <SourceIconBar isGuest={!user} sources={readingSources} onAddSource={addReadingSource} onDeleteSource={deleteReadingSource} />
             </div>
@@ -1306,6 +1084,6 @@ export default function App() {
           />
         )}
       </AnimatePresence>
-    </main></>
+    </main>
   );
 }
