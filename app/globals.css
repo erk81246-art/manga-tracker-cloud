@@ -78,3 +78,19 @@
     max-width: 1180px !important;
   }
 }
+
+
+/* Portrait collection hero mode */
+@media (orientation: portrait) and (max-width: 899px) {
+  .hero-showcase {
+    margin-top: 0.25rem;
+  }
+}
+
+@media (orientation: portrait) and (min-width: 700px) and (max-width: 1279px) {
+  .hero-showcase {
+    max-width: 48rem;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}

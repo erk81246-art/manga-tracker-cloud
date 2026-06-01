@@ -4,6 +4,8 @@ import React, { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Bell,
+  ChevronRight,
+  ChevronLeft,
   BookOpen,
   Cloud,
   ExternalLink,
@@ -14,6 +16,7 @@ import {
   Menu,
   Pencil,
   Plus,
+  Play,
   RefreshCw,
   Save,
   Search,
@@ -602,6 +605,195 @@ function MangaForm({
   );
 }
 
+
+function HeroCarousel({
+  items,
+  activeIndex,
+  setActiveIndex,
+  onOpen,
+  favoriteIds,
+  onToggleFavorite,
+  user,
+}: {
+  items: MangaItem[];
+  activeIndex: number;
+  setActiveIndex: (index: number) => void;
+  onOpen: (item: MangaItem) => void;
+  favoriteIds: string[];
+  onToggleFavorite: (item: MangaItem) => void;
+  user: SupabaseUser | null;
+}) {
+  const featured = items.slice(0, 8);
+  if (featured.length === 0) return null;
+
+  const index = Math.min(activeIndex, featured.length - 1);
+  const active = featured[index];
+  const prev = featured[(index - 1 + featured.length) % featured.length];
+  const next = featured[(index + 1) % featured.length];
+  const hasUpdate = chapterNumber(active.latest_chapter) > chapterNumber(active.read_chapter);
+  const isFavorite = favoriteIds.includes(active.id);
+
+  function move(step: number) {
+    setActiveIndex((index + step + featured.length) % featured.length);
+  }
+
+  return (
+    <section className="hero-showcase mb-6 overflow-hidden rounded-[2.2rem] bg-zinc-950 p-3 text-white shadow-sm md:p-5">
+      <div className="mb-4 flex items-center justify-between">
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.24em] text-purple-300">Featured</p>
+          <h2 className="mt-1 text-xl font-black md:text-3xl">Collection Highlight</h2>
+        </div>
+        <div className="flex gap-2">
+          <button onClick={() => move(-1)} className="rounded-2xl bg-white/10 p-3 text-white active:scale-95">
+            <ChevronLeft size={20} />
+          </button>
+          <button onClick={() => move(1)} className="rounded-2xl bg-white/10 p-3 text-white active:scale-95">
+            <ChevronRight size={20} />
+          </button>
+        </div>
+      </div>
+
+      <div className="relative min-h-[560px] md:min-h-[430px]">
+        {featured.length > 1 && (
+          <button onClick={() => move(-1)} className="absolute left-0 top-12 hidden h-[310px] w-[170px] overflow-hidden rounded-[1.7rem] opacity-45 md:block">
+            {prev.cover ? <img src={prev.cover} alt={prev.title} className="h-full w-full object-cover" /> : <div className="h-full w-full bg-zinc-800" />}
+            <div className="absolute inset-0 bg-black/45" />
+            <p className="absolute bottom-4 left-4 right-4 line-clamp-2 text-left text-xl font-black">{prev.title}</p>
+          </button>
+        )}
+
+        {featured.length > 1 && (
+          <button onClick={() => move(1)} className="absolute right-0 top-12 hidden h-[310px] w-[170px] overflow-hidden rounded-[1.7rem] opacity-45 md:block">
+            {next.cover ? <img src={next.cover} alt={next.title} className="h-full w-full object-cover" /> : <div className="h-full w-full bg-zinc-800" />}
+            <div className="absolute inset-0 bg-black/45" />
+            <p className="absolute bottom-4 left-4 right-4 line-clamp-2 text-left text-xl font-black">{next.title}</p>
+          </button>
+        )}
+
+        <motion.div
+          key={active.id}
+          drag="x"
+          dragConstraints={{ left: 0, right: 0 }}
+          onDragEnd={(_, info) => {
+            if (info.offset.x < -80) move(1);
+            if (info.offset.x > 80) move(-1);
+          }}
+          initial={{ opacity: 0, scale: 0.96, y: 12 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          className="relative z-10 mx-auto min-h-[540px] overflow-hidden rounded-[2rem] border border-purple-400/40 bg-zinc-900 shadow-[0_0_32px_rgba(168,85,247,0.25)] md:min-h-[410px] md:w-[72%]"
+        >
+          {active.cover ? <img src={active.cover} alt={active.title} className="absolute inset-0 h-full w-full object-cover" /> : <div className="absolute inset-0 bg-zinc-800" />}
+          <div className="absolute inset-0 bg-gradient-to-r from-black via-black/70 to-black/10" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+
+          <div className="relative z-10 flex min-h-[540px] flex-col justify-end p-5 md:min-h-[410px] md:p-8">
+            <div className="mb-auto flex items-center justify-between">
+              <span className="rounded-full bg-purple-500 px-4 py-2 text-xs font-black text-white">
+                {hasUpdate ? "NEW CHAPTER" : `TIER ${active.tier}`}
+              </span>
+              {user && (
+                <button onClick={() => onToggleFavorite(active)} className={`rounded-full p-3 ${isFavorite ? "bg-rose-500 text-white" : "bg-white/10 text-white"}`}>
+                  <Heart size={22} fill={isFavorite ? "currentColor" : "none"} />
+                </button>
+              )}
+            </div>
+
+            <h1 className="max-w-xl text-5xl font-black leading-none tracking-tight md:text-6xl">{active.title}</h1>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-white">อ่านถึง {active.read_chapter || "-"}</span>
+              <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-white">ล่าสุด {active.latest_chapter || "-"}</span>
+              <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-white">Tier {active.tier}</span>
+            </div>
+            <p className="mt-4 line-clamp-2 max-w-xl text-sm font-medium text-white/75">{active.note || "กดรายละเอียดเพื่อดูข้อมูลและจัดการเรื่องนี้"}</p>
+            <div className="mt-5 flex flex-wrap gap-3">
+              <button onClick={() => onOpen(active)} className="flex items-center gap-2 rounded-2xl bg-purple-600 px-5 py-3 text-sm font-black text-white shadow-lg shadow-purple-600/25 active:scale-95">
+                <BookOpen size={18} /> รายละเอียด
+              </button>
+              {active.source_url && (
+                <a href={active.source_url} target="_blank" rel="noreferrer" className="flex items-center gap-2 rounded-2xl bg-white/10 px-5 py-3 text-sm font-black text-white active:scale-95">
+                  <Play size={18} /> อ่านต่อ
+                </a>
+              )}
+            </div>
+          </div>
+        </motion.div>
+      </div>
+
+      <div className="mt-3 flex justify-center gap-2">
+        {featured.map((item, i) => (
+          <button key={item.id} onClick={() => setActiveIndex(i)} className={`h-2 rounded-full transition-all ${i === index ? "w-8 bg-purple-500" : "w-2 bg-white/20"}`} aria-label={`go to ${item.title}`} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function ContinueReadingRow({ items, onOpen }: { items: MangaItem[]; onOpen: (item: MangaItem) => void }) {
+  const list = items.filter((item) => item.read_chapter || chapterNumber(item.latest_chapter) > chapterNumber(item.read_chapter)).slice(0, 6);
+  if (list.length === 0) return null;
+  return (
+    <section className="mb-6">
+      <div className="mb-3 flex items-center justify-between">
+        <h2 className="text-xl font-black text-zinc-950">อ่านต่อ</h2>
+        <span className="text-sm font-bold text-zinc-400">{list.length} เรื่อง</span>
+      </div>
+      <div className="flex gap-3 overflow-x-auto pb-2">
+        {list.map((item) => {
+          const read = chapterNumber(item.read_chapter);
+          const latest = Math.max(chapterNumber(item.latest_chapter), read);
+          const percent = latest ? Math.min(100, Math.round((read / latest) * 100)) : 0;
+          return (
+            <button key={item.id} onClick={() => onOpen(item)} className="min-w-[230px] rounded-3xl bg-white p-3 text-left shadow-sm active:scale-[0.99]">
+              <div className="flex gap-3">
+                <div className="h-20 w-14 shrink-0 overflow-hidden rounded-2xl bg-zinc-100">
+                  {item.cover ? <img src={item.cover} alt={item.title} className="h-full w-full object-cover" /> : null}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="line-clamp-2 text-sm font-black">{item.title}</p>
+                  <p className="mt-1 text-xs font-bold text-purple-600">ตอนที่ {item.read_chapter || "-"}</p>
+                  <p className="text-xs text-zinc-400">ล่าสุด {item.latest_chapter || "-"}</p>
+                </div>
+              </div>
+              <div className="mt-3 h-2 overflow-hidden rounded-full bg-zinc-100">
+                <div className="h-full rounded-full bg-purple-600" style={{ width: `${percent}%` }} />
+              </div>
+            </button>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+function NewChapterRow({ items, onOpen }: { items: MangaItem[]; onOpen: (item: MangaItem) => void }) {
+  const list = items.filter((item) => chapterNumber(item.latest_chapter) > chapterNumber(item.read_chapter)).slice(0, 6);
+  if (list.length === 0) return null;
+  return (
+    <section className="mb-6">
+      <div className="mb-3 flex items-center justify-between">
+        <h2 className="text-xl font-black text-zinc-950">ตอนใหม่มาแล้ว</h2>
+        <span className="rounded-full bg-rose-100 px-3 py-1 text-sm font-black text-rose-600">{list.length}</span>
+      </div>
+      <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-3">
+        {list.map((item) => (
+          <button key={item.id} onClick={() => onOpen(item)} className="flex items-center gap-3 rounded-3xl bg-white p-3 text-left shadow-sm active:scale-[0.99]">
+            <div className="h-16 w-12 shrink-0 overflow-hidden rounded-2xl bg-zinc-100">
+              {item.cover ? <img src={item.cover} alt={item.title} className="h-full w-full object-cover" /> : null}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="line-clamp-1 font-black">{item.title}</p>
+              <p className="text-sm font-bold text-rose-600">ใหม่ถึงตอน {item.latest_chapter}</p>
+              <p className="text-xs text-zinc-400">อ่านถึง {item.read_chapter || "-"}</p>
+            </div>
+            <span className="rounded-full bg-rose-500 px-2 py-1 text-[10px] font-black text-white">NEW</span>
+          </button>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function Sidebar({
   user,
   stats,
@@ -700,6 +892,7 @@ export default function App() {
   const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [query, setQuery] = useState("");
+  const [heroIndex, setHeroIndex] = useState(0);
   const [filter, setFilter] = useState<"all" | "updated" | "favorites" | MangaStatus>("all");
   const [tab, setTab] = useState<"collection" | "tier">("tier");
   const [form, setForm] = useState<Omit<MangaItem, "id" | "user_id">>(emptyForm);
@@ -976,7 +1169,7 @@ export default function App() {
 
           {syncing && <p className="mb-3 rounded-2xl bg-white p-3 text-center text-sm text-zinc-500">กำลัง sync ข้อมูล...</p>}
 
-          <div className={`app-sticky-bar sticky z-20 bg-zinc-100/90 px-4 py-3 backdrop-blur ${isWideLandscape ? "top-4 mx-0 rounded-[2rem] bg-white px-3 shadow-sm" : "top-0 -mx-4"} xl:top-6 xl:mx-0 xl:rounded-[2rem] xl:bg-white xl:px-3 xl:shadow-sm`}>
+          <div className={`app-sticky-bar sticky z-20 bg-zinc-100/90 px-4 py-3 backdrop-blur ${tab === "collection" && !isWideLandscape ? "hidden md:block" : ""} ${isWideLandscape ? "top-4 mx-0 rounded-[2rem] bg-white px-3 shadow-sm" : "top-0 -mx-4"} xl:top-6 xl:mx-0 xl:rounded-[2rem] xl:bg-white xl:px-3 xl:shadow-sm`}>
             <div className="hidden rounded-3xl bg-white p-1 shadow-sm">
               <button onClick={() => user && setTab("collection")} disabled={!user} className={`flex flex-1 items-center justify-center gap-2 rounded-[1.1rem] px-3 py-2 text-sm font-bold ${tab === "collection" ? "bg-zinc-950 text-white" : "text-zinc-500"}`}>
                 <BookOpen size={16} /> Collection
@@ -996,6 +1189,17 @@ export default function App() {
 
           {tab === "collection" ? (
             <>
+              <HeroCarousel
+                items={filtered.length ? filtered : items}
+                activeIndex={heroIndex}
+                setActiveIndex={setHeroIndex}
+                onOpen={setSelectedItem}
+                favoriteIds={favoriteIds}
+                onToggleFavorite={toggleFavorite}
+                user={user}
+              />
+              <div className="hidden md:block"><ContinueReadingRow items={items} onOpen={setSelectedItem} /></div>
+              <div className="hidden md:block"><NewChapterRow items={items} onOpen={setSelectedItem} /></div>
               <div className="mb-4 mt-4 flex gap-2 overflow-x-auto pb-1 xl:hidden">
                 {filters.map(([key, label]) => (
                   <button key={key} onClick={() => setFilter(key)} className={`shrink-0 rounded-full px-4 py-2 text-sm font-bold ${filter === key ? "bg-zinc-950 text-white" : "bg-white text-zinc-500"}`}>
@@ -1004,7 +1208,8 @@ export default function App() {
                 ))}
               </div>
 
-              <div className="mt-4 grid grid-cols-3 gap-x-3 gap-y-5 sm:grid-cols-4 md:grid-cols-7 lg:grid-cols-7 xl:grid-cols-6 2xl:grid-cols-7">
+              <div className="mb-3 mt-2 hidden items-center justify-between md:flex"><h2 className="text-2xl font-black text-zinc-950">All Collections <span className="text-zinc-400">({filtered.length})</span></h2></div>
+              <div className="mt-4 hidden grid-cols-3 md:grid gap-x-3 gap-y-5 sm:grid-cols-4 md:grid-cols-7 lg:grid-cols-7 xl:grid-cols-6 2xl:grid-cols-7">
                 <AnimatePresence>
                   {filtered.map((item) => (
                     <MangaTile key={item.id} item={item} onOpen={setSelectedItem} isFavorite={favoriteIds.includes(item.id)} />
@@ -1013,7 +1218,7 @@ export default function App() {
               </div>
 
               {filtered.length === 0 && (
-                <div className="mt-4 rounded-[2rem] bg-white p-8 text-center shadow-sm">
+                <div className="mt-4 hidden rounded-[2rem] bg-white p-8 text-center shadow-sm md:block">
                   <Star className="mx-auto text-zinc-300" size={36} />
                   <h3 className="mt-3 font-black">ยังไม่มีรายการ</h3>
                   <p className="mt-1 text-sm text-zinc-500">กดเพิ่มมังงะเพื่อเริ่มใช้งาน</p>
