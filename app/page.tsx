@@ -1224,8 +1224,8 @@ export default function App() {
                 ))}
               </div>
 
-              <div className="mb-3 mt-2 hidden items-center justify-between md:flex"><h2 className="text-2xl font-black text-zinc-950">All Collections <span className="text-zinc-400">({filtered.length})</span></h2></div>
-              <div className="mt-4 hidden grid-cols-3 md:grid gap-x-3 gap-y-5 sm:grid-cols-4 md:grid-cols-7 lg:grid-cols-7 xl:grid-cols-6 2xl:grid-cols-7">
+              <div className="mb-3 mt-2 flex items-center justify-between"><h2 className="text-2xl font-black text-zinc-950">All Collections <span className="text-zinc-400">({filtered.length})</span></h2></div>
+              <div className="mt-4 grid grid-cols-3 gap-x-3 gap-y-5 sm:grid-cols-4 md:grid-cols-7 lg:grid-cols-7 xl:grid-cols-6 2xl:grid-cols-7">
                 <AnimatePresence>
                   {filtered.map((item) => (
                     <MangaTile key={item.id} item={item} onOpen={setSelectedItem} isFavorite={favoriteIds.includes(item.id)} />
@@ -1234,7 +1234,7 @@ export default function App() {
               </div>
 
               {filtered.length === 0 && (
-                <div className="mt-4 hidden rounded-[2rem] bg-white p-8 text-center shadow-sm md:block">
+                <div className="mt-4 rounded-[2rem] bg-white p-8 text-center shadow-sm">
                   <Star className="mx-auto text-zinc-300" size={36} />
                   <h3 className="mt-3 font-black">ยังไม่มีรายการ</h3>
                   <p className="mt-1 text-sm text-zinc-500">กดเพิ่มมังงะเพื่อเริ่มใช้งาน</p>

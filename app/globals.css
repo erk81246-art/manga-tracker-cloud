@@ -94,3 +94,11 @@
     margin-right: auto;
   }
 }
+
+
+/* portrait all collections spacing */
+@media (orientation: portrait) and (max-width: 899px) {
+  .hero-showcase {
+    margin-bottom: 1rem;
+  }
+}
