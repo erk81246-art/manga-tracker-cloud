@@ -1,9 +1,7 @@
-# Manga Tracker Portrait Hero
+# Manga Tracker Menu Search + Source Add
 
-รื้อหน้า Collection แนวตั้ง:
-- แนวตั้งโชว์ Hero Carousel เป็นหลัก
-- Hero สูงขึ้น เต็มหน้าแบบ showcase
-- ซ่อน Search / Filter / Continue Reading / New Chapter / Grid ในแนวตั้ง
-- แนวนอน/จอกว้างยังเห็น Continue Reading, New Chapter, Grid
-- Tier List ยังใช้แบบเดิม
+แก้เพิ่ม:
+- ย้าย Search ไปอยู่ใน Drawer Menu
+- ในแนวตั้งกดปุ่ม เว็บอ่าน แล้วเพิ่มเว็บอ่านเองได้
+- เว็บอ่านที่เพิ่มเก็บใน localStorage
 - ไม่ต้องรัน SQL ใหม่

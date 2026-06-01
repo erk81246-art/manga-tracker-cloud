@@ -901,6 +901,9 @@ export default function App() {
   const [selectedItem, setSelectedItem] = useState<MangaItem | null>(null);
   const [syncing, setSyncing] = useState(false);
   const [sourcesOpen, setSourcesOpen] = useState(false);
+  const [sourceAddOpen, setSourceAddOpen] = useState(false);
+  const [newSourceName, setNewSourceName] = useState("");
+  const [newSourceUrl, setNewSourceUrl] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
   const [isWideLandscape, setIsWideLandscape] = useState(false);
   const [readingSources, setReadingSources] = useState(defaultReadingSources);
@@ -1137,6 +1140,19 @@ export default function App() {
     ["paused", "ดองไว้"],
   ];
 
+
+  function submitNewReadingSource() {
+    const cleanName = newSourceName.trim();
+    let cleanUrl = newSourceUrl.trim();
+    if (!cleanName || !cleanUrl) return;
+    if (!/^https?:\/\//i.test(cleanUrl)) cleanUrl = `https://${cleanUrl}`;
+    const short = cleanName.replace(/[^a-z0-9]/gi, "").slice(0, 5).toUpperCase() || "WEB";
+    addReadingSource({ name: cleanName, short, url: cleanUrl });
+    setNewSourceName("");
+    setNewSourceUrl("");
+    setSourceAddOpen(false);
+  }
+
   return (
     <main className="min-h-screen bg-zinc-100 text-zinc-950 xl:p-6">
       <div className={`app-shell mx-auto grid gap-4 ${isWideLandscape ? "max-w-7xl px-0 pb-4 pt-0" : "max-w-md px-4 pb-28 pt-3 sm:max-w-xl md:max-w-3xl"} xl:max-w-7xl xl:px-0 xl:pt-0`}>
@@ -1329,6 +1345,40 @@ export default function App() {
                   </a>
                 ))}
               </div>
+
+              {user && (
+                <div className="mt-4 rounded-3xl bg-zinc-50 p-3">
+                  <button
+                    onClick={() => setSourceAddOpen(!sourceAddOpen)}
+                    className="flex w-full items-center justify-center gap-2 rounded-2xl bg-zinc-950 px-4 py-3 text-sm font-bold text-white"
+                  >
+                    <Plus size={16} /> เพิ่มเว็บอ่าน
+                  </button>
+
+                  {sourceAddOpen && (
+                    <div className="mt-3 space-y-2">
+                      <input
+                        value={newSourceName}
+                        onChange={(e) => setNewSourceName(e.target.value)}
+                        placeholder="ชื่อเว็บ เช่น Manga ABC"
+                        className="w-full rounded-2xl border border-zinc-200 bg-white px-4 py-3 text-sm outline-none focus:border-zinc-950"
+                      />
+                      <input
+                        value={newSourceUrl}
+                        onChange={(e) => setNewSourceUrl(e.target.value)}
+                        placeholder="URL เช่น https://example.com"
+                        className="w-full rounded-2xl border border-zinc-200 bg-white px-4 py-3 text-sm outline-none focus:border-zinc-950"
+                      />
+                      <button
+                        onClick={submitNewReadingSource}
+                        className="w-full rounded-2xl bg-zinc-900 px-4 py-3 text-sm font-bold text-white"
+                      >
+                        บันทึกเว็บ
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
             </motion.div>
           </motion.div>
         )}
@@ -1366,6 +1416,19 @@ export default function App() {
                 <p className="text-xs text-zinc-400">ทั้งหมด</p>
                 <p className="text-4xl font-black">{stats.total}</p>
                 {user && <p className="mt-1 text-xs font-semibold text-zinc-400">Favorite {stats.favorites || 0}</p>}
+              </div>
+
+              <div className="mt-4 flex items-center gap-2 rounded-[1.4rem] bg-white/10 px-4 py-3">
+                <Search size={18} className="text-zinc-400" />
+                <input
+                  value={query}
+                  onChange={(e) => {
+                    setQuery(e.target.value);
+                    setTab("collection");
+                  }}
+                  placeholder="ค้นหามังงะ..."
+                  className="w-full bg-transparent text-sm font-semibold text-white placeholder:text-zinc-500 outline-none"
+                />
               </div>
 
               <div className="mt-4 grid grid-cols-1 gap-2 rounded-[1.5rem] bg-white/10 p-1">
