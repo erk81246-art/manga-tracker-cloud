@@ -1,14 +1,13 @@
-# Manga Tracker State Final Fix
+# Manga Tracker Reading History
 
-แก้จากโค้ดจริงที่ส่งมา:
-- saveItem ตอนแก้ไขมังงะไม่ใช้ data จาก Supabase แล้ว
-- เพราะ update แบบไม่ select จะได้ data = null
-- เปลี่ยนเป็น setItems ด้วย { ...item, ...next }
-- แก้ safeItems reference ที่ทำให้ build fail
-- เพิ่ม guard กัน item เป็น null ใน filter/stats
+เพิ่ม Reading History:
+- กดเปิดรายละเอียดมังงะเรื่องไหน ระบบจำเป็นประวัติ
+- แสดงแถว "อ่านล่าสุด" ใต้ Hero/Collection Highlight
+- เรียงจากเรื่องที่เปิดล่าสุด
+- เก็บใน localStorage แยกตาม user id ของเครื่องนั้น
 - ไม่ต้องรัน SQL ใหม่
+- ไม่กระทบข้อมูล Supabase
 
-ตรวจสอบ:
-- ยังเหลือ "(data as MangaItem)" ในไฟล์ไหม: False
-- ยังเหลือ "safeItems" ในไฟล์ไหม: False
-- update(next) ยังมี .select ตามหลังไหม: False
+หมายเหตุ:
+- ประวัติจะจำเฉพาะเครื่อง/เบราว์เซอร์นั้น
+- ถ้าเปิดคนละเครื่อง ประวัติจะไม่ตามไปด้วย

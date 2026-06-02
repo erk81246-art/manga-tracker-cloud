@@ -56,6 +56,7 @@ const STORAGE_KEY = "manga-tracker-items-v2";
 const SOURCES_STORAGE_KEY = "manga-tracker-reading-sources-v1";
 const PASS_STORAGE_KEY = "manga-tracker-pass-cache-v1";
 const PASS_INDEX_KEY = "manga-tracker-pass-index-v1";
+const HISTORY_STORAGE_KEY = "manga-tracker-reading-history-v1";
 const ADMIN_EMAILS = ["erk81246@gmail.com"];
 
 const emptyForm: Omit<MangaItem, "id" | "user_id"> = {
@@ -735,6 +736,67 @@ function HeroCarousel({
   );
 }
 
+
+function ReadingHistoryRow({
+  items,
+  historyIds,
+  onOpen,
+}: {
+  items: MangaItem[];
+  historyIds: string[];
+  onOpen: (item: MangaItem) => void;
+}) {
+  const list = historyIds
+    .map((id) => items.find((item) => item && item.id === id))
+    .filter(Boolean)
+    .slice(0, 8) as MangaItem[];
+
+  if (list.length === 0) return null;
+
+  return (
+    <section className="mb-6">
+      <div className="mb-3 flex items-center justify-between">
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.22em] text-zinc-400">History</p>
+          <h2 className="text-xl font-black text-zinc-950">อ่านล่าสุด</h2>
+        </div>
+        <span className="text-sm font-bold text-zinc-400">{list.length} เรื่อง</span>
+      </div>
+
+      <div className="flex gap-3 overflow-x-auto pb-2">
+        {list.map((item, index) => {
+          const hasUpdate = chapterNumber(item.latest_chapter) > chapterNumber(item.read_chapter);
+          return (
+            <button
+              key={item.id}
+              onClick={() => onOpen(item)}
+              className="group min-w-[150px] rounded-[1.7rem] bg-white p-2 text-left shadow-sm active:scale-[0.99] md:min-w-[180px]"
+            >
+              <div className="relative aspect-[3/4] overflow-hidden rounded-[1.35rem] bg-zinc-100">
+                {item.cover ? (
+                  <img src={item.cover} alt={item.title} className="h-full w-full object-cover transition-transform group-hover:scale-105" />
+                ) : null}
+                <div className="absolute left-2 top-2 rounded-full bg-black/75 px-2 py-1 text-[10px] font-black text-white">
+                  #{index + 1}
+                </div>
+                {hasUpdate && (
+                  <div className="absolute right-2 top-2 rounded-full bg-rose-500 px-2 py-1 text-[10px] font-black text-white">
+                    NEW
+                  </div>
+                )}
+              </div>
+              <p className="mt-2 line-clamp-2 text-sm font-black text-zinc-950">{item.title}</p>
+              <p className="mt-1 text-xs font-bold text-zinc-400">
+                อ่านถึง {item.read_chapter || "-"} · ล่าสุด {item.latest_chapter || "-"}
+              </p>
+            </button>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
 function ContinueReadingRow({ items, onOpen }: { items: MangaItem[]; onOpen: (item: MangaItem) => void }) {
   const list = items.filter((item) => item.read_chapter || chapterNumber(item.latest_chapter) > chapterNumber(item.read_chapter)).slice(0, 6);
   if (list.length === 0) return null;
@@ -1356,6 +1418,35 @@ export default function App() {
     setSourceAddOpen(false);
   }
 
+
+  useEffect(() => {
+    try {
+      const key = `${HISTORY_STORAGE_KEY}:${user?.id || "guest"}`;
+      const saved = localStorage.getItem(key);
+      if (saved) setHistoryIds(JSON.parse(saved));
+      else setHistoryIds([]);
+    } catch {
+      setHistoryIds([]);
+    }
+  }, [user?.id]);
+
+  function rememberHistory(item: MangaItem) {
+    if (!item?.id) return;
+    setHistoryIds((prev) => {
+      const next = [item.id, ...prev.filter((id) => id !== item.id)].slice(0, 20);
+      try {
+        const key = `${HISTORY_STORAGE_KEY}:${user?.id || "guest"}`;
+        localStorage.setItem(key, JSON.stringify(next));
+      } catch {}
+      return next;
+    });
+  }
+
+  function openDetail(item: MangaItem) {
+    rememberHistory(item);
+    setSelectedItem(item);
+  }
+
   const isAdmin = ADMIN_EMAILS.includes(user?.email?.toLowerCase() ?? "");
   const canManageItem = (item: MangaItem | null) => Boolean(item && (isAdmin || item.user_id === user?.id));
   const passLoaded = loaded && (!supabase || !syncing);
@@ -1416,13 +1507,14 @@ export default function App() {
                 items={filtered.length ? filtered : items}
                 activeIndex={heroIndex}
                 setActiveIndex={setHeroIndex}
-                onOpen={setSelectedItem}
+                onOpen={openDetail}
                 favoriteIds={favoriteIds}
                 onToggleFavorite={toggleFavorite}
                 user={user}
               />
-              <div className="hidden md:block"><ContinueReadingRow items={items} onOpen={setSelectedItem} /></div>
-              <div className="hidden md:block"><NewChapterRow items={items} onOpen={setSelectedItem} /></div>
+              <ReadingHistoryRow items={items} historyIds={historyIds} onOpen={openDetail} />
+              <div className="hidden md:block"><ContinueReadingRow items={items} onOpen={openDetail} /></div>
+              <div className="hidden md:block"><NewChapterRow items={items} onOpen={openDetail} /></div>
               <div className="mb-4 mt-4 flex gap-2 overflow-x-auto pb-1 xl:hidden">
                 {filters.map(([key, label]) => (
                   <button key={key} onClick={() => setFilter(key)} className={`shrink-0 rounded-full px-4 py-2 text-sm font-bold ${filter === key ? "bg-zinc-950 text-white" : "bg-white text-zinc-500"}`}>
@@ -1435,7 +1527,7 @@ export default function App() {
               <div className="mt-4 grid grid-cols-3 gap-x-3 gap-y-5 sm:grid-cols-4 md:grid-cols-7 lg:grid-cols-7 xl:grid-cols-6 2xl:grid-cols-7">
                 <AnimatePresence>
                   {filtered.map((item) => (
-                    <MangaTile key={item.id} item={item} onOpen={setSelectedItem} isFavorite={favoriteIds.includes(item.id)} />
+                    <MangaTile key={item.id} item={item} onOpen={openDetail} isFavorite={favoriteIds.includes(item.id)} />
                   ))}
                 </AnimatePresence>
               </div>
@@ -1463,7 +1555,7 @@ export default function App() {
                     </div>
                     <div className="grid grid-cols-4 gap-2 sm:grid-cols-5 md:grid-cols-6 md:grid-cols-7 lg:grid-cols-8 xl:grid-cols-10">
                       {tierItems.map((item) => (
-                        <MangaTile key={item.id} item={item} onOpen={setSelectedItem} small isFavorite={favoriteIds.includes(item.id)} />
+                        <MangaTile key={item.id} item={item} onOpen={openDetail} small isFavorite={favoriteIds.includes(item.id)} />
                       ))}
                       {tierItems.length === 0 && <p className="col-span-4 text-sm text-zinc-400">ยังไม่มีเรื่องใน Tier นี้</p>}
                     </div>
