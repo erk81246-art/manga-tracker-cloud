@@ -736,7 +736,7 @@ function HeroCarousel({
 }
 
 function ContinueReadingRow({ items, onOpen }: { items: MangaItem[]; onOpen: (item: MangaItem) => void }) {
-  const list = items.filter((item) => item.read_chapter || chapterNumber(item.latest_chapter) > chapterNumber(item.read_chapter)).slice(0, 6);
+  const list = safeItems.filter((item) => item.read_chapter || chapterNumber(item.latest_chapter) > chapterNumber(item.read_chapter)).slice(0, 6);
   if (list.length === 0) return null;
   return (
     <section className="mb-6">
@@ -773,7 +773,7 @@ function ContinueReadingRow({ items, onOpen }: { items: MangaItem[]; onOpen: (it
 }
 
 function NewChapterRow({ items, onOpen }: { items: MangaItem[]; onOpen: (item: MangaItem) => void }) {
-  const list = items.filter((item) => chapterNumber(item.latest_chapter) > chapterNumber(item.read_chapter)).slice(0, 6);
+  const list = safeItems.filter((item) => chapterNumber(item.latest_chapter) > chapterNumber(item.read_chapter)).slice(0, 6);
   if (list.length === 0) return null;
   return (
     <section className="mb-6">
@@ -933,8 +933,8 @@ function MangaPassIntro({
   useEffect(() => {
     if (!items.length) return;
 
-    const favoriteItems = items.filter((item) => favoriteIds.includes(item.id) && item.cover);
-    const candidates = favoriteItems.length ? favoriteItems : items.filter((item) => item.cover);
+    const favoriteItems = safeItems.filter((item) => favoriteIds.includes(item.id) && item.cover);
+    const candidates = favoriteItems.length ? favoriteItems : safeItems.filter((item) => item.cover);
     if (!candidates.length) return;
 
     let nextIndex = 0;
@@ -1210,13 +1210,13 @@ export default function App() {
         const matchesFilter = filter === "all" || (filter === "updated" && hasUpdate) || (filter === "favorites" && favoriteIds.includes(item.id)) || item.status === filter;
         return matchesQuery && matchesFilter;
       }),
-    [items, query, filter, favoriteIds]
+    [safeItems, query, filter, favoriteIds]
   );
 
   const stats = useMemo(
     () => ({
-      total: items.length,
-      updated: items.filter((item) => chapterNumber(item.latest_chapter) > chapterNumber(item.read_chapter)).length,
+      total: safeItems.length,
+      updated: items.filter((item) => item && chapterNumber(item.latest_chapter) > chapterNumber(item.read_chapter)).length,
       reading: items.filter((item) => item.status === "reading").length,
       finished: items.filter((item) => item.status === "finished").length,
       paused: items.filter((item) => item.status === "paused").length,
@@ -1412,7 +1412,7 @@ export default function App() {
           {tab === "collection" ? (
             <>
               <HeroCarousel
-                items={filtered.length ? filtered : items}
+                items={filtered.length ? filtered : safeItems}
                 activeIndex={heroIndex}
                 setActiveIndex={setHeroIndex}
                 onOpen={setSelectedItem}
@@ -1420,8 +1420,8 @@ export default function App() {
                 onToggleFavorite={toggleFavorite}
                 user={user}
               />
-              <div className="hidden md:block"><ContinueReadingRow items={items} onOpen={setSelectedItem} /></div>
-              <div className="hidden md:block"><NewChapterRow items={items} onOpen={setSelectedItem} /></div>
+              <div className="hidden md:block"><ContinueReadingRow items={safeItems} onOpen={setSelectedItem} /></div>
+              <div className="hidden md:block"><NewChapterRow items={safeItems} onOpen={setSelectedItem} /></div>
               <div className="mb-4 mt-4 flex gap-2 overflow-x-auto pb-1 xl:hidden">
                 {filters.map(([key, label]) => (
                   <button key={key} onClick={() => setFilter(key)} className={`shrink-0 rounded-full px-4 py-2 text-sm font-bold ${filter === key ? "bg-zinc-950 text-white" : "bg-white text-zinc-500"}`}>
@@ -1676,7 +1676,7 @@ export default function App() {
         {showMangaPass && (
           <MangaPassIntro
             user={user}
-            items={items}
+            items={safeItems}
             favoriteIds={favoriteIds}
             loaded={passLoaded}
             onEnter={() => setShowMangaPass(false)}
