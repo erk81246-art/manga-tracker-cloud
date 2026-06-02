@@ -13,6 +13,7 @@ import {
   Image as ImageIcon,
   Layers,
   LogOut,
+  LogIn,
   Menu,
   Pencil,
   Plus,
@@ -243,6 +244,36 @@ function SourceIconBar({
       </Card>
 
       <AnimatePresence>
+
+        {authOpen && !user && (
+          <motion.div
+            className="fixed inset-0 z-[90] flex items-end bg-black/50 p-3 md:items-center md:justify-center md:p-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setAuthOpen(false)}
+          >
+            <motion.div
+              className="w-full max-w-md rounded-[2rem] bg-white p-4 shadow-2xl"
+              initial={{ y: 40, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 40, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="mb-3 flex items-center justify-between">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.2em] text-zinc-400">Login</p>
+                  <h2 className="text-2xl font-black text-zinc-950">เข้าสู่ระบบ</h2>
+                </div>
+                <button onClick={() => setAuthOpen(false)} className="rounded-full bg-zinc-100 p-2 text-zinc-600">
+                  <X size={20} />
+                </button>
+              </div>
+              <AuthBox />
+            </motion.div>
+          </motion.div>
+        )}
+
         {open && (
           <motion.div className="fixed inset-0 z-[60] flex items-end bg-black/40 p-3 md:items-center md:justify-center md:p-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
             <motion.div className="w-full rounded-[2rem] bg-white p-4 shadow-xl md:max-w-md" initial={{ y: 40 }} animate={{ y: 0 }} exit={{ y: 40 }}>
@@ -1591,24 +1622,15 @@ export default function App() {
       <div className={`app-shell mx-auto grid gap-4 ${isWideLandscape ? "max-w-7xl px-0 pb-4 pt-0" : "max-w-md px-4 pb-28 pt-3 sm:max-w-xl md:max-w-3xl"} xl:max-w-7xl xl:px-0 xl:pt-0`}>
 
         <section className="min-w-0">
-          {user && (
-            <div className="mb-3 flex items-center justify-between gap-2 md:mb-4">
-              <button onClick={() => setMenuOpen(true)} className="fixed left-4 top-4 z-50 flex items-center gap-2 rounded-2xl bg-zinc-950 px-4 py-3 text-sm font-bold text-white shadow-sm"><Menu size={18} /> เมนู
-              </button>
-              <p className="text-sm font-bold text-zinc-400">{isAdmin ? "Admin" : "User"} · ทั้งหมด {stats.total} เรื่อง</p>
-            </div>
-          )}
-          {!user && (
-            <div className="mb-4">
-              <AuthBox />
-            </div>
-          )}
+          <div className="mb-3 flex items-center justify-between gap-2 md:mb-4">
+            <button onClick={() => setMenuOpen(true)} className="fixed left-4 top-4 z-50 flex items-center gap-2 rounded-2xl bg-zinc-950 px-4 py-3 text-sm font-bold text-white shadow-sm"><Menu size={18} /> เมนู
+            </button>
+            <p className="text-sm font-bold text-zinc-400">{user ? (isAdmin ? "Admin" : "User") : "Guest"} · ทั้งหมด {stats.total} เรื่อง</p>
+          </div>
 
-          {user && (
-            <div className="sticky top-4 z-40 mb-4 hidden md:block">
-              <SourceIconBar isGuest={!user} sources={readingSources} onAddSource={addReadingSource} onDeleteSource={deleteReadingSource} />
-            </div>
-          )}
+          <div className="sticky top-4 z-40 mb-4 hidden md:block">
+            <SourceIconBar isGuest={!user} sources={readingSources} onAddSource={addReadingSource} onDeleteSource={deleteReadingSource} />
+          </div>
 
           {syncing && <p className="mb-3 rounded-2xl bg-white p-3 text-center text-sm text-zinc-500">กำลัง sync ข้อมูล...</p>}
 
@@ -1709,7 +1731,7 @@ export default function App() {
           <ExternalLink size={18} />
           เว็บอ่าน
         </button>
-        {user && (
+        {user ? (
           <>
             <button onClick={openAdd} className="flex flex-1 flex-col items-center justify-center rounded-3xl bg-white px-2 py-2 text-[11px] font-black text-zinc-950">
               <Plus size={20} />
@@ -1720,6 +1742,11 @@ export default function App() {
               Logout
             </button>
           </>
+        ) : (
+          <button onClick={() => setAuthOpen(true)} className="flex flex-1 flex-col items-center justify-center rounded-3xl bg-white px-2 py-2 text-[11px] font-black text-zinc-950">
+            <LogIn size={18} />
+            เข้าสู่ระบบ
+          </button>
         )}
       </div>
 
@@ -1881,14 +1908,18 @@ export default function App() {
               )}
 
               <div className="mt-5 space-y-2">
-                {user && (
-                  <button onClick={() => { openAdd(); setMenuOpen(false); }} className="flex w-full items-center justify-center gap-2 rounded-[1.2rem] bg-white px-4 py-3 font-bold text-zinc-950">
-                    <Plus size={18} /> เพิ่มมังงะ
-                  </button>
-                )}
-                {user && (
-                  <button onClick={logout} className="flex w-full items-center justify-center gap-2 rounded-[1.2rem] bg-zinc-900 px-4 py-3 font-bold text-white">
-                    <LogOut size={18} /> Logout
+                {user ? (
+                  <>
+                    <button onClick={() => { openAdd(); setMenuOpen(false); }} className="flex w-full items-center justify-center gap-2 rounded-[1.2rem] bg-white px-4 py-3 font-bold text-zinc-950">
+                      <Plus size={18} /> เพิ่มมังงะ
+                    </button>
+                    <button onClick={logout} className="flex w-full items-center justify-center gap-2 rounded-[1.2rem] bg-zinc-900 px-4 py-3 font-bold text-white">
+                      <LogOut size={18} /> Logout
+                    </button>
+                  </>
+                ) : (
+                  <button onClick={() => { setAuthOpen(true); setMenuOpen(false); }} className="flex w-full items-center justify-center gap-2 rounded-[1.2rem] bg-white px-4 py-3 font-bold text-zinc-950">
+                    <LogIn size={18} /> เข้าสู่ระบบ
                   </button>
                 )}
               </div>
