@@ -267,7 +267,7 @@ function SourceIconBar({
                         <p className="font-black">{src.name}</p>
                         <p className="truncate text-xs text-white/60">{src.url}</p>
                       </div>
-                      <ExternalLink size={18} className="text-white/70" />
+                      <ExternalLink size={18} className="text-zinc-300" />
                     </a>
                     {!isGuest && (
                       <button onClick={() => onDeleteSource(src.url)} className="rounded-2xl bg-zinc-100 p-3 text-rose-600">
@@ -388,7 +388,7 @@ function DetailModal({
 
   return (
     <motion.div
-      className="fixed inset-0 z-[80] flex touch-none items-end justify-center overflow-hidden bg-black/70 p-0 md:items-center md:p-6"
+      className="fixed inset-0 z-[80] flex touch-none items-end justify-center overflow-hidden bg-black/80 p-0 md:items-center md:p-6"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -396,7 +396,7 @@ function DetailModal({
     >
       <motion.div
         onClick={(e) => e.stopPropagation()}
-        className="relative flex touch-auto h-[92dvh] w-[100vw] max-w-[100vw] flex-col overflow-hidden rounded-t-[2.5rem] bg-zinc-950 text-white shadow-2xl md:h-[88vh] md:w-full md:max-w-[520px] md:rounded-[2.5rem] xl:max-w-[760px]"
+        className="relative flex touch-auto h-[92dvh] w-[100vw] max-w-[100vw] flex-col overflow-hidden rounded-t-[2.5rem] bg-black text-white shadow-2xl md:h-[88vh] md:w-full md:max-w-[520px] md:rounded-[2.5rem] xl:max-w-[760px]"
         initial={{ y: 60, scale: 0.97, opacity: 0 }}
         animate={{ y: 0, scale: 1, opacity: 1 }}
         exit={{ y: 60, scale: 0.97, opacity: 0 }}
@@ -405,24 +405,24 @@ function DetailModal({
         <div className="relative h-full overflow-y-auto overflow-x-hidden overscroll-contain pb-28">
           <div className="absolute inset-0">
             {item.cover ? (
-              <img src={item.cover} alt={item.title} className="h-full w-full scale-110 object-cover opacity-45 blur-xl" />
+              <img src={item.cover} alt={item.title} className="h-full w-full scale-110 object-cover opacity-25 blur-2xl" />
             ) : (
               <div className="h-full w-full bg-zinc-900" />
             )}
-            <div className="absolute inset-0 bg-gradient-to-b from-black/15 via-black/65 to-black" />
-            <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black via-black/80 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/80 to-black" />
+            <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black via-black to-transparent" />
           </div>
 
           <button
             onClick={onClose}
-            className="absolute right-5 top-5 z-20 grid h-12 w-12 place-items-center rounded-full bg-white/15 text-white backdrop-blur-xl active:scale-95"
+            className="absolute right-5 top-5 z-20 grid h-12 w-12 place-items-center rounded-full bg-zinc-900/95 text-white shadow-xl active:scale-95"
             aria-label="close"
           >
             <X size={26} />
           </button>
 
           <div className="relative z-10 w-full max-w-full overflow-x-hidden px-4 pb-8 pt-16 md:px-8">
-            <div className="mx-auto mb-5 w-[68%] max-w-[280px] overflow-hidden rounded-[2.2rem] bg-zinc-900 shadow-2xl ring-1 ring-white/15 md:w-[46%] xl:w-[260px]">
+            <div className="mx-auto mb-5 w-[68%] max-w-[280px] overflow-hidden rounded-[2.2rem] bg-black shadow-2xl ring-1 ring-white/10 md:w-[46%] xl:w-[260px]">
               {item.cover ? (
                 <img src={item.cover} alt={item.title} className="aspect-[3/4] w-full object-cover" />
               ) : (
@@ -432,10 +432,10 @@ function DetailModal({
 
             <div className="space-y-4 text-center xl:text-left">
               <div className="flex items-center justify-center gap-2 xl:justify-start">
-                <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-black text-white backdrop-blur">
+                <span className="rounded-full bg-zinc-900 px-3 py-1 text-xs font-black text-white backdrop-blur">
                   Tier {item.tier}
                 </span>
-                <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-black text-white backdrop-blur">
+                <span className="rounded-full bg-zinc-900 px-3 py-1 text-xs font-black text-white backdrop-blur">
                   {item.status === "reading" ? "กำลังอ่าน" : item.status === "finished" ? "จบแล้ว" : "รอ"}
                 </span>
                 {hasUpdate && (
@@ -450,18 +450,18 @@ function DetailModal({
               </h2>
 
               {item.note && (
-                <p className="mx-auto max-w-full whitespace-pre-line break-words text-base font-semibold leading-7 text-white/70 xl:max-w-xl">
+                <p className="mx-auto max-w-full whitespace-pre-line break-words text-sm font-semibold leading-7 text-white/60 md:text-base xl:max-w-xl">
                   {item.note}
                 </p>
               )}
 
               <div className="grid grid-cols-2 gap-3 pt-2">
-                <div className="rounded-[1.6rem] bg-white/10 p-4 text-left backdrop-blur-xl">
-                  <p className="text-xs font-bold text-white/45">อ่านถึง</p>
+                <div className="rounded-[1.6rem] bg-zinc-900 p-4 text-left backdrop-blur-xl">
+                  <p className="text-xs font-bold text-zinc-500">อ่านถึง</p>
                   <p className="mt-1 text-2xl font-black">ตอน {item.read_chapter || "-"}</p>
                 </div>
-                <div className="rounded-[1.6rem] bg-white/10 p-4 text-left backdrop-blur-xl">
-                  <p className="text-xs font-bold text-white/45">ล่าสุด</p>
+                <div className="rounded-[1.6rem] bg-zinc-900 p-4 text-left backdrop-blur-xl">
+                  <p className="text-xs font-bold text-zinc-500">ล่าสุด</p>
                   <p className="mt-1 text-2xl font-black">ตอน {item.latest_chapter || "-"}</p>
                 </div>
               </div>
@@ -470,7 +470,7 @@ function DetailModal({
                 <button
                   onClick={() => onToggleFavorite?.(item)}
                   disabled={isGuest}
-                  className={`rounded-2xl px-4 py-3 text-sm font-black active:scale-95 ${isFavorite ? "bg-rose-500 text-white" : "bg-white/10 text-white"}`}
+                  className={`rounded-2xl px-4 py-3 text-sm font-black active:scale-95 ${isFavorite ? "bg-rose-500 text-white" : "bg-zinc-900 text-white"}`}
                 >
                   <Heart size={18} className="mx-auto mb-1" fill={isFavorite ? "currentColor" : "none"} />
                   Favorite
@@ -479,15 +479,15 @@ function DetailModal({
                 <button
                   onClick={handleCheckLatest}
                   disabled={checking || isGuest}
-                  className="rounded-2xl bg-white/10 px-4 py-3 text-sm font-black text-white active:scale-95 disabled:opacity-50"
+                  className="rounded-2xl bg-zinc-900 px-4 py-3 text-sm font-black text-white active:scale-95 disabled:opacity-50"
                 >
                   <RefreshCw size={18} className={`mx-auto mb-1 ${checking ? "animate-spin" : ""}`} />
                   เช็กตอน
                 </button>
               </div>
 
-              <div className="rounded-[1.8rem] bg-white/10 p-4 text-left backdrop-blur-xl">
-                <p className="mb-3 text-sm font-black text-white/70">จัด Tier</p>
+              <div className="rounded-[1.8rem] bg-zinc-900 p-4 text-left backdrop-blur-xl">
+                <p className="mb-3 text-sm font-black text-zinc-300">จัด Tier</p>
                 <div className="grid grid-cols-5 gap-2">
                   {tiers.map((tier) => (
                     <button
@@ -495,7 +495,7 @@ function DetailModal({
                       onClick={() => canManage && onTierChange(item.id, tier)}
                       disabled={!canManage}
                       className={`h-12 rounded-2xl text-sm font-black active:scale-95 disabled:opacity-50 ${
-                        item.tier === tier ? "bg-white text-zinc-950" : "bg-white/10 text-white"
+                        item.tier === tier ? "bg-white text-zinc-950" : "bg-zinc-900 text-white"
                       }`}
                     >
                       {tier}
@@ -508,7 +508,7 @@ function DetailModal({
         </div>
 
         {!isGuest && (
-          <div className="absolute inset-x-0 bottom-0 z-20 overflow-hidden border-t border-white/10 bg-black/70 p-3 backdrop-blur-xl md:p-4">
+          <div className="absolute inset-x-0 bottom-0 z-20 overflow-hidden border-t border-white/10 bg-black p-3 md:p-4">
             <div className="mx-auto grid w-full max-w-[520px] grid-cols-[1fr_1fr_auto] gap-2">
               <button
                 onClick={readUrl ? openRead : () => canManage && onEdit(item)}
@@ -518,11 +518,11 @@ function DetailModal({
               </button>
 
               {canManage ? (
-                <button onClick={() => onEdit(item)} className="rounded-2xl bg-white/10 px-4 py-3 text-sm font-black text-white active:scale-95">
+                <button onClick={() => onEdit(item)} className="rounded-2xl bg-zinc-900 px-4 py-3 text-sm font-black text-white active:scale-95">
                   แก้ไข
                 </button>
               ) : (
-                <button className="rounded-2xl bg-white/10 px-4 py-3 text-sm font-black text-white/50" disabled>
+                <button className="rounded-2xl bg-zinc-900 px-4 py-3 text-sm font-black text-white/50" disabled>
                   ดูอย่างเดียว
                 </button>
               )}
@@ -762,7 +762,7 @@ function HeroCarousel({
                 {hasUpdate ? "NEW CHAPTER" : `TIER ${active.tier}`}
               </span>
               {user && (
-                <button onClick={() => onToggleFavorite(active)} className={`rounded-full p-3 ${isFavorite ? "bg-rose-500 text-white" : "bg-white/10 text-white"}`}>
+                <button onClick={() => onToggleFavorite(active)} className={`rounded-full p-3 ${isFavorite ? "bg-rose-500 text-white" : "bg-zinc-900 text-white"}`}>
                   <Heart size={22} fill={isFavorite ? "currentColor" : "none"} />
                 </button>
               )}
@@ -1026,7 +1026,7 @@ function Sidebar({
           <Plus size={18} /> เพิ่มมังงะ
         </button>
         {user && (
-          <button onClick={onLogout} className="flex w-full items-center justify-center gap-2 rounded-[1.1rem] bg-white/10 px-3 py-2.5 text-sm font-bold text-white">
+          <button onClick={onLogout} className="flex w-full items-center justify-center gap-2 rounded-[1.1rem] bg-zinc-900 px-3 py-2.5 text-sm font-bold text-white">
             <LogOut size={18} /> Logout
           </button>
         )}
@@ -1138,7 +1138,7 @@ function MangaPassIntro({
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/35 to-transparent" />
               <div className="absolute left-5 top-5 rounded-full bg-white/90 px-4 py-2 text-xs font-black text-zinc-950">MANGA PASS</div>
               <div className="absolute bottom-5 left-5 right-5 text-white">
-                <p className="text-sm font-bold text-white/70">ADMIT ONE</p>
+                <p className="text-sm font-bold text-zinc-300">ADMIT ONE</p>
                 <h1 className="mt-1 line-clamp-2 text-4xl font-black leading-none">{title}</h1>
                 <p className="mt-2 text-sm font-semibold text-white/80">for {username}</p>
               </div>
@@ -1763,7 +1763,7 @@ export default function App() {
                       <p className="font-black">{src.name}</p>
                       <p className="truncate text-xs text-white/60">{src.url}</p>
                     </div>
-                    <ExternalLink size={18} className="text-white/70" />
+                    <ExternalLink size={18} className="text-zinc-300" />
                   </a>
                 ))}
               </div>
@@ -1835,13 +1835,13 @@ export default function App() {
                 </button>
               </div>
 
-              <div className="rounded-[1.5rem] bg-white/10 p-4">
+              <div className="rounded-[1.5rem] bg-zinc-900 p-4">
                 <p className="text-xs text-zinc-400">ทั้งหมด</p>
                 <p className="text-4xl font-black">{stats.total}</p>
                 {user && <p className="mt-1 text-xs font-semibold text-zinc-400">Favorite {stats.favorites || 0}</p>}
               </div>
 
-              <div className="mt-4 flex items-center gap-2 rounded-[1.4rem] bg-white/10 px-4 py-3">
+              <div className="mt-4 flex items-center gap-2 rounded-[1.4rem] bg-zinc-900 px-4 py-3">
                 <Search size={18} className="text-zinc-400" />
                 <input
                   value={query}
@@ -1881,7 +1881,7 @@ export default function App() {
                   </button>
                 )}
                 {user && (
-                  <button onClick={logout} className="flex w-full items-center justify-center gap-2 rounded-[1.2rem] bg-white/10 px-4 py-3 font-bold text-white">
+                  <button onClick={logout} className="flex w-full items-center justify-center gap-2 rounded-[1.2rem] bg-zinc-900 px-4 py-3 font-bold text-white">
                     <LogOut size={18} /> Logout
                   </button>
                 )}
