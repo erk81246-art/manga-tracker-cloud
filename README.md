@@ -1,6 +1,9 @@
-# Manga Tracker History Last URL Build Fix
+# Manga Tracker History Open URL
 
-แก้ build error:
-- Cannot find name 'continueUrl'
-- ปุ่มอ่านต่อใช้ item.last_read_url || item.source_url โดยตรง
-- ยังต้องรัน SQL supabase/last_read_fields.sql เหมือนเดิม
+แก้ Reading History:
+- กดการ์ดใน "อ่านล่าสุด" แล้วเปิด last_read_url ทันที
+- ถ้าไม่มี last_read_url จะเปิด source_url
+- ถ้าไม่มี URL เลยค่อยเปิดรายละเอียด
+- ยังมีปุ่ม "รายละเอียด" แยกไว้
+- เพิ่ม last_read_at ตอนบันทึก last_read_url
+- ยังต้องรัน SQL supabase/last_read_fields.sql ถ้ายังไม่ได้รัน

@@ -786,26 +786,19 @@ function ReadingHistoryRow({
           return (
             <button
               key={item.id}
-              onClick={() => onOpen(item)}
+              onClick={() => {
+                const continueUrl = item.last_read_url || item.source_url;
+                if (continueUrl) window.open(continueUrl, "_blank", "noopener,noreferrer");
+                else onOpen(item);
+              }}
               className="group min-w-[150px] rounded-[1.7rem] bg-white p-2 text-left shadow-sm active:scale-[0.99] md:min-w-[180px]"
             >
               <div className="relative aspect-[3/4] overflow-hidden rounded-[1.35rem] bg-zinc-100">
-                {item.cover ? (
-                  <img src={item.cover} alt={item.title} className="h-full w-full object-cover transition-transform group-hover:scale-105" />
-                ) : null}
-                <div className="absolute left-2 top-2 rounded-full bg-black/75 px-2 py-1 text-[10px] font-black text-white">
-                  #{index + 1}
-                </div>
-                {hasUpdate && (
-                  <div className="absolute right-2 top-2 rounded-full bg-rose-500 px-2 py-1 text-[10px] font-black text-white">
-                    NEW
-                  </div>
-                )}
+                {item.cover ? <img src={item.cover} alt={item.title} className="h-full w-full object-cover transition-transform group-hover:scale-105" /> : null}
+                <div className="absolute left-2 top-2 rounded-full bg-black/75 px-2 py-1 text-[10px] font-black text-white">#{index + 1}</div>
               </div>
               <p className="mt-2 line-clamp-2 text-sm font-black text-zinc-950">{item.title}</p>
-              <p className="mt-1 text-xs font-bold text-zinc-400">
-                อ่านถึง {item.read_chapter || "-"} · ล่าสุด {item.latest_chapter || "-"}
-              </p>
+              <p className="mt-1 text-xs font-bold text-zinc-400">แตะเพื่ออ่านต่อ</p>
             </button>
           );
         })}
@@ -1326,12 +1319,12 @@ export default function App() {
 
     if (supabase && user) {
       if (editingId) {
-        const next = { ...form };
+        const next = { ...form, last_read_at: form.last_read_url ? new Date().toISOString() : form.last_read_at };
         const { error } = await supabase.from("manga_items").update(next).eq("id", editingId);
         if (error) return alert(error.message);
         setItems((prev) => prev.map((item) => (item.id === editingId ? { ...item, ...next } : item)));
       } else {
-        const next = { ...form, user_id: user.id };
+        const next = { ...form, last_read_at: form.last_read_url ? new Date().toISOString() : form.last_read_at, user_id: user.id };
         const { data, error } = await supabase.from("manga_items").insert(next).select().single();
         if (error) return alert(error.message);
         setItems((prev) => [data as MangaItem, ...prev]);
