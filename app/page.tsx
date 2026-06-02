@@ -245,34 +245,7 @@ function SourceIconBar({
 
       <AnimatePresence>
 
-        {authOpen && !user && (
-          <motion.div
-            className="fixed inset-0 z-[90] flex items-end bg-black/50 p-3 md:items-center md:justify-center md:p-6"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setAuthOpen(false)}
-          >
-            <motion.div
-              className="w-full max-w-md rounded-[2rem] bg-white p-4 shadow-2xl"
-              initial={{ y: 40, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: 40, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="mb-3 flex items-center justify-between">
-                <div>
-                  <p className="text-xs font-black uppercase tracking-[0.2em] text-zinc-400">Login</p>
-                  <h2 className="text-2xl font-black text-zinc-950">เข้าสู่ระบบ</h2>
-                </div>
-                <button onClick={() => setAuthOpen(false)} className="rounded-full bg-zinc-100 p-2 text-zinc-600">
-                  <X size={20} />
-                </button>
-              </div>
-              <AuthBox />
-            </motion.div>
-          </motion.div>
-        )}
+        
 
         {open && (
           <motion.div className="fixed inset-0 z-[60] flex items-end bg-black/40 p-3 md:items-center md:justify-center md:p-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
@@ -1677,6 +1650,36 @@ export default function App() {
               <div className="mb-3 mt-2 flex items-center justify-between"><h2 className="text-2xl font-black text-zinc-950">All Collections <span className="text-zinc-400">({filtered.length})</span></h2></div>
               <div className="mt-4 grid grid-cols-3 gap-x-3 gap-y-5 sm:grid-cols-4 md:grid-cols-7 lg:grid-cols-7 xl:grid-cols-6 2xl:grid-cols-7">
                 <AnimatePresence>
+
+        {authOpen && !user && (
+          <motion.div
+            className="fixed inset-0 z-[90] flex items-end bg-black/50 p-3 md:items-center md:justify-center md:p-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setAuthOpen(false)}
+          >
+            <motion.div
+              className="w-full max-w-md rounded-[2rem] bg-white p-4 shadow-2xl"
+              initial={{ y: 40, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 40, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="mb-3 flex items-center justify-between">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.2em] text-zinc-400">Login</p>
+                  <h2 className="text-2xl font-black text-zinc-950">เข้าสู่ระบบ</h2>
+                </div>
+                <button onClick={() => setAuthOpen(false)} className="rounded-full bg-zinc-100 p-2 text-zinc-600">
+                  <X size={20} />
+                </button>
+              </div>
+              <AuthBox />
+            </motion.div>
+          </motion.div>
+        )}
+
                   {filtered.map((item) => (
                     <MangaTile key={item.id} item={item} onOpen={openDetail} isFavorite={favoriteIds.includes(item.id)} />
                   ))}
