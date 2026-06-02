@@ -1,12 +1,11 @@
-# Manga Tracker Google Login
+# Manga Tracker Admin Email
 
-ปรับโค้ด:
-- ปุ่ม Continue with Google ใช้ Supabase OAuth
-- เพิ่ม prompt เลือกบัญชี Google
-- แสดง error ถ้า OAuth ไม่สำเร็จ
+เพิ่มระบบ Admin แบบ B:
+- Admin email: erk81246@gmail.com
+- Admin แก้ / ลบ / เปลี่ยน Tier ได้ทุกเรื่อง
+- User ทั่วไปแก้ / ลบ / เปลี่ยน Tier ได้เฉพาะเรื่องที่ตัวเองเพิ่ม
+- User ทุกคนยังเห็นมังงะทั้งหมด และ Favorite/Follow ได้เหมือนเดิม
+- ไม่ต้องรัน SQL ใหม่
 
-ต้องตั้งค่าใน Supabase:
-1. Authentication > Providers > Google > Enable
-2. ใส่ Google Client ID และ Client Secret
-3. ตั้ง Redirect URL ใน Google Cloud เป็น callback URL ของ Supabase
-4. ตั้ง Site URL / Redirect URLs ใน Supabase ให้ตรงกับ Vercel URL
+ถ้าจะเพิ่ม admin ใหม่:
+แก้ const ADMIN_EMAILS ใน app/page.tsx แล้ว deploy ใหม่

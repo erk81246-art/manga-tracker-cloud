@@ -56,6 +56,7 @@ const STORAGE_KEY = "manga-tracker-items-v2";
 const SOURCES_STORAGE_KEY = "manga-tracker-reading-sources-v1";
 const PASS_STORAGE_KEY = "manga-tracker-pass-cache-v1";
 const PASS_INDEX_KEY = "manga-tracker-pass-index-v1";
+const ADMIN_EMAILS = ["erk81246@gmail.com"];
 
 const emptyForm: Omit<MangaItem, "id" | "user_id"> = {
   title: "",
@@ -122,24 +123,10 @@ function AuthBox() {
 
   async function googleLogin() {
     if (!supabase) return;
-    setBusy(true);
-    setMessage("");
-
-    const { error } = await supabase.auth.signInWithOAuth({
+    await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: {
-        redirectTo: window.location.origin,
-        queryParams: {
-          access_type: "offline",
-          prompt: "select_account",
-        },
-      },
+      options: { redirectTo: window.location.origin },
     });
-
-    if (error) {
-      setMessage(error.message);
-      setBusy(false);
-    }
   }
 
   if (!isSupabaseReady) {
@@ -357,6 +344,7 @@ function DetailModal({
   isGuest = false,
   isFavorite = false,
   onToggleFavorite,
+  canManage = false,
 }: {
   item: MangaItem;
   onClose: () => void;
@@ -367,6 +355,7 @@ function DetailModal({
   isGuest?: boolean;
   isFavorite?: boolean;
   onToggleFavorite?: (item: MangaItem) => void;
+  canManage?: boolean;
 }) {
   const [checking, setChecking] = useState(false);
   const [message, setMessage] = useState("");
@@ -465,8 +454,8 @@ function DetailModal({
             {tiers.map((tier) => (
               <button
                 key={tier}
-                onClick={() => !isGuest && onTierChange(item.id, tier)}
-                disabled={isGuest}
+                onClick={() => canManage && onTierChange(item.id, tier)}
+                disabled={!canManage}
                 className={`h-10 min-w-10 rounded-2xl text-sm font-black ${item.tier === tier ? "bg-zinc-950 text-white" : "bg-white text-zinc-500"}`}
               >
                 {tier}
@@ -1243,6 +1232,7 @@ export default function App() {
   };
 
   const openEdit = (item: MangaItem) => {
+    if (!(ADMIN_EMAILS.includes(user?.email?.toLowerCase() ?? "") || item.user_id === user?.id)) return alert("บัญชีนี้ไม่มีสิทธิ์แก้ไขเรื่องนี้");
     setSelectedItem(null);
     setEditingId(item.id);
     const { id, user_id, ...rest } = item;
@@ -1276,6 +1266,8 @@ export default function App() {
   }
 
   async function deleteItem(id: string) {
+    const target = items.find((item) => item.id === id) || null;
+    if (!(ADMIN_EMAILS.includes(user?.email?.toLowerCase() ?? "") || target?.user_id === user?.id)) return alert("บัญชีนี้ไม่มีสิทธิ์ลบเรื่องนี้");
     if (!confirm("ลบเรื่องนี้ใช่ไหม?")) return;
     if (supabase && user) {
       const { error } = await supabase.from("manga_items").delete().eq("id", id);
@@ -1286,6 +1278,8 @@ export default function App() {
   }
 
   async function changeTier(id: string, tier: MangaTier) {
+    const target = items.find((item) => item.id === id) || null;
+    if (!(ADMIN_EMAILS.includes(user?.email?.toLowerCase() ?? "") || target?.user_id === user?.id)) return alert("บัญชีนี้ไม่มีสิทธิ์เปลี่ยน Tier เรื่องนี้");
     setItems((prev) => prev.map((item) => (item.id === id ? { ...item, tier } : item)));
     if (supabase && user) await supabase.from("manga_items").update({ tier }).eq("id", id);
   }
@@ -1361,6 +1355,8 @@ export default function App() {
     setSourceAddOpen(false);
   }
 
+  const isAdmin = ADMIN_EMAILS.includes(user?.email?.toLowerCase() ?? "");
+  const canManageItem = (item: MangaItem | null) => Boolean(item && (isAdmin || item.user_id === user?.id));
   const passLoaded = loaded && (!supabase || !syncing);
 
   return (
@@ -1373,7 +1369,7 @@ export default function App() {
               <button onClick={() => setMenuOpen(true)} className="flex items-center gap-2 rounded-2xl bg-zinc-950 px-4 py-3 text-sm font-bold text-white shadow-sm">
                 <Menu size={18} /> เมนู
               </button>
-              <p className="text-sm font-bold text-zinc-400">ทั้งหมด {stats.total} เรื่อง</p>
+              <p className="text-sm font-bold text-zinc-400">{isAdmin ? "Admin" : "User"} · ทั้งหมด {stats.total} เรื่อง</p>
             </div>
           )}
           {!user && (
@@ -1698,6 +1694,7 @@ export default function App() {
             isGuest={!user}
             isFavorite={selectedItem ? favoriteIds.includes(selectedItem.id) : false}
             onToggleFavorite={toggleFavorite}
+            canManage={canManageItem(selectedItem)}
           />
         )}
         {openForm && (
