@@ -342,6 +342,7 @@ function MangaTile({
   );
 }
 
+
 function DetailModal({
   item,
   onClose,
@@ -366,137 +367,191 @@ function DetailModal({
   canManage?: boolean;
 }) {
   const [checking, setChecking] = useState(false);
-  const [message, setMessage] = useState("");
   const hasUpdate = chapterNumber(item.latest_chapter) > chapterNumber(item.read_chapter);
-  const newCount = Math.max(0, chapterNumber(item.latest_chapter) - chapterNumber(item.read_chapter));
+  const readUrl = item.last_read_url || item.source_url || "";
 
   async function handleCheckLatest() {
+    if (isGuest) return;
     setChecking(true);
-    setMessage("");
     try {
       await onCheckLatest(item);
-      setMessage("เช็กและอัปเดตตอนล่าสุดแล้ว");
     } catch (error: any) {
-      setMessage(error?.message || "เช็กไม่สำเร็จ");
+      alert(error.message || "เช็กตอนล่าสุดไม่สำเร็จ");
+    } finally {
+      setChecking(false);
     }
-    setChecking(false);
+  }
+
+  function openRead() {
+    if (readUrl) window.open(readUrl, "_blank", "noopener,noreferrer");
   }
 
   return (
-    <motion.div className="fixed inset-0 z-50 flex items-end bg-black/50 p-3 md:items-center md:justify-center md:p-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-      <motion.div className="max-h-[92vh] w-full overflow-y-auto rounded-[2rem] bg-white p-4 shadow-xl md:max-w-3xl md:p-6" initial={{ y: 40 }} animate={{ y: 0 }} exit={{ y: 40 }}>
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-lg font-black text-zinc-950">รายละเอียด</h2>
-          <button onClick={onClose} className="rounded-full bg-zinc-100 p-2 text-zinc-600">
-            <X size={20} />
-          </button>
-        </div>
-
-        <div className="flex gap-4">
-          <div className="h-44 w-32 shrink-0 overflow-hidden rounded-3xl bg-zinc-100">
+    <motion.div
+      className="fixed inset-0 z-[80] flex items-end justify-center bg-black/70 p-0 md:items-center md:p-6"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      onClick={onClose}
+    >
+      <motion.div
+        onClick={(e) => e.stopPropagation()}
+        className="relative flex max-h-[94vh] w-full max-w-[520px] flex-col overflow-hidden rounded-t-[2.5rem] bg-zinc-950 text-white shadow-2xl md:max-h-[90vh] md:rounded-[2.5rem] xl:max-w-[760px]"
+        initial={{ y: 60, scale: 0.97, opacity: 0 }}
+        animate={{ y: 0, scale: 1, opacity: 1 }}
+        exit={{ y: 60, scale: 0.97, opacity: 0 }}
+        transition={{ type: "spring", stiffness: 260, damping: 25 }}
+      >
+        <div className="relative min-h-[78vh] overflow-y-auto pb-28 md:min-h-[720px] xl:min-h-[640px]">
+          <div className="absolute inset-0">
             {item.cover ? (
-              <img loading="lazy" src={item.cover} alt={item.title} className="h-full w-full object-cover" />
+              <img src={item.cover} alt={item.title} className="h-full w-full scale-110 object-cover opacity-45 blur-xl" />
             ) : (
-              <div className="flex h-full w-full items-center justify-center text-zinc-300">
-                <ImageIcon size={32} />
-              </div>
+              <div className="h-full w-full bg-zinc-900" />
             )}
+            <div className="absolute inset-0 bg-gradient-to-b from-black/15 via-black/65 to-black" />
+            <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black via-black/80 to-transparent" />
           </div>
 
-          <div className="min-w-0 flex-1">
-            <div className="flex items-start justify-between gap-2">
-              <h1 className="text-2xl font-black leading-tight text-zinc-950">{item.title || "ไม่มีชื่อเรื่อง"}</h1>
-              <div className="flex shrink-0 items-center gap-2">
-                {!isGuest && (
-                  <button
-                    onClick={() => onToggleFavorite?.(item)}
-                    className={`rounded-full p-2 ${isFavorite ? "bg-rose-100 text-rose-600" : "bg-zinc-100 text-zinc-500"}`}
-                    title={isFavorite ? "เลิก Favorite" : "Favorite"}
-                  >
-                    <Heart size={18} fill={isFavorite ? "currentColor" : "none"} />
-                  </button>
-                )}
-                <span className="rounded-full bg-zinc-950 px-3 py-1 text-sm font-black text-white">{item.tier}</span>
-              </div>
-            </div>
+          <button
+            onClick={onClose}
+            className="absolute right-5 top-5 z-20 grid h-12 w-12 place-items-center rounded-full bg-white/15 text-white backdrop-blur-xl active:scale-95"
+            aria-label="close"
+          >
+            <X size={26} />
+          </button>
 
-            <div className="mt-3 flex flex-wrap gap-2">
-              <span className={`rounded-full px-3 py-1 text-xs font-bold ${statusMap[item.status].badge}`}>{statusMap[item.status].label}</span>
-              {hasUpdate && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-rose-100 px-3 py-1 text-xs font-bold text-rose-700">
-                  <Bell size={12} /> มีตอนใหม่ {newCount ? `+${newCount}` : ""}
-                </span>
+          <div className="relative z-10 px-5 pb-8 pt-16 md:px-8">
+            <div className="mx-auto mb-5 w-[72%] max-w-[310px] overflow-hidden rounded-[2.2rem] bg-zinc-900 shadow-2xl ring-1 ring-white/15 md:w-[46%] xl:float-left xl:mr-8 xl:w-[260px]">
+              {item.cover ? (
+                <img src={item.cover} alt={item.title} className="aspect-[3/4] w-full object-cover" />
+              ) : (
+                <div className="aspect-[3/4] grid place-items-center text-zinc-500">ไม่มีรูป</div>
               )}
             </div>
 
-            <p className="mt-3 text-sm text-zinc-500">{item.note || "ยังไม่มีโน้ต"}</p>
-          </div>
-        </div>
+            <div className="space-y-4 text-center xl:text-left">
+              <div className="flex items-center justify-center gap-2 xl:justify-start">
+                <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-black text-white backdrop-blur">
+                  Tier {item.tier}
+                </span>
+                <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-black text-white backdrop-blur">
+                  {item.status === "reading" ? "กำลังอ่าน" : item.status === "finished" ? "จบแล้ว" : "รอ"}
+                </span>
+                {hasUpdate && (
+                  <span className="rounded-full bg-rose-500 px-3 py-1 text-xs font-black text-white">
+                    NEW +{chapterNumber(item.latest_chapter) - chapterNumber(item.read_chapter)}
+                  </span>
+                )}
+              </div>
 
-        <div className="mt-4 grid grid-cols-2 gap-3">
-          <div className="rounded-3xl bg-zinc-50 p-4">
-            <p className="text-xs font-semibold text-zinc-400">อ่านถึง</p>
-            <p className="mt-1 text-2xl font-black text-zinc-950">ตอน {item.read_chapter || "-"}</p>
-          </div>
-          <div className="rounded-3xl bg-zinc-50 p-4">
-            <p className="text-xs font-semibold text-zinc-400">ล่าสุด</p>
-            <p className="mt-1 text-2xl font-black text-zinc-950">ตอน {item.latest_chapter || "-"}</p>
-          </div>
-        </div>
+              <h2 className="text-4xl font-black leading-tight tracking-tight text-white md:text-5xl">
+                {item.title}
+              </h2>
 
-        <div className="mt-4 rounded-3xl bg-zinc-50 p-4">
-          <button
-            onClick={handleCheckLatest}
-            disabled={checking || !item.source_url || isGuest}
-            className="flex w-full items-center justify-center gap-2 rounded-2xl bg-zinc-950 px-3 py-2.5 text-xs font-bold text-white disabled:opacity-50"
-          >
-            <RefreshCw size={16} className={checking ? "animate-spin" : ""} />
-            {isGuest ? "Login เพื่อเช็กตอนล่าสุด" : checking ? "กำลังเช็ก..." : "เช็กตอนล่าสุดจากเว็บ"}
-          </button>
-          {message && <p className="mt-2 text-center text-xs font-semibold text-zinc-500">{message}</p>}
-        </div>
+              {item.note && (
+                <p className="mx-auto max-w-xl whitespace-pre-line text-base font-semibold leading-7 text-white/70 xl:mx-0">
+                  {item.note}
+                </p>
+              )}
 
-        <div className="mt-4 rounded-3xl bg-zinc-50 p-4">
-          <p className="mb-3 text-sm font-black text-zinc-700">จัด Tier</p>
-          <div className="flex gap-2 overflow-x-auto">
-            {tiers.map((tier) => (
-              <button
-                key={tier}
-                onClick={() => canManage && onTierChange(item.id, tier)}
-                disabled={!canManage}
-                className={`h-10 min-w-10 rounded-2xl text-sm font-black ${item.tier === tier ? "bg-zinc-950 text-white" : "bg-white text-zinc-500"}`}
-              >
-                {tier}
-              </button>
-            ))}
-          </div>
-        </div>
+              <div className="grid grid-cols-2 gap-3 pt-2">
+                <div className="rounded-[1.6rem] bg-white/10 p-4 text-left backdrop-blur-xl">
+                  <p className="text-xs font-bold text-white/45">อ่านถึง</p>
+                  <p className="mt-1 text-2xl font-black">ตอน {item.read_chapter || "-"}</p>
+                </div>
+                <div className="rounded-[1.6rem] bg-white/10 p-4 text-left backdrop-blur-xl">
+                  <p className="text-xs font-bold text-white/45">ล่าสุด</p>
+                  <p className="mt-1 text-2xl font-black">ตอน {item.latest_chapter || "-"}</p>
+                </div>
+              </div>
 
-        <div className="mt-4 flex gap-2">
-          {isGuest ? (
-            <div className="w-full rounded-2xl bg-zinc-100 px-4 py-3 text-center text-sm font-bold text-zinc-500">
-              Login เพื่อเปิดเว็บอ่าน / แก้ไข / ลบ
+              <div className="grid grid-cols-3 gap-2 pt-2">
+                <button
+                  onClick={() => onToggleFavorite?.(item)}
+                  disabled={isGuest}
+                  className={`rounded-2xl px-4 py-3 text-sm font-black active:scale-95 ${isFavorite ? "bg-rose-500 text-white" : "bg-white/10 text-white"}`}
+                >
+                  <Heart size={18} className="mx-auto mb-1" fill={isFavorite ? "currentColor" : "none"} />
+                  Favorite
+                </button>
+
+                <button
+                  onClick={openRead}
+                  disabled={!readUrl || isGuest}
+                  className="rounded-2xl bg-white px-4 py-3 text-sm font-black text-zinc-950 active:scale-95 disabled:opacity-50"
+                >
+                  <ExternalLink size={18} className="mx-auto mb-1" />
+                  อ่านต่อ
+                </button>
+
+                <button
+                  onClick={handleCheckLatest}
+                  disabled={checking || isGuest}
+                  className="rounded-2xl bg-white/10 px-4 py-3 text-sm font-black text-white active:scale-95 disabled:opacity-50"
+                >
+                  <RefreshCw size={18} className={`mx-auto mb-1 ${checking ? "animate-spin" : ""}`} />
+                  เช็กตอน
+                </button>
+              </div>
+
+              <div className="rounded-[1.8rem] bg-white/10 p-4 text-left backdrop-blur-xl">
+                <p className="mb-3 text-sm font-black text-white/70">จัด Tier</p>
+                <div className="grid grid-cols-5 gap-2">
+                  {TIERS.map((tier) => (
+                    <button
+                      key={tier}
+                      onClick={() => canManage && onTierChange(item.id, tier)}
+                      disabled={!canManage}
+                      className={`h-12 rounded-2xl text-sm font-black active:scale-95 disabled:opacity-50 ${
+                        item.tier === tier ? "bg-white text-zinc-950" : "bg-white/10 text-white"
+                      }`}
+                    >
+                      {tier}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
-          ) : (
-            <>
-              {(item.last_read_url || item.source_url) && (
-                <button onClick={() => window.open(item.last_read_url || item.source_url, "_blank", "noopener,noreferrer")} className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-zinc-100 px-4 py-3 text-sm font-bold text-zinc-700">
-                  <ExternalLink size={16} /> อ่านต่อ
+          </div>
+        </div>
+
+        {!isGuest && (
+          <div className="absolute inset-x-0 bottom-0 z-20 border-t border-white/10 bg-black/70 p-4 backdrop-blur-xl">
+            <div className="mx-auto grid max-w-[520px] grid-cols-[1fr_1fr_auto] gap-2">
+              {readUrl ? (
+                <button onClick={openRead} className="rounded-2xl bg-white px-4 py-3 text-sm font-black text-zinc-950 active:scale-95">
+                  อ่านต่อ
+                </button>
+              ) : (
+                <button onClick={() => canManage && onEdit(item)} className="rounded-2xl bg-white px-4 py-3 text-sm font-black text-zinc-950 active:scale-95">
+                  เพิ่มลิงก์
                 </button>
               )}
-              <button onClick={() => onEdit(item)} className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-zinc-950 px-3 py-2.5 text-xs font-bold text-white">
-                <Pencil size={16} /> แก้ไข
-              </button>
-              <button onClick={() => onDelete(item.id)} className="rounded-2xl border border-zinc-200 px-4 py-3 text-rose-600">
-                <Trash2 size={18} />
-              </button>
-            </>
-          )}
-        </div>
+
+              {canManage ? (
+                <button onClick={() => onEdit(item)} className="rounded-2xl bg-white/10 px-4 py-3 text-sm font-black text-white active:scale-95">
+                  แก้ไข
+                </button>
+              ) : (
+                <button className="rounded-2xl bg-white/10 px-4 py-3 text-sm font-black text-white/50" disabled>
+                  ดูอย่างเดียว
+                </button>
+              )}
+
+              {canManage && (
+                <button onClick={() => onDelete(item.id)} className="grid h-12 w-12 place-items-center rounded-2xl bg-rose-500/20 text-rose-300 active:scale-95">
+                  <Trash2 size={20} />
+                </button>
+              )}
+            </div>
+          </div>
+        )}
       </motion.div>
     </motion.div>
   );
 }
+
 
 function MangaForm({
   value,

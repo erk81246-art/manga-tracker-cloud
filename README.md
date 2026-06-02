@@ -1,8 +1,10 @@
-# Manga Tracker Sticky Menu
+# Manga Tracker Cinematic Detail UI
 
-ปรับเมนูให้กดได้ตลอดเวลา:
-- เมนูมือถือด้านล่าง fixed อยู่ด้านล่างจอ
-- เพิ่ม padding ด้านล่างให้ content ไม่โดนเมนูบัง
-- ปุ่มเมนูมุมบนซ้าย fixed เวลาเลื่อนหน้า
-- Sidebar/เมนูแนวนอนตั้งค่า sticky top
+เปลี่ยนหน้ารายละเอียด:
+- Full-screen / cinematic poster style
+- ใช้รูปปกเป็นพื้นหลังเบลอ + gradient
+- ปุ่มอ่านต่อ / favorite / เช็กตอนเด่นขึ้น
+- Tier selector แบบ dark glass
+- Bottom action bar สำหรับอ่านต่อ/แก้ไข/ลบ
+- เหมาะกับมือถือและ iPad มากขึ้น
 - ไม่ต้องรัน SQL ใหม่
