@@ -352,6 +352,7 @@ function DetailModal({
   isGuest = false,
   isFavorite = false,
   onToggleFavorite,
+  onRead,
   canManage = false,
 }: {
   item: MangaItem;
@@ -363,6 +364,7 @@ function DetailModal({
   isGuest?: boolean;
   isFavorite?: boolean;
   onToggleFavorite?: (item: MangaItem) => void;
+  onRead?: (item: MangaItem) => void;
   canManage?: boolean;
 }) {
   const [checking, setChecking] = useState(false);
@@ -480,9 +482,9 @@ function DetailModal({
           ) : (
             <>
               {(item.last_read_url || item.source_url) && (
-                <a href={item.last_read_url || item.source_url} target="_blank" rel="noreferrer" className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-zinc-100 px-4 py-3 text-sm font-bold text-zinc-700">
+                <button onClick={() => onRead?.(item)} className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-zinc-100 px-4 py-3 text-sm font-bold text-zinc-700">
                   <ExternalLink size={16} /> อ่านต่อ
-                </a>
+                </button>
               )}
               <button onClick={() => onEdit(item)} className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-zinc-950 px-3 py-2.5 text-xs font-bold text-white">
                 <Pencil size={16} /> แก้ไข
@@ -637,6 +639,7 @@ function HeroCarousel({
   onOpen,
   favoriteIds,
   onToggleFavorite,
+  onRead,
   user,
 }: {
   items: MangaItem[];
@@ -645,6 +648,7 @@ function HeroCarousel({
   onOpen: (item: MangaItem) => void;
   favoriteIds: string[];
   onToggleFavorite: (item: MangaItem) => void;
+  onRead: (item: MangaItem) => void;
   user: SupabaseUser | null;
 }) {
   const featured = items.slice(0, 8);
@@ -734,10 +738,10 @@ function HeroCarousel({
               <button onClick={() => onOpen(active)} className="flex items-center gap-2 rounded-2xl bg-purple-600 px-5 py-3 text-sm font-black text-white shadow-lg shadow-purple-600/25 active:scale-95">
                 <BookOpen size={18} /> รายละเอียด
               </button>
-              {active.source_url && (
-                <a href={active.source_url} target="_blank" rel="noreferrer" className="flex items-center gap-2 rounded-2xl bg-white/10 px-5 py-3 text-sm font-black text-white active:scale-95">
+              {(active.last_read_url || active.source_url) && (
+                <button onClick={() => onRead(active)} className="flex items-center gap-2 rounded-2xl bg-white/10 px-5 py-3 text-sm font-black text-white active:scale-95">
                   <Play size={18} /> อ่านต่อ
-                </a>
+                </button>
               )}
             </div>
           </div>
@@ -759,10 +763,12 @@ function ReadingHistoryRow({
   items,
   historyIds,
   onOpen,
+  onRead,
 }: {
   items: MangaItem[];
   historyIds: string[];
   onOpen: (item: MangaItem) => void;
+  onRead: (item: MangaItem) => void;
 }) {
   const list = historyIds
     .map((id) => items.find((item) => item && item.id === id))
@@ -770,12 +776,7 @@ function ReadingHistoryRow({
     .slice(0, 8) as MangaItem[];
 
   function openReadingUrl(item: MangaItem) {
-    const url = (item.last_read_url || "").trim() || (item.source_url || "").trim();
-    if (url) {
-      window.open(url, "_blank", "noopener,noreferrer");
-      return;
-    }
-    onOpen(item);
+    onRead(item);
   }
 
   if (list.length === 0) return null;
@@ -1476,10 +1477,44 @@ export default function App() {
     });
   }
 
+  function buildChapterUrl(item: MangaItem) {
+    const directUrl = (item.last_read_url || "").trim();
+    if (directUrl) return directUrl;
+
+    const baseUrl = (item.source_url || "").trim().replace(/\/$/, "");
+    if (!baseUrl) return "";
+
+    const chapter = (item.last_read_chapter || item.read_chapter || "").trim();
+    if (!chapter) return baseUrl;
+
+    const cleanChapter = chapter.replace(/^chapter[-\s]*/i, "");
+    return `${baseUrl}/chapter-${cleanChapter}`;
+  }
+
   function openDetail(item: MangaItem) {
-    rememberHistory(item);
     setSelectedItem(item);
   }
+
+  async function openReading(item: MangaItem) {
+    const url = buildChapterUrl(item);
+    rememberHistory(item);
+
+    const updatePayload = {
+      last_read_url: url || item.last_read_url || item.source_url || "",
+      last_read_chapter: item.last_read_chapter || item.read_chapter || "",
+      last_read_at: new Date().toISOString(),
+    };
+
+    setItems((prev) => prev.map((manga) => (manga.id === item.id ? { ...manga, ...updatePayload } : manga)));
+
+    if (supabase && user) {
+      await supabase.from("manga_items").update(updatePayload).eq("id", item.id);
+    }
+
+    if (url) window.open(url, "_blank", "noopener,noreferrer");
+    else setSelectedItem(item);
+  }
+
 
   const isAdmin = ADMIN_EMAILS.includes(user?.email?.toLowerCase() ?? "");
   const canManageItem = (item: MangaItem | null) => Boolean(item && (isAdmin || item.user_id === user?.id));
@@ -1539,9 +1574,10 @@ export default function App() {
                 onOpen={openDetail}
                 favoriteIds={favoriteIds}
                 onToggleFavorite={toggleFavorite}
+                onRead={openReading}
                 user={user}
               />
-              <ReadingHistoryRow items={items} historyIds={historyIds} onOpen={openDetail} />
+              <ReadingHistoryRow items={items} historyIds={historyIds} onOpen={openDetail} onRead={openReading} />
               <div className="hidden md:block"><NewChapterRow items={items} onOpen={openDetail} /></div>
               <div className="mb-4 mt-4 flex gap-2 overflow-x-auto pb-1 xl:hidden">
                 {filters.map(([key, label]) => (
@@ -1816,6 +1852,7 @@ export default function App() {
             isGuest={!user}
             isFavorite={selectedItem ? favoriteIds.includes(selectedItem.id) : false}
             onToggleFavorite={toggleFavorite}
+            onRead={openReading}
             canManage={canManageItem(selectedItem)}
           />
         )}

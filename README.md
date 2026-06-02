@@ -1,19 +1,12 @@
-# Manga Tracker History Direct URL Clean
+# Manga Tracker Open Reading History
 
 แก้ตามที่ขอ:
-1. การ์ด "อ่านล่าสุด"
-- กดการ์ดแล้วเปิด last_read_url ทันที
-- ถ้าไม่มี last_read_url จะเปิด source_url
-- ถ้าไม่มีทั้งคู่ค่อยเปิดรายละเอียด
-
-2. แนวนอน
-- เอาแถบ Continue Reading / อ่านต่อ ออกแล้ว
-- เหลือ Reading History / อ่านล่าสุด เป็นหลัก ไม่ซ้ำซ้อน
-
-3. Last Read URL
-- ช่องอ่านต่อ URL ควรใส่ลิงก์ chapter โดยตรง เช่น
-  https://speed-manga.net/manga/solo-leveling/chapter-124
-
-ต้องรัน SQL supabase/last_read_fields.sql ถ้ายังไม่ได้รัน
-
-Checks: {'ReadingHistoryRow': True, 'ContinueReading_usage': False, 'last_read_url': True}
+- กดดูรายละเอียด จะไม่เข้า "อ่านล่าสุด" แล้ว
+- เฉพาะกด "อ่านต่อ" เท่านั้นถึงจะบันทึก Reading History
+- เพิ่ม openReading(item) แยกจาก openDetail(item)
+- openReading จะพยายามเปิด:
+  1) last_read_url ถ้ามี
+  2) ถ้าไม่มี จะสร้างจาก source_url + /chapter-{read_chapter}
+  3) ถ้าไม่มี chapter จะเปิด source_url
+- เหมาะกับเว็บที่ URL เป็นแพทเทิร์น เช่น /chapter-124
+- ยังต้องรัน SQL last_read_fields.sql ถ้ายังไม่ได้รัน
