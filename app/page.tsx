@@ -480,7 +480,7 @@ function DetailModal({
           ) : (
             <>
               {(item.last_read_url || item.source_url) && (
-                <button onClick={() => onRead ? onRead(item) : window.open(item.last_read_url || item.source_url, "_blank", "noopener,noreferrer")} className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-zinc-100 px-4 py-3 text-sm font-bold text-zinc-700">
+                <button onClick={() => window.open(item.last_read_url || item.source_url, "_blank", "noopener,noreferrer")} className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-zinc-100 px-4 py-3 text-sm font-bold text-zinc-700">
                   <ExternalLink size={16} /> อ่านต่อ
                 </button>
               )}
@@ -1582,8 +1582,7 @@ export default function App() {
                 onOpen={openDetail}
                 favoriteIds={favoriteIds}
                 onToggleFavorite={toggleFavorite}
-                onRead={openReading}
-                user={user}
+                    user={user}
               />
               <ReadingHistoryRow items={items} historyIds={historyIds} onOpen={openDetail} onRead={openReading} />
               <div className="hidden md:block"><NewChapterRow items={items} onOpen={openDetail} /></div>
@@ -1860,7 +1859,6 @@ export default function App() {
             isGuest={!user}
             isFavorite={selectedItem ? favoriteIds.includes(selectedItem.id) : false}
             onToggleFavorite={toggleFavorite}
-            onRead={openReading}
             canManage={canManageItem(selectedItem)}
           />
         )}
