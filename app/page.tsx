@@ -73,7 +73,7 @@ const emptyForm: Omit<MangaItem, "id" | "user_id"> = {
   note: "",
   last_read_url: "",
   last_read_chapter: "",
-  last_read_at: "",
+  last_read_at: null as any,
 };
 
 const statusMap: Record<MangaStatus, { label: string; badge: string }> = {
@@ -1342,18 +1342,27 @@ export default function App() {
     setOpenForm(true);
   };
 
+  function sanitizeMangaPayload<T extends Record<string, any>>(payload: T): T {
+    return {
+      ...payload,
+      last_read_url: payload.last_read_url || null,
+      last_read_chapter: payload.last_read_chapter || null,
+      last_read_at: payload.last_read_at || null,
+    };
+  }
+
   async function saveItem() {
     if (!form.title.trim()) return;
 
     if (supabase && user) {
       if (editingId) {
-        const next = { ...form, last_read_at: form.last_read_url ? new Date().toISOString() : form.last_read_at };
-        const { error } = await supabase.from("manga_items").update(next).eq("id", editingId);
+        const next = { ...form, last_read_at: form.last_read_url ? new Date().toISOString() : (form.last_read_at || null) };
+        const { error } = await supabase.from("manga_items").update(sanitizeMangaPayload(next)).eq("id", editingId);
         if (error) return alert(error.message);
-        setItems((prev) => prev.map((item) => (item.id === editingId ? { ...item, ...next } : item)));
+        setItems((prev) => prev.map((item) => (item.id === editingId ? { ...item, ...sanitizeMangaPayload(next) } : item)));
       } else {
-        const next = { ...form, last_read_at: form.last_read_url ? new Date().toISOString() : form.last_read_at, user_id: user.id };
-        const { data, error } = await supabase.from("manga_items").insert(next).select().single();
+        const next = { ...form, last_read_at: form.last_read_url ? new Date().toISOString() : (form.last_read_at || null), user_id: user.id };
+        const { data, error } = await supabase.from("manga_items").insert(sanitizeMangaPayload(next)).select().single();
         if (error) return alert(error.message);
         setItems((prev) => [data as MangaItem, ...prev]);
       }
