@@ -1246,7 +1246,7 @@ export default function App() {
     if (supabase && user) {
       if (editingId) {
         const next = { ...form };
-        const { data, error } = await supabase.from("manga_items").update(next).eq("id", editingId);
+        const { data, error } = await supabase.from("manga_items").update(next).eq("id", editingId).select().single();
         if (error) return alert(error.message);
         setItems((prev) => prev.map((item) => (item.id === editingId ? (data as MangaItem) : item)));
       } else {
