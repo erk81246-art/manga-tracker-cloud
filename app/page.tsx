@@ -1582,7 +1582,8 @@ export default function App() {
                 onOpen={openDetail}
                 favoriteIds={favoriteIds}
                 onToggleFavorite={toggleFavorite}
-                    user={user}
+                    onRead={openReading}
+                user={user}
               />
               <ReadingHistoryRow items={items} historyIds={historyIds} onOpen={openDetail} onRead={openReading} />
               <div className="hidden md:block"><NewChapterRow items={items} onOpen={openDetail} /></div>
