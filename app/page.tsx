@@ -1538,14 +1538,13 @@ export default function App() {
   const passLoaded = loaded && (!supabase || !syncing);
 
   return (
-    <main className="min-h-screen bg-zinc-100 text-zinc-950 xl:p-6">
+    <main className="min-h-screen bg-zinc-100 pb-28 text-zinc-950 xl:p-6 xl:pb-6">
       <div className={`app-shell mx-auto grid gap-4 ${isWideLandscape ? "max-w-7xl px-0 pb-4 pt-0" : "max-w-md px-4 pb-28 pt-3 sm:max-w-xl md:max-w-3xl"} xl:max-w-7xl xl:px-0 xl:pt-0`}>
 
         <section className="min-w-0">
           {user && (
             <div className="mb-3 flex items-center justify-between gap-2 md:mb-4">
-              <button onClick={() => setMenuOpen(true)} className="flex items-center gap-2 rounded-2xl bg-zinc-950 px-4 py-3 text-sm font-bold text-white shadow-sm">
-                <Menu size={18} /> เมนู
+              <button onClick={() => setMenuOpen(true)} className="fixed left-4 top-4 z-50 flex items-center gap-2 rounded-2xl bg-zinc-950 px-4 py-3 text-sm font-bold text-white shadow-sm"><Menu size={18} /> เมนู
               </button>
               <p className="text-sm font-bold text-zinc-400">{isAdmin ? "Admin" : "User"} · ทั้งหมด {stats.total} เรื่อง</p>
             </div>
@@ -1557,7 +1556,7 @@ export default function App() {
           )}
 
           {user && (
-            <div className="mb-4 hidden md:block">
+            <div className="sticky top-4 z-40 mb-4 hidden md:block">
               <SourceIconBar isGuest={!user} sources={readingSources} onAddSource={addReadingSource} onDeleteSource={deleteReadingSource} />
             </div>
           )}
