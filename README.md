@@ -1,12 +1,10 @@
-# Manga Tracker Open Reading History
+# Manga Tracker Reading Safe Fix
 
-แก้ตามที่ขอ:
-- กดดูรายละเอียด จะไม่เข้า "อ่านล่าสุด" แล้ว
-- เฉพาะกด "อ่านต่อ" เท่านั้นถึงจะบันทึก Reading History
-- เพิ่ม openReading(item) แยกจาก openDetail(item)
-- openReading จะพยายามเปิด:
-  1) last_read_url ถ้ามี
-  2) ถ้าไม่มี จะสร้างจาก source_url + /chapter-{read_chapter}
-  3) ถ้าไม่มี chapter จะเปิด source_url
-- เหมาะกับเว็บที่ URL เป็นแพทเทิร์น เช่น /chapter-124
-- ยังต้องรัน SQL last_read_fields.sql ถ้ายังไม่ได้รัน
+แก้ปุ่มอ่าน:
+- กดอ่านต่อได้แน่นอน
+- openReading ไม่ await Supabase ก่อนเปิดเว็บแล้ว จึงไม่ค้าง
+- ถ้า save history ลง Supabase fail จะ warn เฉย ๆ ไม่บล็อกการอ่าน
+- ถ้าไม่มี last_read_url จะสร้างจาก source_url + /chapter-{read_chapter}
+- ถ้าสร้างไม่ได้ จะเปิด source_url เดิม
+- กดรายละเอียดไม่เข้าอ่านล่าสุด
+- เฉพาะกดอ่านต่อถึงเข้าอ่านล่าสุด

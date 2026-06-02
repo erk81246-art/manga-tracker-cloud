@@ -482,7 +482,7 @@ function DetailModal({
           ) : (
             <>
               {(item.last_read_url || item.source_url) && (
-                <button onClick={() => onRead?.(item)} className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-zinc-100 px-4 py-3 text-sm font-bold text-zinc-700">
+                <button onClick={() => onRead ? onRead(item) : window.open(item.last_read_url || item.source_url, "_blank", "noopener,noreferrer")} className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-zinc-100 px-4 py-3 text-sm font-bold text-zinc-700">
                   <ExternalLink size={16} /> อ่านต่อ
                 </button>
               )}
@@ -739,7 +739,7 @@ function HeroCarousel({
                 <BookOpen size={18} /> รายละเอียด
               </button>
               {(active.last_read_url || active.source_url) && (
-                <button onClick={() => onRead(active)} className="flex items-center gap-2 rounded-2xl bg-white/10 px-5 py-3 text-sm font-black text-white active:scale-95">
+                <button onClick={() => onRead ? onRead(active) : window.open(active.last_read_url || active.source_url, "_blank", "noopener,noreferrer")} className="flex items-center gap-2 rounded-2xl bg-white/10 px-5 py-3 text-sm font-black text-white active:scale-95">
                   <Play size={18} /> อ่านต่อ
                 </button>
               )}
@@ -776,7 +776,13 @@ function ReadingHistoryRow({
     .slice(0, 8) as MangaItem[];
 
   function openReadingUrl(item: MangaItem) {
-    onRead(item);
+    if (onRead) {
+      onRead(item);
+      return;
+    }
+    const url = (item.last_read_url || item.source_url || "").trim();
+    if (url) window.open(url, "_blank", "noopener,noreferrer");
+    else onOpen(item);
   }
 
   if (list.length === 0) return null;
@@ -1487,16 +1493,19 @@ export default function App() {
     const chapter = (item.last_read_chapter || item.read_chapter || "").trim();
     if (!chapter) return baseUrl;
 
+    if (/\/chapter[-/]/i.test(baseUrl)) return baseUrl;
+
     const cleanChapter = chapter.replace(/^chapter[-\s]*/i, "");
     return `${baseUrl}/chapter-${cleanChapter}`;
   }
+
 
   function openDetail(item: MangaItem) {
     setSelectedItem(item);
   }
 
-  async function openReading(item: MangaItem) {
-    const url = buildChapterUrl(item);
+  function openReading(item: MangaItem) {
+    const url = buildChapterUrl(item) || item.last_read_url || item.source_url || "";
     rememberHistory(item);
 
     const updatePayload = {
@@ -1507,9 +1516,19 @@ export default function App() {
 
     setItems((prev) => prev.map((manga) => (manga.id === item.id ? { ...manga, ...updatePayload } : manga)));
 
-    if (supabase && user) {
-      await supabase.from("manga_items").update(updatePayload).eq("id", item.id);
+    if (supabase && user && item.id) {
+      supabase.from("manga_items").update(updatePayload).eq("id", item.id).then(({ error }) => {
+        if (error) console.warn("save reading history failed", error.message);
+      });
     }
+
+    if (url) {
+      window.open(url, "_blank", "noopener,noreferrer");
+    } else {
+      setSelectedItem(item);
+    }
+  }
+
 
     if (url) window.open(url, "_blank", "noopener,noreferrer");
     else setSelectedItem(item);
