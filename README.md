@@ -1,9 +1,12 @@
-# Manga Tracker Manga Pass Local Cycle
+# Manga Tracker Google Login
 
-อัปเดต Manga Pass:
-- จำรูป Pass ล่าสุดไว้ใน localStorage
-- เปิดรอบต่อไปใช้รูปเดิมขึ้นทันที
-- หลังโหลด Favorite แล้วจะวนรูป Favorite ทีละเรื่องแบบ B
-- Preload รูปใหม่ก่อนค่อย fade-in
-- ถ้าไม่มี Favorite ใช้เรื่องแรกที่มีปก
-- ไม่ต้องรัน SQL ใหม่
+ปรับโค้ด:
+- ปุ่ม Continue with Google ใช้ Supabase OAuth
+- เพิ่ม prompt เลือกบัญชี Google
+- แสดง error ถ้า OAuth ไม่สำเร็จ
+
+ต้องตั้งค่าใน Supabase:
+1. Authentication > Providers > Google > Enable
+2. ใส่ Google Client ID และ Client Secret
+3. ตั้ง Redirect URL ใน Google Cloud เป็น callback URL ของ Supabase
+4. ตั้ง Site URL / Redirect URLs ใน Supabase ให้ตรงกับ Vercel URL
