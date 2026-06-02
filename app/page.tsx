@@ -479,8 +479,8 @@ function DetailModal({
             </div>
           ) : (
             <>
-              {continueUrl && (
-                <a href={continueUrl} target="_blank" rel="noreferrer" className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-zinc-100 px-4 py-3 text-sm font-bold text-zinc-700">
+              {(item.last_read_url || item.source_url) && (
+                <a href={item.last_read_url || item.source_url} target="_blank" rel="noreferrer" className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-zinc-100 px-4 py-3 text-sm font-bold text-zinc-700">
                   <ExternalLink size={16} /> อ่านต่อ
                 </a>
               )}
