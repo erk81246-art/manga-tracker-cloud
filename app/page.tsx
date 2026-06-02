@@ -352,7 +352,6 @@ function DetailModal({
   isGuest = false,
   isFavorite = false,
   onToggleFavorite,
-  onRead,
   canManage = false,
 }: {
   item: MangaItem;
@@ -364,7 +363,6 @@ function DetailModal({
   isGuest?: boolean;
   isFavorite?: boolean;
   onToggleFavorite?: (item: MangaItem) => void;
-  onRead?: (item: MangaItem) => void;
   canManage?: boolean;
 }) {
   const [checking, setChecking] = useState(false);
@@ -739,7 +737,7 @@ function HeroCarousel({
                 <BookOpen size={18} /> รายละเอียด
               </button>
               {(active.last_read_url || active.source_url) && (
-                <button onClick={() => onRead ? onRead(active) : window.open(active.last_read_url || active.source_url, "_blank", "noopener,noreferrer")} className="flex items-center gap-2 rounded-2xl bg-white/10 px-5 py-3 text-sm font-black text-white active:scale-95">
+                <button onClick={() => onRead(active)} className="flex items-center gap-2 rounded-2xl bg-white/10 px-5 py-3 text-sm font-black text-white active:scale-95">
                   <Play size={18} /> อ่านต่อ
                 </button>
               )}
@@ -768,7 +766,7 @@ function ReadingHistoryRow({
   items: MangaItem[];
   historyIds: string[];
   onOpen: (item: MangaItem) => void;
-  onRead: (item: MangaItem) => void;
+  onRead?: (item: MangaItem) => void;
 }) {
   const list = historyIds
     .map((id) => items.find((item) => item && item.id === id))
@@ -1483,6 +1481,10 @@ export default function App() {
     });
   }
 
+  function openDetail(item: MangaItem) {
+    setSelectedItem(item);
+  }
+
   function buildChapterUrl(item: MangaItem) {
     const directUrl = (item.last_read_url || "").trim();
     if (directUrl) return directUrl;
@@ -1499,13 +1501,8 @@ export default function App() {
     return `${baseUrl}/chapter-${cleanChapter}`;
   }
 
-
-  function openDetail(item: MangaItem) {
-    setSelectedItem(item);
-  }
-
   function openReading(item: MangaItem) {
-    const url = buildChapterUrl(item) || item.last_read_url || item.source_url || "";
+    const url = buildChapterUrl(item) || item.source_url || "";
     rememberHistory(item);
 
     const updatePayload = {
@@ -1521,14 +1518,6 @@ export default function App() {
         if (error) console.warn("save reading history failed", error.message);
       });
     }
-
-    if (url) {
-      window.open(url, "_blank", "noopener,noreferrer");
-    } else {
-      setSelectedItem(item);
-    }
-  }
-
 
     if (url) window.open(url, "_blank", "noopener,noreferrer");
     else setSelectedItem(item);
