@@ -498,7 +498,7 @@ function DetailModal({
               <div className="rounded-[1.8rem] bg-white/10 p-4 text-left backdrop-blur-xl">
                 <p className="mb-3 text-sm font-black text-white/70">จัด Tier</p>
                 <div className="grid grid-cols-5 gap-2">
-                  {TIERS.map((tier) => (
+                  {tiers.map((tier) => (
                     <button
                       key={tier}
                       onClick={() => canManage && onTierChange(item.id, tier)}

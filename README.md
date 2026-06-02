@@ -1,10 +1,6 @@
-# Manga Tracker Cinematic Detail UI
+# Manga Tracker Cinematic Detail Tier Fix
 
-เปลี่ยนหน้ารายละเอียด:
-- Full-screen / cinematic poster style
-- ใช้รูปปกเป็นพื้นหลังเบลอ + gradient
-- ปุ่มอ่านต่อ / favorite / เช็กตอนเด่นขึ้น
-- Tier selector แบบ dark glass
-- Bottom action bar สำหรับอ่านต่อ/แก้ไข/ลบ
-- เหมาะกับมือถือและ iPad มากขึ้น
+แก้ build error:
+- Cannot find name 'TIERS'
+- เปลี่ยนเป็น tiers.map(...)
 - ไม่ต้องรัน SQL ใหม่
