@@ -43,6 +43,9 @@ type MangaItem = {
   status: MangaStatus;
   tier: MangaTier;
   note: string;
+  last_read_url?: string;
+  last_read_chapter?: string;
+  last_read_at?: string;
   user_id?: string;
 };
 
@@ -68,6 +71,9 @@ const emptyForm: Omit<MangaItem, "id" | "user_id"> = {
   status: "reading",
   tier: "A",
   note: "",
+  last_read_url: "",
+  last_read_chapter: "",
+  last_read_at: "",
 };
 
 const statusMap: Record<MangaStatus, { label: string; badge: string }> = {
@@ -308,6 +314,7 @@ function MangaTile({
   isFavorite?: boolean;
 }) {
   const hasUpdate = chapterNumber(item.latest_chapter) > chapterNumber(item.read_chapter);
+  const continueUrl = item.last_read_url || item.source_url;
 
   return (
     <motion.button
@@ -472,9 +479,9 @@ function DetailModal({
             </div>
           ) : (
             <>
-              {item.source_url && (
-                <a href={item.source_url} target="_blank" rel="noreferrer" className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-zinc-100 px-4 py-3 text-sm font-bold text-zinc-700">
-                  <ExternalLink size={16} /> เปิดเว็บ
+              {continueUrl && (
+                <a href={continueUrl} target="_blank" rel="noreferrer" className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-zinc-100 px-4 py-3 text-sm font-bold text-zinc-700">
+                  <ExternalLink size={16} /> อ่านต่อ
                 </a>
               )}
               <button onClick={() => onEdit(item)} className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-zinc-950 px-3 py-2.5 text-xs font-bold text-white">
@@ -563,6 +570,16 @@ function MangaForm({
           <label className="block">
             <span className="text-sm font-bold text-zinc-700">ลิงก์เว็บที่อ่าน</span>
             <input value={value.source_url} onChange={(e) => set("source_url", e.target.value)} placeholder="https://..." className="mt-1 w-full rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-3 outline-none focus:border-zinc-950" />
+          </label>
+
+          <label className="block">
+            <span className="text-sm font-bold text-zinc-700">อ่านต่อ URL</span>
+            <input value={value.last_read_url || ""} onChange={(e) => set("last_read_url" as any, e.target.value)} placeholder="ลิงก์หน้าตอนที่อ่านค้างไว้" className="mt-1 w-full rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-3 outline-none focus:border-zinc-950" />
+          </label>
+
+          <label className="block">
+            <span className="text-sm font-bold text-zinc-700">อ่านล่าสุดถึงตอน</span>
+            <input value={value.last_read_chapter || ""} onChange={(e) => set("last_read_chapter" as any, e.target.value)} placeholder="เช่น 124" className="mt-1 w-full rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-3 outline-none focus:border-zinc-950" />
           </label>
 
           <div className="grid grid-cols-2 gap-3">
@@ -1472,12 +1489,7 @@ export default function App() {
           )}
 
           {user && (
-            <div className={`desktop-topbar mb-4 gap-3 ${isWideLandscape ? "grid grid-cols-[1fr_220px]" : "hidden"} xl:grid xl:grid-cols-[1fr_240px]`}>
-              <Card className="p-5">
-                <p className="text-sm font-bold text-zinc-400">Good evening,</p>
-                <h2 className="mt-1 text-2xl font-black text-zinc-950">{user.email?.split("@")[0] || "Reader"}</h2>
-                <p className="mt-1 text-sm text-zinc-500">ค้นหา จัดการ และเช็กตอนใหม่จากที่นี่</p>
-              </Card>
+            <div className="mb-4 hidden md:block">
               <SourceIconBar isGuest={!user} sources={readingSources} onAddSource={addReadingSource} onDeleteSource={deleteReadingSource} />
             </div>
           )}
@@ -1706,6 +1718,7 @@ export default function App() {
                     <Cloud size={14} /> {user ? "Sync" : "Manga"}
                   </p>
                   <h2 className="mt-1 text-3xl font-black leading-tight">Library</h2>
+                  {user && <p className="mt-1 text-xs font-semibold text-zinc-400">บัญชี: {user.email}</p>}
                 </div>
                 <button onClick={() => setMenuOpen(false)} className="rounded-2xl bg-white/10 p-3 text-white">
                   <X size={20} />
