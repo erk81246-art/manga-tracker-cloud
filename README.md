@@ -1,14 +1,14 @@
-# Manga Tracker Null After Save Fix
+# Manga Tracker State Final Fix
 
-แก้ปัญหา:
-- หลังบันทึกแล้วหน้า crash
-- Console: Cannot read properties of null (reading 'title')
-- สาเหตุ: update สำเร็จเป็น 204 แต่โค้ดเอา data=null ไปใส่ใน items
-
-แก้แล้ว:
-- หลัง update สำเร็จ ใช้ payload อัปเดต state แทน data จาก Supabase
-- เพิ่ม safeItems กัน null ใน list/filter/hero
-- ยังเก็บ fix เดิมที่ลบ select=* หลัง update
+แก้จากโค้ดจริงที่ส่งมา:
+- saveItem ตอนแก้ไขมังงะไม่ใช้ data จาก Supabase แล้ว
+- เพราะ update แบบไม่ select จะได้ data = null
+- เปลี่ยนเป็น setItems ด้วย { ...item, ...next }
+- แก้ safeItems reference ที่ทำให้ build fail
+- เพิ่ม guard กัน item เป็น null ใน filter/stats
 - ไม่ต้องรัน SQL ใหม่
 
-ยังพบ pattern ? data : item เหลือไหม: False
+ตรวจสอบ:
+- ยังเหลือ "(data as MangaItem)" ในไฟล์ไหม: False
+- ยังเหลือ "safeItems" ในไฟล์ไหม: False
+- update(next) ยังมี .select ตามหลังไหม: False

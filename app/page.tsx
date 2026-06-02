@@ -736,7 +736,7 @@ function HeroCarousel({
 }
 
 function ContinueReadingRow({ items, onOpen }: { items: MangaItem[]; onOpen: (item: MangaItem) => void }) {
-  const list = safeItems.filter((item) => item.read_chapter || chapterNumber(item.latest_chapter) > chapterNumber(item.read_chapter)).slice(0, 6);
+  const list = items.filter((item) => item.read_chapter || chapterNumber(item.latest_chapter) > chapterNumber(item.read_chapter)).slice(0, 6);
   if (list.length === 0) return null;
   return (
     <section className="mb-6">
@@ -773,7 +773,7 @@ function ContinueReadingRow({ items, onOpen }: { items: MangaItem[]; onOpen: (it
 }
 
 function NewChapterRow({ items, onOpen }: { items: MangaItem[]; onOpen: (item: MangaItem) => void }) {
-  const list = safeItems.filter((item) => chapterNumber(item.latest_chapter) > chapterNumber(item.read_chapter)).slice(0, 6);
+  const list = items.filter((item) => chapterNumber(item.latest_chapter) > chapterNumber(item.read_chapter)).slice(0, 6);
   if (list.length === 0) return null;
   return (
     <section className="mb-6">
@@ -933,8 +933,8 @@ function MangaPassIntro({
   useEffect(() => {
     if (!items.length) return;
 
-    const favoriteItems = safeItems.filter((item) => favoriteIds.includes(item.id) && item.cover);
-    const candidates = favoriteItems.length ? favoriteItems : safeItems.filter((item) => item.cover);
+    const favoriteItems = items.filter((item) => favoriteIds.includes(item.id) && item.cover);
+    const candidates = favoriteItems.length ? favoriteItems : items.filter((item) => item.cover);
     if (!candidates.length) return;
 
     let nextIndex = 0;
@@ -1172,7 +1172,7 @@ export default function App() {
       if (!supabase) return;
       setSyncing(true);
       const { data, error } = await supabase.from("manga_items").select("*").order("created_at", { ascending: false });
-      if (!error && data) setItems(data as MangaItem[]);
+      if (!error && data) setItems((data as MangaItem[]).filter(Boolean));
       setSyncing(false);
     }
     loadCloud();
@@ -1205,21 +1205,22 @@ export default function App() {
   const filtered = useMemo(
     () =>
       items.filter((item) => {
+        if (!item) return false;
         const matchesQuery = item.title.toLowerCase().includes(query.toLowerCase());
         const hasUpdate = chapterNumber(item.latest_chapter) > chapterNumber(item.read_chapter);
         const matchesFilter = filter === "all" || (filter === "updated" && hasUpdate) || (filter === "favorites" && favoriteIds.includes(item.id)) || item.status === filter;
         return matchesQuery && matchesFilter;
       }),
-    [safeItems, query, filter, favoriteIds]
+    [items, query, filter, favoriteIds]
   );
 
   const stats = useMemo(
     () => ({
-      total: safeItems.length,
-      updated: items.filter((item) => item && chapterNumber(item.latest_chapter) > chapterNumber(item.read_chapter)).length,
-      reading: items.filter((item) => item.status === "reading").length,
-      finished: items.filter((item) => item.status === "finished").length,
-      paused: items.filter((item) => item.status === "paused").length,
+      total: items.length,
+      updated: items.filter((item) => chapterNumber(item.latest_chapter) > chapterNumber(item.read_chapter)).length,
+      reading: items.filter((item) => item && item.status === "reading").length,
+      finished: items.filter((item) => item && item.status === "finished").length,
+      paused: items.filter((item) => item && item.status === "paused").length,
       favorites: favoriteIds.length,
     }),
     [items, favoriteIds]
@@ -1246,9 +1247,9 @@ export default function App() {
     if (supabase && user) {
       if (editingId) {
         const next = { ...form };
-        const { data, error } = await supabase.from("manga_items").update(next).eq("id", editingId);
+        const { error } = await supabase.from("manga_items").update(next).eq("id", editingId);
         if (error) return alert(error.message);
-        setItems((prev) => prev.map((item) => (item.id === editingId ? (data as MangaItem) : item)));
+        setItems((prev) => prev.map((item) => (item.id === editingId ? { ...item, ...next } : item)));
       } else {
         const next = { ...form, user_id: user.id };
         const { data, error } = await supabase.from("manga_items").insert(next).select().single();
@@ -1412,7 +1413,7 @@ export default function App() {
           {tab === "collection" ? (
             <>
               <HeroCarousel
-                items={filtered.length ? filtered : safeItems}
+                items={filtered.length ? filtered : items}
                 activeIndex={heroIndex}
                 setActiveIndex={setHeroIndex}
                 onOpen={setSelectedItem}
@@ -1420,8 +1421,8 @@ export default function App() {
                 onToggleFavorite={toggleFavorite}
                 user={user}
               />
-              <div className="hidden md:block"><ContinueReadingRow items={safeItems} onOpen={setSelectedItem} /></div>
-              <div className="hidden md:block"><NewChapterRow items={safeItems} onOpen={setSelectedItem} /></div>
+              <div className="hidden md:block"><ContinueReadingRow items={items} onOpen={setSelectedItem} /></div>
+              <div className="hidden md:block"><NewChapterRow items={items} onOpen={setSelectedItem} /></div>
               <div className="mb-4 mt-4 flex gap-2 overflow-x-auto pb-1 xl:hidden">
                 {filters.map(([key, label]) => (
                   <button key={key} onClick={() => setFilter(key)} className={`shrink-0 rounded-full px-4 py-2 text-sm font-bold ${filter === key ? "bg-zinc-950 text-white" : "bg-white text-zinc-500"}`}>
@@ -1676,7 +1677,7 @@ export default function App() {
         {showMangaPass && (
           <MangaPassIntro
             user={user}
-            items={safeItems}
+            items={items}
             favoriteIds={favoriteIds}
             loaded={passLoaded}
             onEnter={() => setShowMangaPass(false)}
