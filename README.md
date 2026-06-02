@@ -1,17 +1,6 @@
-# Manga Tracker Guest First + Reading History Reliable
+# Manga Tracker Guest Open Reading Fix
 
-แก้ตามที่ขอ:
-1. Guest เข้าแอปได้เลย
-- ไม่มีกล่องเข้าสู่ระบบเด้งมาบังทันที
-- เห็น Collection / Tier / เว็บอ่าน ได้เหมือนหน้าแอป
-- ปุ่มเข้าสู่ระบบย้ายไปอยู่แถบด้านล่าง/เมนู
-
-2. Reading History เสถียรขึ้น
-- กดรายละเอียดไม่บันทึกอ่านล่าสุด
-- กดอ่านต่อเท่านั้นถึงบันทึกอ่านล่าสุด
-- Hero / Detail / ปุ่มอ่านต่อ เรียก openReading(item) ให้มากที่สุด
-- openReading จะ rememberHistory + เปิด URL
-
-หมายเหตุ:
-- ถ้าปุ่มอ่านบางจุดยังไม่เข้าประวัติ ให้ส่งรูปจุดนั้นมา เดี๋ยวจับ selector เพิ่ม
+แก้ build error:
+- JSX elements cannot have multiple attributes with the same name
+- ลบ onRead={openReading} ที่ซ้ำใน HeroCarousel แล้ว
 - ไม่ต้องรัน SQL ใหม่

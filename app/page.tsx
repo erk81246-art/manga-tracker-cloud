@@ -1640,7 +1640,6 @@ export default function App() {
                 favoriteIds={favoriteIds}
                 onToggleFavorite={toggleFavorite}
                                     onRead={openReading}
-onRead={openReading}
                 user={user}
               />
               <ReadingHistoryRow items={items} historyIds={historyIds} onOpen={openDetail} onRead={openReading} />
