@@ -388,7 +388,7 @@ function DetailModal({
 
   return (
     <motion.div
-      className="fixed inset-0 z-[80] flex items-end justify-center bg-black/70 p-0 md:items-center md:p-6"
+      className="fixed inset-0 z-[80] flex items-end justify-center overflow-hidden bg-black/70 p-0 md:items-center md:p-6"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -396,13 +396,13 @@ function DetailModal({
     >
       <motion.div
         onClick={(e) => e.stopPropagation()}
-        className="relative flex max-h-[94vh] w-full max-w-[520px] flex-col overflow-hidden rounded-t-[2.5rem] bg-zinc-950 text-white shadow-2xl md:max-h-[90vh] md:rounded-[2.5rem] xl:max-w-[760px]"
+        className="relative flex h-[92dvh] w-full max-w-[520px] flex-col overflow-hidden rounded-t-[2.5rem] bg-zinc-950 text-white shadow-2xl md:h-[88vh] md:rounded-[2.5rem] xl:max-w-[760px]"
         initial={{ y: 60, scale: 0.97, opacity: 0 }}
         animate={{ y: 0, scale: 1, opacity: 1 }}
         exit={{ y: 60, scale: 0.97, opacity: 0 }}
         transition={{ type: "spring", stiffness: 260, damping: 25 }}
       >
-        <div className="relative min-h-[78vh] overflow-y-auto pb-28 md:min-h-[720px] xl:min-h-[640px]">
+        <div className="relative h-full overflow-y-auto overscroll-contain pb-28">
           <div className="absolute inset-0">
             {item.cover ? (
               <img src={item.cover} alt={item.title} className="h-full w-full scale-110 object-cover opacity-45 blur-xl" />
@@ -466,7 +466,7 @@ function DetailModal({
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-2 pt-2">
+              <div className="grid grid-cols-2 gap-2 pt-2">
                 <button
                   onClick={() => onToggleFavorite?.(item)}
                   disabled={isGuest}
@@ -474,15 +474,6 @@ function DetailModal({
                 >
                   <Heart size={18} className="mx-auto mb-1" fill={isFavorite ? "currentColor" : "none"} />
                   Favorite
-                </button>
-
-                <button
-                  onClick={openRead}
-                  disabled={!readUrl || isGuest}
-                  className="rounded-2xl bg-white px-4 py-3 text-sm font-black text-zinc-950 active:scale-95 disabled:opacity-50"
-                >
-                  <ExternalLink size={18} className="mx-auto mb-1" />
-                  อ่านต่อ
                 </button>
 
                 <button
@@ -519,15 +510,12 @@ function DetailModal({
         {!isGuest && (
           <div className="absolute inset-x-0 bottom-0 z-20 border-t border-white/10 bg-black/70 p-4 backdrop-blur-xl">
             <div className="mx-auto grid max-w-[520px] grid-cols-[1fr_1fr_auto] gap-2">
-              {readUrl ? (
-                <button onClick={openRead} className="rounded-2xl bg-white px-4 py-3 text-sm font-black text-zinc-950 active:scale-95">
-                  อ่านต่อ
-                </button>
-              ) : (
-                <button onClick={() => canManage && onEdit(item)} className="rounded-2xl bg-white px-4 py-3 text-sm font-black text-zinc-950 active:scale-95">
-                  เพิ่มลิงก์
-                </button>
-              )}
+              <button
+                onClick={readUrl ? openRead : () => canManage && onEdit(item)}
+                className="rounded-2xl bg-white px-4 py-3 text-sm font-black text-zinc-950 active:scale-95"
+              >
+                {readUrl ? "อ่านต่อ" : "เพิ่มลิงก์อ่าน"}
+              </button>
 
               {canManage ? (
                 <button onClick={() => onEdit(item)} className="rounded-2xl bg-white/10 px-4 py-3 text-sm font-black text-white active:scale-95">
