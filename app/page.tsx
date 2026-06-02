@@ -54,6 +54,8 @@ type UserFavorite = {
 
 const STORAGE_KEY = "manga-tracker-items-v2";
 const SOURCES_STORAGE_KEY = "manga-tracker-reading-sources-v1";
+const PASS_STORAGE_KEY = "manga-tracker-pass-cache-v1";
+const PASS_INDEX_KEY = "manga-tracker-pass-index-v1";
 
 const emptyForm: Omit<MangaItem, "id" | "user_id"> = {
   title: "",
@@ -888,6 +890,12 @@ function Sidebar({
 }
 
 
+
+type PassCache = {
+  title: string;
+  cover: string;
+};
+
 function MangaPassIntro({
   user,
   items,
@@ -901,12 +909,56 @@ function MangaPassIntro({
   loaded: boolean;
   onEnter: () => void;
 }) {
-  const favoriteItem = items.find((item) => favoriteIds.includes(item.id) && item.cover);
-  const fallbackItem = items.find((item) => item.cover) || items[0];
-  const passItem = favoriteItem || fallbackItem;
-  const cover = passItem?.cover || "";
-  const title = passItem?.title || "Manga Library";
+  const [cachedPass, setCachedPass] = useState<PassCache | null>(null);
+  const [displayPass, setDisplayPass] = useState<PassCache>({ title: "Manga Library", cover: "" });
+
   const username = user?.email?.split("@")[0] || "Guest";
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(PASS_STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved) as PassCache;
+        if (parsed?.cover) {
+          setCachedPass(parsed);
+          setDisplayPass(parsed);
+        }
+      }
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    if (!items.length) return;
+
+    const favoriteItems = items.filter((item) => favoriteIds.includes(item.id) && item.cover);
+    const candidates = favoriteItems.length ? favoriteItems : items.filter((item) => item.cover);
+    if (!candidates.length) return;
+
+    let nextIndex = 0;
+    try {
+      const savedIndex = Number(localStorage.getItem(PASS_INDEX_KEY) || "0");
+      nextIndex = Number.isFinite(savedIndex) ? savedIndex % candidates.length : 0;
+    } catch {}
+
+    const selected = candidates[nextIndex] || candidates[0];
+    const nextPass = { title: selected.title || "Manga Library", cover: selected.cover || "" };
+
+    const img = new Image();
+    img.onload = () => {
+      setDisplayPass(nextPass);
+      try {
+        localStorage.setItem(PASS_STORAGE_KEY, JSON.stringify(nextPass));
+        localStorage.setItem(PASS_INDEX_KEY, String((nextIndex + 1) % candidates.length));
+      } catch {}
+    };
+    img.onerror = () => {
+      if (!cachedPass && nextPass.cover) setDisplayPass(nextPass);
+    };
+    img.src = nextPass.cover;
+  }, [items, favoriteIds, cachedPass]);
+
+  const cover = displayPass.cover;
+  const title = displayPass.title || "Manga Library";
 
   function tryEnter(offset: number) {
     if (!loaded) return;
@@ -920,7 +972,7 @@ function MangaPassIntro({
       exit={{ opacity: 0, scale: 1.03 }}
       transition={{ duration: 0.45 }}
     >
-      {cover && <img src={cover} alt={title} className="absolute inset-0 h-full w-full scale-110 object-cover opacity-25 blur-2xl" />}
+      {cover && <motion.img key={`bg-${cover}`} src={cover} alt={title} className="absolute inset-0 h-full w-full scale-110 object-cover opacity-25 blur-2xl" initial={{ opacity: 0 }} animate={{ opacity: 0.25 }} />}
       <div className="absolute inset-0 bg-gradient-to-br from-black via-zinc-950/90 to-purple-950/40" />
 
       <motion.div
@@ -932,7 +984,11 @@ function MangaPassIntro({
         <div className="md:hidden">
           <div className="relative overflow-hidden rounded-[2.2rem] bg-white text-zinc-950 shadow-2xl">
             <div className="relative h-[62vh] min-h-[500px] overflow-hidden">
-              {cover ? <img src={cover} alt={title} className="absolute inset-0 h-full w-full object-cover" /> : <div className="absolute inset-0 bg-gradient-to-br from-purple-700 to-zinc-950" />}
+              {cover ? (
+                <motion.img key={`portrait-${cover}`} src={cover} alt={title} className="absolute inset-0 h-full w-full object-cover" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.45 }} />
+              ) : (
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-700 via-zinc-900 to-zinc-950" />
+              )}
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/35 to-transparent" />
               <div className="absolute left-5 top-5 rounded-full bg-white/90 px-4 py-2 text-xs font-black text-zinc-950">MANGA PASS</div>
               <div className="absolute bottom-5 left-5 right-5 text-white">
@@ -970,7 +1026,11 @@ function MangaPassIntro({
           <div className="relative overflow-hidden rounded-[2.5rem] bg-white text-zinc-950 shadow-2xl">
             <div className="grid min-h-[430px] grid-cols-[1fr_180px]">
               <div className="relative overflow-hidden">
-                {cover ? <img src={cover} alt={title} className="absolute inset-0 h-full w-full object-cover" /> : <div className="absolute inset-0 bg-gradient-to-br from-purple-700 to-zinc-950" />}
+                {cover ? (
+                  <motion.img key={`landscape-${cover}`} src={cover} alt={title} className="absolute inset-0 h-full w-full object-cover" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.45 }} />
+                ) : (
+                  <div className="absolute inset-0 bg-gradient-to-br from-purple-700 via-zinc-900 to-zinc-950" />
+                )}
                 <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/45 to-transparent" />
                 <div className="relative z-10 flex h-full flex-col justify-between p-8 text-white">
                   <div>
@@ -1017,6 +1077,7 @@ function MangaPassIntro({
     </motion.div>
   );
 }
+
 
 export default function App() {
   const [user, setUser] = useState<SupabaseUser | null>(null);
