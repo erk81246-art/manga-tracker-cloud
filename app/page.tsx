@@ -1152,6 +1152,7 @@ export default function App() {
   const [query, setQuery] = useState("");
   const [heroIndex, setHeroIndex] = useState(0);
   const [showMangaPass, setShowMangaPass] = useState(true);
+  const [historyIds, setHistoryIds] = useState<string[]>([]);
   const [filter, setFilter] = useState<"all" | "updated" | "favorites" | MangaStatus>("all");
   const [tab, setTab] = useState<"collection" | "tier">("tier");
   const [form, setForm] = useState<Omit<MangaItem, "id" | "user_id">>(emptyForm);

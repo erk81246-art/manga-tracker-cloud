@@ -1,13 +1,9 @@
-# Manga Tracker Reading History
+# Manga Tracker Reading History State Fix
 
-เพิ่ม Reading History:
-- กดเปิดรายละเอียดมังงะเรื่องไหน ระบบจำเป็นประวัติ
-- แสดงแถว "อ่านล่าสุด" ใต้ Hero/Collection Highlight
-- เรียงจากเรื่องที่เปิดล่าสุด
-- เก็บใน localStorage แยกตาม user id ของเครื่องนั้น
+แก้ build error:
+- Cannot find name 'setHistoryIds'
+- เพิ่ม state historyIds/setHistoryIds ใน App component แล้ว
+- Reading History เก็บใน localStorage แยกตาม user id
 - ไม่ต้องรัน SQL ใหม่
-- ไม่กระทบข้อมูล Supabase
 
-หมายเหตุ:
-- ประวัติจะจำเฉพาะเครื่อง/เบราว์เซอร์นั้น
-- ถ้าเปิดคนละเครื่อง ประวัติจะไม่ตามไปด้วย
+Checks: {'state': True, 'helper': True, 'component': True}
