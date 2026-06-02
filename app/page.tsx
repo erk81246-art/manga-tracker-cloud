@@ -19,6 +19,7 @@ import {
   Play,
   RefreshCw,
   Save,
+  Scissors,
   Search,
   Star,
   Trash2,
@@ -886,6 +887,137 @@ function Sidebar({
   );
 }
 
+
+function MangaPassIntro({
+  user,
+  items,
+  favoriteIds,
+  loaded,
+  onEnter,
+}: {
+  user: SupabaseUser | null;
+  items: MangaItem[];
+  favoriteIds: string[];
+  loaded: boolean;
+  onEnter: () => void;
+}) {
+  const favoriteItem = items.find((item) => favoriteIds.includes(item.id) && item.cover);
+  const fallbackItem = items.find((item) => item.cover) || items[0];
+  const passItem = favoriteItem || fallbackItem;
+  const cover = passItem?.cover || "";
+  const title = passItem?.title || "Manga Library";
+  const username = user?.email?.split("@")[0] || "Guest";
+
+  function tryEnter(offset: number) {
+    if (!loaded) return;
+    if (Math.abs(offset) > 80) onEnter();
+  }
+
+  return (
+    <motion.div
+      className="fixed inset-0 z-[100] flex items-center justify-center overflow-hidden bg-zinc-950 p-4 text-white"
+      initial={{ opacity: 1 }}
+      exit={{ opacity: 0, scale: 1.03 }}
+      transition={{ duration: 0.45 }}
+    >
+      {cover && <img src={cover} alt={title} className="absolute inset-0 h-full w-full scale-110 object-cover opacity-25 blur-2xl" />}
+      <div className="absolute inset-0 bg-gradient-to-br from-black via-zinc-950/90 to-purple-950/40" />
+
+      <motion.div
+        className="relative w-full max-w-[430px] md:max-w-[900px]"
+        initial={{ opacity: 0, y: 18, scale: 0.96 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.55 }}
+      >
+        <div className="md:hidden">
+          <div className="relative overflow-hidden rounded-[2.2rem] bg-white text-zinc-950 shadow-2xl">
+            <div className="relative h-[62vh] min-h-[500px] overflow-hidden">
+              {cover ? <img src={cover} alt={title} className="absolute inset-0 h-full w-full object-cover" /> : <div className="absolute inset-0 bg-gradient-to-br from-purple-700 to-zinc-950" />}
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/35 to-transparent" />
+              <div className="absolute left-5 top-5 rounded-full bg-white/90 px-4 py-2 text-xs font-black text-zinc-950">MANGA PASS</div>
+              <div className="absolute bottom-5 left-5 right-5 text-white">
+                <p className="text-sm font-bold text-white/70">ADMIT ONE</p>
+                <h1 className="mt-1 line-clamp-2 text-4xl font-black leading-none">{title}</h1>
+                <p className="mt-2 text-sm font-semibold text-white/80">for {username}</p>
+              </div>
+            </div>
+
+            <div className="bg-white px-5 py-5">
+              <div className="mb-3 flex items-center justify-between text-xs font-black uppercase tracking-[0.25em] text-zinc-400">
+                <span>Collection</span>
+                <span>{loaded ? "Ready" : "Loading"}</span>
+              </div>
+              <div className="relative flex items-center gap-3">
+                <div className={`h-px flex-1 border-t-2 border-dashed ${loaded ? "border-purple-500" : "border-zinc-300"}`} />
+                <motion.button
+                  drag="x"
+                  dragConstraints={{ left: -135, right: 135 }}
+                  onDragEnd={(_, info) => tryEnter(info.offset.x)}
+                  onClick={() => loaded && onEnter()}
+                  className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-white shadow-lg ${loaded ? "bg-purple-600 shadow-purple-600/30" : "bg-zinc-400"}`}
+                  whileTap={{ scale: 0.92 }}
+                >
+                  <Scissors size={22} />
+                </motion.button>
+                <div className={`h-px flex-1 border-t-2 border-dashed ${loaded ? "border-purple-500" : "border-zinc-300"}`} />
+              </div>
+              <p className="mt-4 text-center text-sm font-bold text-zinc-500">{loaded ? "ลากตรงเส้นปะ หรือแตะกรรไกรเพื่อเข้าสู่คลัง" : "กำลังโหลดข้อมูลข้างใน..."}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="hidden md:block">
+          <div className="relative overflow-hidden rounded-[2.5rem] bg-white text-zinc-950 shadow-2xl">
+            <div className="grid min-h-[430px] grid-cols-[1fr_180px]">
+              <div className="relative overflow-hidden">
+                {cover ? <img src={cover} alt={title} className="absolute inset-0 h-full w-full object-cover" /> : <div className="absolute inset-0 bg-gradient-to-br from-purple-700 to-zinc-950" />}
+                <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/45 to-transparent" />
+                <div className="relative z-10 flex h-full flex-col justify-between p-8 text-white">
+                  <div>
+                    <p className="text-sm font-black uppercase tracking-[0.35em] text-purple-300">Manga Pass</p>
+                    <h1 className="mt-4 max-w-xl text-6xl font-black leading-none">{title}</h1>
+                    <p className="mt-4 text-lg font-semibold text-white/75">Collection access for {username}</p>
+                  </div>
+                  <div className="max-w-md">
+                    <div className="mb-3 flex items-center justify-between text-xs font-black uppercase tracking-[0.25em] text-white/55">
+                      <span>Tear here</span>
+                      <span>{loaded ? "Ready" : "Loading"}</span>
+                    </div>
+                    <div className="relative flex items-center gap-3">
+                      <div className={`h-px flex-1 border-t-2 border-dashed ${loaded ? "border-purple-400" : "border-white/30"}`} />
+                      <motion.button
+                        drag="x"
+                        dragConstraints={{ left: -160, right: 160 }}
+                        onDragEnd={(_, info) => tryEnter(info.offset.x)}
+                        onClick={() => loaded && onEnter()}
+                        className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-white shadow-lg ${loaded ? "bg-purple-600 shadow-purple-600/30" : "bg-white/20"}`}
+                        whileTap={{ scale: 0.92 }}
+                      >
+                        <Scissors size={22} />
+                      </motion.button>
+                      <div className={`h-px flex-1 border-t-2 border-dashed ${loaded ? "border-purple-400" : "border-white/30"}`} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="relative flex flex-col items-center justify-between border-l-2 border-dashed border-zinc-300 bg-zinc-50 p-6">
+                <div className="text-center">
+                  <p className="text-xs font-black uppercase tracking-[0.3em] text-zinc-400">Admit</p>
+                  <p className="mt-2 text-4xl font-black [writing-mode:vertical-rl]">ONE</p>
+                </div>
+                <div className="flex flex-col items-center gap-2">
+                  {[1,2,3,4].map((dot) => <div key={dot} className="h-3 w-3 rounded-full bg-zinc-300" />)}
+                </div>
+                <p className="rotate-90 whitespace-nowrap text-xs font-black tracking-[0.25em] text-zinc-400">MANGA TRACKER</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
 export default function App() {
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [items, setItems] = useState<MangaItem[]>([]);
@@ -893,6 +1025,7 @@ export default function App() {
   const [loaded, setLoaded] = useState(false);
   const [query, setQuery] = useState("");
   const [heroIndex, setHeroIndex] = useState(0);
+  const [showMangaPass, setShowMangaPass] = useState(true);
   const [filter, setFilter] = useState<"all" | "updated" | "favorites" | MangaStatus>("all");
   const [tab, setTab] = useState<"collection" | "tier">("tier");
   const [form, setForm] = useState<Omit<MangaItem, "id" | "user_id">>(emptyForm);
@@ -1152,6 +1285,8 @@ export default function App() {
     setNewSourceUrl("");
     setSourceAddOpen(false);
   }
+
+  const passLoaded = loaded && (!supabase || !syncing);
 
   return (
     <main className="min-h-screen bg-zinc-100 text-zinc-950 xl:p-6">
@@ -1465,6 +1600,16 @@ export default function App() {
               </div>
             </motion.aside>
           </motion.div>
+        )}
+
+        {showMangaPass && (
+          <MangaPassIntro
+            user={user}
+            items={items}
+            favoriteIds={favoriteIds}
+            loaded={passLoaded}
+            onEnter={() => setShowMangaPass(false)}
+          />
         )}
 
         {selectedItem && (

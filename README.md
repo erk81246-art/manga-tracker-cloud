@@ -1,7 +1,10 @@
-# Manga Tracker Portrait All Collections
+# Manga Tracker Manga Pass Intro
 
-แก้เพิ่ม:
-- หน้าแนวตั้ง ใต้ Collection Highlight มี All Collections แล้ว
-- แสดง grid มังงะในแนวตั้งเหมือนแนวนอน
-- Continue Reading / New Chapter ยังซ่อนไว้ในแนวตั้งตามเดิม
+เพิ่มหน้าโหลดก่อนเข้าแอป:
+- ใช้รูปปกจาก Favorite ของบัญชีนั้น
+- ถ้าไม่มี Favorite ใช้เรื่องแรกที่มีปก
+- รองรับทั้งแนวตั้งและแนวนอน
+- แนวตั้งเป็นตั๋วตั้ง
+- แนวนอนเป็นตั๋วยาวพร้อม ADMIT ONE
+- รอโหลดข้อมูลก่อน แล้วลาก/แตะกรรไกรเพื่อเข้าคลัง
 - ไม่ต้องรัน SQL ใหม่
