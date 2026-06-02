@@ -353,6 +353,7 @@ function DetailModal({
   isGuest = false,
   isFavorite = false,
   onToggleFavorite,
+  onRead,
   canManage = false,
 }: {
   item: MangaItem;
@@ -364,6 +365,7 @@ function DetailModal({
   isGuest?: boolean;
   isFavorite?: boolean;
   onToggleFavorite?: (item: MangaItem) => void;
+  onRead?: (item: MangaItem) => void;
   canManage?: boolean;
 }) {
   const [checking, setChecking] = useState(false);
@@ -383,7 +385,10 @@ function DetailModal({
   }
 
   function openRead() {
-    if (readUrl) window.open(readUrl, "_blank", "noopener,noreferrer");
+    if (readUrl) {
+      onRead?.(item);
+      if (!onRead) window.open(readUrl, "_blank", "noopener,noreferrer");
+    }
   }
 
   return (
@@ -1246,6 +1251,7 @@ export default function App() {
   const [newSourceName, setNewSourceName] = useState("");
   const [newSourceUrl, setNewSourceUrl] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
+  const [authOpen, setAuthOpen] = useState(false);
   const [isWideLandscape, setIsWideLandscape] = useState(false);
   const [readingSources, setReadingSources] = useState(defaultReadingSources);
 
@@ -1633,7 +1639,8 @@ export default function App() {
                 onOpen={openDetail}
                 favoriteIds={favoriteIds}
                 onToggleFavorite={toggleFavorite}
-                    onRead={openReading}
+                                    onRead={openReading}
+onRead={openReading}
                 user={user}
               />
               <ReadingHistoryRow items={items} historyIds={historyIds} onOpen={openDetail} onRead={openReading} />
@@ -1911,6 +1918,7 @@ export default function App() {
             isGuest={!user}
             isFavorite={selectedItem ? favoriteIds.includes(selectedItem.id) : false}
             onToggleFavorite={toggleFavorite}
+            onRead={openReading}
             canManage={canManageItem(selectedItem)}
           />
         )}
