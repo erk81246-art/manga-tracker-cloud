@@ -1,18 +1,9 @@
-# Manga Tracker Detail Cinematic Polish
+# Manga Tracker Detail No Horizontal Scroll
 
-แก้ตามที่ขอ:
-1. หน้ารายละเอียดนิ่งขึ้น
-- ใช้ h-[92dvh] และ overscroll-contain
-- ลดการขยับของ modal ตอน scroll
-
-2. ปุ่มอ่านต่อไม่ซ้ำ
-- เอาปุ่มอ่านต่อด้านบนออก
-- เหลืออ่านต่อใน bottom action bar จุดเดียว
-
-3. ปุ่มแก้ไขกลับมา
-- Bottom bar มีปุ่ม อ่านต่อ / แก้ไข / ลบ
-- ปุ่มแก้ไขแสดงเมื่อ canManage
-
-4. แถบอ่านล่าสุดกลับหน้าหลัก
-- เพิ่ม/คืน ReadingHistoryRow ใต้ Hero
+แก้ปัญหาหน้ารายละเอียดขยับซ้ายขวา:
+- Modal ล็อกความกว้างไม่เกิน 100vw บนมือถือ
+- ซ่อน overflow-x ใน detail content
+- เอา float layout ที่ทำให้เนื้อหาหลุดจอออก
+- ชื่อเรื่อง/โน้ตบังคับตัดบรรทัด ไม่ดันหน้ากว้าง
+- Bottom action bar ไม่ล้นจอ
 - ไม่ต้องรัน SQL ใหม่

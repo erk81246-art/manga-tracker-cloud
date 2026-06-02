@@ -388,7 +388,7 @@ function DetailModal({
 
   return (
     <motion.div
-      className="fixed inset-0 z-[80] flex items-end justify-center overflow-hidden bg-black/70 p-0 md:items-center md:p-6"
+      className="fixed inset-0 z-[80] flex touch-none items-end justify-center overflow-hidden bg-black/70 p-0 md:items-center md:p-6"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -396,13 +396,13 @@ function DetailModal({
     >
       <motion.div
         onClick={(e) => e.stopPropagation()}
-        className="relative flex h-[92dvh] w-full max-w-[520px] flex-col overflow-hidden rounded-t-[2.5rem] bg-zinc-950 text-white shadow-2xl md:h-[88vh] md:rounded-[2.5rem] xl:max-w-[760px]"
+        className="relative flex touch-auto h-[92dvh] w-[100vw] max-w-[100vw] flex-col overflow-hidden rounded-t-[2.5rem] bg-zinc-950 text-white shadow-2xl md:h-[88vh] md:w-full md:max-w-[520px] md:rounded-[2.5rem] xl:max-w-[760px]"
         initial={{ y: 60, scale: 0.97, opacity: 0 }}
         animate={{ y: 0, scale: 1, opacity: 1 }}
         exit={{ y: 60, scale: 0.97, opacity: 0 }}
         transition={{ type: "spring", stiffness: 260, damping: 25 }}
       >
-        <div className="relative h-full overflow-y-auto overscroll-contain pb-28">
+        <div className="relative h-full overflow-y-auto overflow-x-hidden overscroll-contain pb-28">
           <div className="absolute inset-0">
             {item.cover ? (
               <img src={item.cover} alt={item.title} className="h-full w-full scale-110 object-cover opacity-45 blur-xl" />
@@ -421,8 +421,8 @@ function DetailModal({
             <X size={26} />
           </button>
 
-          <div className="relative z-10 px-5 pb-8 pt-16 md:px-8">
-            <div className="mx-auto mb-5 w-[72%] max-w-[310px] overflow-hidden rounded-[2.2rem] bg-zinc-900 shadow-2xl ring-1 ring-white/15 md:w-[46%] xl:float-left xl:mr-8 xl:w-[260px]">
+          <div className="relative z-10 w-full max-w-full overflow-x-hidden px-4 pb-8 pt-16 md:px-8">
+            <div className="mx-auto mb-5 w-[68%] max-w-[280px] overflow-hidden rounded-[2.2rem] bg-zinc-900 shadow-2xl ring-1 ring-white/15 md:w-[46%] xl:w-[260px]">
               {item.cover ? (
                 <img src={item.cover} alt={item.title} className="aspect-[3/4] w-full object-cover" />
               ) : (
@@ -445,12 +445,12 @@ function DetailModal({
                 )}
               </div>
 
-              <h2 className="text-4xl font-black leading-tight tracking-tight text-white md:text-5xl">
+              <h2 className="max-w-full break-words text-3xl font-black leading-tight tracking-tight text-white md:text-5xl">
                 {item.title}
               </h2>
 
               {item.note && (
-                <p className="mx-auto max-w-xl whitespace-pre-line text-base font-semibold leading-7 text-white/70 xl:mx-0">
+                <p className="mx-auto max-w-full whitespace-pre-line break-words text-base font-semibold leading-7 text-white/70 xl:max-w-xl">
                   {item.note}
                 </p>
               )}
@@ -508,8 +508,8 @@ function DetailModal({
         </div>
 
         {!isGuest && (
-          <div className="absolute inset-x-0 bottom-0 z-20 border-t border-white/10 bg-black/70 p-4 backdrop-blur-xl">
-            <div className="mx-auto grid max-w-[520px] grid-cols-[1fr_1fr_auto] gap-2">
+          <div className="absolute inset-x-0 bottom-0 z-20 overflow-hidden border-t border-white/10 bg-black/70 p-3 backdrop-blur-xl md:p-4">
+            <div className="mx-auto grid w-full max-w-[520px] grid-cols-[1fr_1fr_auto] gap-2">
               <button
                 onClick={readUrl ? openRead : () => canManage && onEdit(item)}
                 className="rounded-2xl bg-white px-4 py-3 text-sm font-black text-zinc-950 active:scale-95"
