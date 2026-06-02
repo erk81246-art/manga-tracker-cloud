@@ -574,7 +574,7 @@ function MangaForm({
 
           <label className="block">
             <span className="text-sm font-bold text-zinc-700">อ่านต่อ URL</span>
-            <input value={value.last_read_url || ""} onChange={(e) => set("last_read_url" as any, e.target.value)} placeholder="ลิงก์หน้าตอนที่อ่านค้างไว้" className="mt-1 w-full rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-3 outline-none focus:border-zinc-950" />
+            <input value={value.last_read_url || ""} onChange={(e) => set("last_read_url" as any, e.target.value)} placeholder="เช่น https://speed-manga.net/manga/solo-leveling/chapter-124" className="mt-1 w-full rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-3 outline-none focus:border-zinc-950" />
           </label>
 
           <label className="block">
@@ -754,6 +754,7 @@ function HeroCarousel({
 }
 
 
+
 function ReadingHistoryRow({
   items,
   historyIds,
@@ -767,6 +768,15 @@ function ReadingHistoryRow({
     .map((id) => items.find((item) => item && item.id === id))
     .filter(Boolean)
     .slice(0, 8) as MangaItem[];
+
+  function openReadingUrl(item: MangaItem) {
+    const url = (item.last_read_url || "").trim() || (item.source_url || "").trim();
+    if (url) {
+      window.open(url, "_blank", "noopener,noreferrer");
+      return;
+    }
+    onOpen(item);
+  }
 
   if (list.length === 0) return null;
 
@@ -782,30 +792,43 @@ function ReadingHistoryRow({
 
       <div className="flex gap-3 overflow-x-auto pb-2">
         {list.map((item, index) => {
-          const hasUpdate = chapterNumber(item.latest_chapter) > chapterNumber(item.read_chapter);
+          const directUrl = (item.last_read_url || "").trim();
+          const fallbackUrl = (item.source_url || "").trim();
+          const usingLastReadUrl = Boolean(directUrl);
+
           return (
-            <button
-              key={item.id}
-              onClick={() => {
-                const continueUrl = item.last_read_url || item.source_url;
-                if (continueUrl) window.open(continueUrl, "_blank", "noopener,noreferrer");
-                else onOpen(item);
-              }}
-              className="group min-w-[150px] rounded-[1.7rem] bg-white p-2 text-left shadow-sm active:scale-[0.99] md:min-w-[180px]"
-            >
-              <div className="relative aspect-[3/4] overflow-hidden rounded-[1.35rem] bg-zinc-100">
-                {item.cover ? <img src={item.cover} alt={item.title} className="h-full w-full object-cover transition-transform group-hover:scale-105" /> : null}
-                <div className="absolute left-2 top-2 rounded-full bg-black/75 px-2 py-1 text-[10px] font-black text-white">#{index + 1}</div>
+            <div key={item.id} className="min-w-[230px] rounded-3xl bg-white p-3 shadow-sm md:min-w-[260px]">
+              <button onClick={() => openReadingUrl(item)} className="flex w-full gap-3 text-left active:scale-[0.99]">
+                <div className="relative h-24 w-16 shrink-0 overflow-hidden rounded-2xl bg-zinc-100">
+                  {item.cover ? <img src={item.cover} alt={item.title} className="h-full w-full object-cover" /> : null}
+                  <div className="absolute left-1 top-1 rounded-full bg-black/75 px-1.5 py-0.5 text-[10px] font-black text-white">#{index + 1}</div>
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="line-clamp-2 text-sm font-black text-zinc-950">{item.title}</p>
+                  <p className="mt-1 text-xs font-bold text-purple-600">อ่านถึง {item.last_read_chapter || item.read_chapter || "-"}</p>
+                  <p className="text-xs text-zinc-400">ล่าสุด {item.latest_chapter || "-"}</p>
+                  <p className={`mt-2 text-[11px] font-bold ${usingLastReadUrl ? "text-emerald-600" : "text-amber-600"}`}>
+                    {usingLastReadUrl ? "แตะเพื่อเปิดหน้าตอนที่อ่านค้างไว้" : "ยังไม่มี URL ตอนล่าสุด ใช้หน้าหลักของเรื่องแทน"}
+                  </p>
+                </div>
+              </button>
+
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                <button onClick={() => onOpen(item)} className="rounded-2xl bg-zinc-100 px-3 py-2 text-xs font-black text-zinc-700 active:scale-95">
+                  รายละเอียด
+                </button>
+                <button onClick={() => openReadingUrl(item)} className="flex items-center justify-center gap-1 rounded-2xl bg-zinc-950 px-3 py-2 text-xs font-black text-white active:scale-95">
+                  <ExternalLink size={14} /> อ่านต่อ
+                </button>
               </div>
-              <p className="mt-2 line-clamp-2 text-sm font-black text-zinc-950">{item.title}</p>
-              <p className="mt-1 text-xs font-bold text-zinc-400">แตะเพื่ออ่านต่อ</p>
-            </button>
+            </div>
           );
         })}
       </div>
     </section>
   );
 }
+
 
 function ContinueReadingRow({ items, onOpen }: { items: MangaItem[]; onOpen: (item: MangaItem) => void }) {
   const list = items.filter((item) => item.read_chapter || chapterNumber(item.latest_chapter) > chapterNumber(item.read_chapter)).slice(0, 6);
@@ -1519,7 +1542,6 @@ export default function App() {
                 user={user}
               />
               <ReadingHistoryRow items={items} historyIds={historyIds} onOpen={openDetail} />
-              <div className="hidden md:block"><ContinueReadingRow items={items} onOpen={openDetail} /></div>
               <div className="hidden md:block"><NewChapterRow items={items} onOpen={openDetail} /></div>
               <div className="mb-4 mt-4 flex gap-2 overflow-x-auto pb-1 xl:hidden">
                 {filters.map(([key, label]) => (
