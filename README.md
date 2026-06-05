@@ -1,15 +1,11 @@
-# Manga Tracker Progress Read Chapter Fix
+# Manga Tracker Netflix Sprint 1
 
-แก้ตามที่ขอ:
-1. รวม "อ่านถึงตอน" กับ "อ่านล่าสุดถึงตอน" ให้เป็นค่าเดียวกัน
-- เอาช่องอ่านล่าสุดถึงตอนในหน้าแก้ไขออก
-- ใช้ read_chapter เป็นเลขตอนเดียว
-- saveProgress จะบันทึกทั้ง read_chapter และ last_read_chapter เป็นเลขเดียวกัน
+เริ่มปรับครั้งใหญ่แบบเน้นเสถียร:
+- Theme โทน Netflix: ดำ / แดง / ขาว
+- เพิ่ม Dashboard tab แบบ lightweight
+- Dashboard มี stats, progress, tier distribution, new updates, favorites
+- เพิ่มปุ่ม Dashboard ใน bottom nav
+- ใส่ loading="lazy" ให้รูปบางจุด
+- ไม่ต้องรัน SQL ใหม่
 
-2. แก้ "อ่านถึงของฉัน" ในหน้ารายละเอียดให้บันทึกได้
-- กรอกเลขตอนใน Detail ได้เลย
-- กด "บันทึกตอนที่อ่าน"
-- บันทึกลง user_manga_progress ของบัญชีตัวเอง
-- สร้าง last_read_url จากเลขตอนและ source_url ให้อัตโนมัติ
-
-ต้องรัน SQL user_progress.sql ก่อน ถ้ายังไม่ได้รัน
+ถ้า build error ส่ง log มาได้เลย เดี๋ยวแก้เฉพาะจุดต่อ

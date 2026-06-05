@@ -7,6 +7,7 @@ import {
   ChevronRight,
   ChevronLeft,
   BookOpen,
+  BarChart3,
   Cloud,
   ExternalLink,
   Heart,
@@ -91,7 +92,7 @@ const statusMap: Record<MangaStatus, { label: string; badge: string }> = {
   reading: { label: "กำลังอ่าน", badge: "bg-blue-100 text-blue-700" },
   waiting: { label: "รอตอนใหม่", badge: "bg-amber-100 text-amber-700" },
   finished: { label: "อ่านจบ", badge: "bg-emerald-100 text-emerald-700" },
-  paused: { label: "ดองไว้", badge: "bg-zinc-100 text-zinc-700" },
+  paused: { label: "ดองไว้", badge: "bg-[#0B0B0B] text-zinc-700" },
 };
 
 const tiers: MangaTier[] = ["S", "A", "B", "C", "D"];
@@ -197,7 +198,7 @@ function AuthBox() {
           {mode === "login" ? "ยังไม่มีบัญชี? สมัครสมาชิก" : "มีบัญชีแล้ว? เข้าสู่ระบบ"}
         </button>
 
-        {message && <p className="rounded-2xl bg-zinc-100 p-3 text-sm text-zinc-600">{message}</p>}
+        {message && <p className="rounded-2xl bg-[#0B0B0B] p-3 text-sm text-zinc-600">{message}</p>}
       </div>
     </Card>
   );
@@ -265,7 +266,7 @@ function SourceIconBar({
                   <h2 className="text-xl font-black">แหล่งอ่านหลัก</h2>
                   <p className="text-sm text-zinc-500">{isGuest ? "Login ก่อนถึงจะเปิดเว็บอ่านได้" : "เพิ่มเว็บอ่านเองได้"}</p>
                 </div>
-                <button onClick={() => setOpen(false)} className="rounded-full bg-zinc-100 p-2 text-zinc-600">
+                <button onClick={() => setOpen(false)} className="rounded-full bg-[#0B0B0B] p-2 text-zinc-600">
                   <X size={20} />
                 </button>
               </div>
@@ -284,7 +285,7 @@ function SourceIconBar({
                       <ExternalLink size={18} className="text-zinc-300" />
                     </a>
                     {!isGuest && (
-                      <button onClick={() => onDeleteSource(src.url)} className="rounded-2xl bg-zinc-100 p-3 text-rose-600">
+                      <button onClick={() => onDeleteSource(src.url)} className="rounded-2xl bg-[#0B0B0B] p-3 text-rose-600">
                         <Trash2 size={16} />
                       </button>
                     )}
@@ -343,13 +344,13 @@ function MangaTile({
         {item.cover ? (
           <img loading="lazy" src={item.cover} alt={item.title} className="h-full w-full object-cover transition group-active:scale-95" />
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-zinc-100 text-zinc-300">
+          <div className="flex h-full w-full items-center justify-center bg-[#0B0B0B] text-zinc-300">
             <ImageIcon size={26} />
           </div>
         )}
 
-        {hasUpdate && <div className="absolute right-1.5 top-1.5 rounded-full bg-rose-500 px-1.5 py-0.5 text-[10px] font-black text-white">NEW</div>}
-        <div className="absolute left-1.5 top-1.5 rounded-full bg-black/70 px-2 py-0.5 text-[10px] font-black text-white">{item.tier}</div>{isFavorite && <div className="absolute bottom-1.5 right-1.5 rounded-full bg-rose-500 p-1 text-white"><Heart size={12} fill="currentColor" /></div>}
+        {hasUpdate && <div className="absolute right-1.5 top-1.5 rounded-full bg-red-600 px-1.5 py-0.5 text-[10px] font-black text-white">NEW</div>}
+        <div className="absolute left-1.5 top-1.5 rounded-full bg-black/70 px-2 py-0.5 text-[10px] font-black text-white">{item.tier}</div>{isFavorite && <div className="absolute bottom-1.5 right-1.5 rounded-full bg-red-600 p-1 text-white"><Heart size={12} fill="currentColor" /></div>}
       </div>
       <p className="mt-1.5 line-clamp-2 text-xs font-bold leading-tight text-zinc-800">{item.title || "ไม่มีชื่อเรื่อง"}</p>
     </motion.button>
@@ -439,7 +440,7 @@ function DetailModal({
         <div className="relative h-full overflow-y-auto overflow-x-hidden overscroll-contain pb-28">
           <div className="absolute inset-0">
             {item.cover ? (
-              <img src={item.cover} alt={item.title} className="h-full w-full scale-110 object-cover opacity-25 blur-2xl" />
+              <img loading="lazy" src={item.cover} alt={item.title} className="h-full w-full scale-110 object-cover opacity-25 blur-2xl" />
             ) : (
               <div className="h-full w-full bg-zinc-900" />
             )}
@@ -458,7 +459,7 @@ function DetailModal({
           <div className="relative z-10 w-full max-w-full overflow-x-hidden px-4 pb-8 pt-16 md:px-8">
             <div className="mx-auto mb-5 w-[68%] max-w-[280px] overflow-hidden rounded-[2.2rem] bg-black shadow-2xl ring-1 ring-white/10 md:w-[46%] xl:w-[260px]">
               {item.cover ? (
-                <img src={item.cover} alt={item.title} className="aspect-[3/4] w-full object-cover" />
+                <img loading="lazy" src={item.cover} alt={item.title} className="aspect-[3/4] w-full object-cover" />
               ) : (
                 <div className="aspect-[3/4] grid place-items-center text-zinc-500">ไม่มีรูป</div>
               )}
@@ -473,7 +474,7 @@ function DetailModal({
                   {item.status === "reading" ? "กำลังอ่าน" : item.status === "finished" ? "จบแล้ว" : "รอ"}
                 </span>
                 {hasUpdate && (
-                  <span className="rounded-full bg-rose-500 px-3 py-1 text-xs font-black text-white">
+                  <span className="rounded-full bg-red-600 px-3 py-1 text-xs font-black text-white">
                     NEW +{chapterNumber(item.latest_chapter) - chapterNumber(item.read_chapter)}
                   </span>
                 )}
@@ -522,7 +523,7 @@ function DetailModal({
                 <button
                   onClick={() => onToggleFavorite?.(item)}
                   disabled={isGuest}
-                  className={`rounded-2xl px-4 py-3 text-sm font-black active:scale-95 ${isFavorite ? "bg-rose-500 text-white" : "bg-zinc-900 text-white"}`}
+                  className={`rounded-2xl px-4 py-3 text-sm font-black active:scale-95 ${isFavorite ? "bg-red-600 text-white" : "bg-zinc-900 text-white"}`}
                 >
                   <Heart size={18} className="mx-auto mb-1" fill={isFavorite ? "currentColor" : "none"} />
                   Favorite
@@ -598,7 +599,7 @@ function DetailModal({
               )}
 
               {canManage && (
-                <button onClick={() => onDelete(item.id)} className="grid h-12 w-12 place-items-center rounded-2xl bg-rose-500/20 text-rose-300 active:scale-95">
+                <button onClick={() => onDelete(item.id)} className="grid h-12 w-12 place-items-center rounded-2xl bg-red-600/20 text-rose-300 active:scale-95">
                   <Trash2 size={20} />
                 </button>
               )}
@@ -658,7 +659,7 @@ function MangaForm({
             <h2 className="text-xl font-black text-zinc-950">{editing ? "แก้ไขมังงะ" : "เพิ่มมังงะ"}</h2>
             <p className="text-sm text-zinc-500">เพิ่มรูปจากมือถือได้</p>
           </div>
-          <button onClick={onClose} className="rounded-full bg-zinc-100 p-2 text-zinc-600">
+          <button onClick={onClose} className="rounded-full bg-[#0B0B0B] p-2 text-zinc-600">
             <X size={20} />
           </button>
         </div>
@@ -737,6 +738,130 @@ function MangaForm({
   );
 }
 
+
+
+function DashboardView({
+  items,
+  favoriteIds,
+  onOpen,
+}: {
+  items: MangaItem[];
+  favoriteIds: string[];
+  onOpen: (item: MangaItem) => void;
+}) {
+  const total = items.length;
+  const reading = items.filter((item) => item.status === "reading").length;
+  const finished = items.filter((item) => item.status === "finished").length;
+  const paused = items.filter((item) => item.status === "paused").length;
+  const updatedItems = items.filter((item) => chapterNumber(item.latest_chapter) > chapterNumber(item.read_chapter));
+  const caughtUp = total - updatedItems.length;
+  const caughtPercent = total ? Math.round((caughtUp / total) * 100) : 0;
+  const tierCounts = tiers.map((tier) => ({ tier, count: items.filter((item) => item.tier === tier).length }));
+  const favorites = items.filter((item) => favoriteIds.includes(item.id)).slice(0, 8);
+
+  return (
+    <section className="space-y-6">
+      <div className="relative overflow-hidden rounded-[2rem] bg-[#111111] p-6 text-white ring-1 ring-white/10 md:p-8">
+        <div className="absolute -right-16 -top-16 h-52 w-52 rounded-full bg-red-600/20 blur-3xl" />
+        <div className="relative">
+          <p className="text-xs font-black uppercase tracking-[0.28em] text-red-500">Dashboard</p>
+          <h2 className="mt-2 text-4xl font-black tracking-tight md:text-6xl">Manga Library</h2>
+          <p className="mt-2 max-w-xl text-sm font-semibold text-zinc-400">สรุปคลังมังงะของคุณแบบ Netflix style เบา ลื่น และไม่รก</p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+        {[
+          ["ทั้งหมด", total],
+          ["กำลังอ่าน", reading],
+          ["จบแล้ว", finished],
+          ["พักไว้", paused],
+        ].map(([label, value]) => (
+          <div key={label} className="rounded-[1.6rem] bg-[#151515] p-5 text-white ring-1 ring-white/10">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-zinc-500">{label}</p>
+            <p className="mt-3 text-4xl font-black">{value}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="grid gap-4 xl:grid-cols-[1fr_1.2fr]">
+        <div className="rounded-[1.8rem] bg-[#151515] p-5 text-white ring-1 ring-white/10">
+          <div className="flex items-end justify-between">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-zinc-500">Progress</p>
+              <h3 className="mt-1 text-2xl font-black">อ่านตามทัน</h3>
+            </div>
+            <p className="text-4xl font-black text-red-500">{caughtPercent}%</p>
+          </div>
+          <div className="mt-5 h-3 overflow-hidden rounded-full bg-zinc-800">
+            <div className="h-full rounded-full bg-red-600" style={{ width: `${caughtPercent}%` }} />
+          </div>
+          <p className="mt-3 text-sm font-semibold text-zinc-400">ตามทันแล้ว {caughtUp} เรื่อง · มีตอนใหม่ {updatedItems.length} เรื่อง</p>
+        </div>
+
+        <div className="rounded-[1.8rem] bg-[#151515] p-5 text-white ring-1 ring-white/10">
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-zinc-500">Tier Distribution</p>
+          <div className="mt-4 space-y-3">
+            {tierCounts.map(({ tier, count }) => {
+              const percent = total ? Math.max(6, Math.round((count / total) * 100)) : 6;
+              return (
+                <div key={tier} className="grid grid-cols-[32px_1fr_40px] items-center gap-3">
+                  <span className="text-lg font-black">{tier}</span>
+                  <div className="h-3 overflow-hidden rounded-full bg-zinc-800">
+                    <div className="h-full rounded-full bg-white" style={{ width: `${percent}%` }} />
+                  </div>
+                  <span className="text-right text-sm font-black text-zinc-400">{count}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      <div className="grid gap-4 xl:grid-cols-2">
+        <div className="rounded-[1.8rem] bg-[#151515] p-5 text-white ring-1 ring-white/10">
+          <div className="mb-4 flex items-center justify-between">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-red-500">New Updates</p>
+              <h3 className="text-2xl font-black">ตอนใหม่มาแล้ว</h3>
+            </div>
+            <span className="rounded-full bg-red-600 px-3 py-1 text-xs font-black">{updatedItems.length}</span>
+          </div>
+          <div className="space-y-2">
+            {updatedItems.slice(0, 8).map((item) => (
+              <button key={item.id} onClick={() => onOpen(item)} className="flex w-full items-center gap-3 rounded-2xl bg-black/50 p-2 text-left active:scale-[0.99]">
+                <div className="h-16 w-12 overflow-hidden rounded-xl bg-zinc-800">
+                  {item.cover ? <img loading="lazy" src={item.cover} alt={item.title} className="h-full w-full object-cover" loading="lazy" /> : null}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="line-clamp-1 text-sm font-black">{item.title}</p>
+                  <p className="text-xs font-bold text-red-400">+{chapterNumber(item.latest_chapter) - chapterNumber(item.read_chapter)} ตอน</p>
+                </div>
+              </button>
+            ))}
+            {updatedItems.length === 0 && <p className="rounded-2xl bg-black/50 p-4 text-sm font-semibold text-zinc-500">ยังไม่มีตอนใหม่</p>}
+          </div>
+        </div>
+
+        <div className="rounded-[1.8rem] bg-[#151515] p-5 text-white ring-1 ring-white/10">
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-red-500">Favorites</p>
+          <h3 className="text-2xl font-black">เรื่องที่ติดตาม</h3>
+          <div className="mt-4 flex gap-3 overflow-x-auto pb-2">
+            {favorites.map((item) => (
+              <button key={item.id} onClick={() => onOpen(item)} className="min-w-[120px] text-left active:scale-[0.99]">
+                <div className="aspect-[3/4] overflow-hidden rounded-2xl bg-zinc-800">
+                  {item.cover ? <img loading="lazy" src={item.cover} alt={item.title} className="h-full w-full object-cover" loading="lazy" /> : null}
+                </div>
+                <p className="mt-2 line-clamp-2 text-xs font-black">{item.title}</p>
+              </button>
+            ))}
+            {favorites.length === 0 && <p className="rounded-2xl bg-black/50 p-4 text-sm font-semibold text-zinc-500">ยังไม่มี Favorite</p>}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
 
 function HeroCarousel({
   items,
@@ -823,11 +948,11 @@ function HeroCarousel({
 
           <div className="relative z-10 flex min-h-[540px] flex-col justify-end p-5 md:min-h-[410px] md:p-8">
             <div className="mb-auto flex items-center justify-between">
-              <span className="rounded-full bg-purple-500 px-4 py-2 text-xs font-black text-white">
+              <span className="rounded-full bg-red-600 px-4 py-2 text-xs font-black text-white">
                 {hasUpdate ? "NEW CHAPTER" : `TIER ${active.tier}`}
               </span>
               {user && (
-                <button onClick={() => onToggleFavorite(active)} className={`rounded-full p-3 ${isFavorite ? "bg-rose-500 text-white" : "bg-zinc-900 text-white"}`}>
+                <button onClick={() => onToggleFavorite(active)} className={`rounded-full p-3 ${isFavorite ? "bg-red-600 text-white" : "bg-zinc-900 text-white"}`}>
                   <Heart size={22} fill={isFavorite ? "currentColor" : "none"} />
                 </button>
               )}
@@ -841,7 +966,7 @@ function HeroCarousel({
             </div>
             <p className="mt-4 line-clamp-2 max-w-xl text-sm font-medium text-white/75">{active.note || "กดรายละเอียดเพื่อดูข้อมูลและจัดการเรื่องนี้"}</p>
             <div className="mt-5 flex flex-wrap gap-3">
-              <button onClick={() => onOpen(active)} className="flex items-center gap-2 rounded-2xl bg-purple-600 px-5 py-3 text-sm font-black text-white shadow-lg shadow-purple-600/25 active:scale-95">
+              <button onClick={() => onOpen(active)} className="flex items-center gap-2 rounded-2xl bg-red-600 px-5 py-3 text-sm font-black text-white shadow-lg shadow-purple-600/25 active:scale-95">
                 <BookOpen size={18} /> รายละเอียด
               </button>
               {(active.last_read_url || active.source_url) && (
@@ -856,7 +981,7 @@ function HeroCarousel({
 
       <div className="mt-3 flex justify-center gap-2">
         {featured.map((item, i) => (
-          <button key={item.id} onClick={() => setActiveIndex(i)} className={`h-2 rounded-full transition-all ${i === index ? "w-8 bg-purple-500" : "w-2 bg-white/20"}`} aria-label={`go to ${item.title}`} />
+          <button key={item.id} onClick={() => setActiveIndex(i)} className={`h-2 rounded-full transition-all ${i === index ? "w-8 bg-red-600" : "w-2 bg-white/20"}`} aria-label={`go to ${item.title}`} />
         ))}
       </div>
     </section>
@@ -912,13 +1037,13 @@ function ReadingHistoryRow({
           return (
             <div key={item.id} className="min-w-[230px] rounded-3xl bg-white p-3 shadow-sm md:min-w-[260px]">
               <button onClick={() => openReadingUrl(item)} className="flex w-full gap-3 text-left active:scale-[0.99]">
-                <div className="relative h-24 w-16 shrink-0 overflow-hidden rounded-2xl bg-zinc-100">
-                  {item.cover ? <img src={item.cover} alt={item.title} className="h-full w-full object-cover" /> : null}
+                <div className="relative h-24 w-16 shrink-0 overflow-hidden rounded-2xl bg-[#0B0B0B]">
+                  {item.cover ? <img loading="lazy" src={item.cover} alt={item.title} className="h-full w-full object-cover" /> : null}
                   <div className="absolute left-1 top-1 rounded-full bg-black/75 px-1.5 py-0.5 text-[10px] font-black text-white">#{index + 1}</div>
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="line-clamp-2 text-sm font-black text-zinc-950">{item.title}</p>
-                  <p className="mt-1 text-xs font-bold text-purple-600">อ่านถึง {item.last_read_chapter || item.read_chapter || "-"}</p>
+                  <p className="mt-1 text-xs font-bold text-red-500">อ่านถึง {item.last_read_chapter || item.read_chapter || "-"}</p>
                   <p className="text-xs text-zinc-400">ล่าสุด {item.latest_chapter || "-"}</p>
                   <p className={`mt-2 text-[11px] font-bold ${usingLastReadUrl ? "text-emerald-600" : "text-amber-600"}`}>
                     {usingLastReadUrl ? "แตะเพื่อเปิดหน้าตอนที่อ่านค้างไว้" : "ยังไม่มี URL ตอนล่าสุด ใช้หน้าหลักของเรื่องแทน"}
@@ -927,7 +1052,7 @@ function ReadingHistoryRow({
               </button>
 
               <div className="mt-3 grid grid-cols-2 gap-2">
-                <button onClick={() => onOpen(item)} className="rounded-2xl bg-zinc-100 px-3 py-2 text-xs font-black text-zinc-700 active:scale-95">
+                <button onClick={() => onOpen(item)} className="rounded-2xl bg-[#0B0B0B] px-3 py-2 text-xs font-black text-zinc-700 active:scale-95">
                   รายละเอียด
                 </button>
                 <button onClick={() => openReadingUrl(item)} className="flex items-center justify-center gap-1 rounded-2xl bg-zinc-950 px-3 py-2 text-xs font-black text-white active:scale-95">
@@ -960,17 +1085,17 @@ function ContinueReadingRow({ items, onOpen }: { items: MangaItem[]; onOpen: (it
           return (
             <button key={item.id} onClick={() => onOpen(item)} className="min-w-[230px] rounded-3xl bg-white p-3 text-left shadow-sm active:scale-[0.99]">
               <div className="flex gap-3">
-                <div className="h-20 w-14 shrink-0 overflow-hidden rounded-2xl bg-zinc-100">
-                  {item.cover ? <img src={item.cover} alt={item.title} className="h-full w-full object-cover" /> : null}
+                <div className="h-20 w-14 shrink-0 overflow-hidden rounded-2xl bg-[#0B0B0B]">
+                  {item.cover ? <img loading="lazy" src={item.cover} alt={item.title} className="h-full w-full object-cover" /> : null}
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="line-clamp-2 text-sm font-black">{item.title}</p>
-                  <p className="mt-1 text-xs font-bold text-purple-600">ตอนที่ {item.read_chapter || "-"}</p>
+                  <p className="mt-1 text-xs font-bold text-red-500">ตอนที่ {item.read_chapter || "-"}</p>
                   <p className="text-xs text-zinc-400">ล่าสุด {item.latest_chapter || "-"}</p>
                 </div>
               </div>
-              <div className="mt-3 h-2 overflow-hidden rounded-full bg-zinc-100">
-                <div className="h-full rounded-full bg-purple-600" style={{ width: `${percent}%` }} />
+              <div className="mt-3 h-2 overflow-hidden rounded-full bg-[#0B0B0B]">
+                <div className="h-full rounded-full bg-red-600" style={{ width: `${percent}%` }} />
               </div>
             </button>
           );
@@ -992,15 +1117,15 @@ function NewChapterRow({ items, onOpen }: { items: MangaItem[]; onOpen: (item: M
       <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-3">
         {list.map((item) => (
           <button key={item.id} onClick={() => onOpen(item)} className="flex items-center gap-3 rounded-3xl bg-white p-3 text-left shadow-sm active:scale-[0.99]">
-            <div className="h-16 w-12 shrink-0 overflow-hidden rounded-2xl bg-zinc-100">
-              {item.cover ? <img src={item.cover} alt={item.title} className="h-full w-full object-cover" /> : null}
+            <div className="h-16 w-12 shrink-0 overflow-hidden rounded-2xl bg-[#0B0B0B]">
+              {item.cover ? <img loading="lazy" src={item.cover} alt={item.title} className="h-full w-full object-cover" /> : null}
             </div>
             <div className="min-w-0 flex-1">
               <p className="line-clamp-1 font-black">{item.title}</p>
               <p className="text-sm font-bold text-rose-600">ใหม่ถึงตอน {item.latest_chapter}</p>
               <p className="text-xs text-zinc-400">อ่านถึง {item.read_chapter || "-"}</p>
             </div>
-            <span className="rounded-full bg-rose-500 px-2 py-1 text-[10px] font-black text-white">NEW</span>
+            <span className="rounded-full bg-red-600 px-2 py-1 text-[10px] font-black text-white">NEW</span>
           </button>
         ))}
       </div>
@@ -1023,8 +1148,8 @@ function Sidebar({
   stats: { total: number; updated: number; reading: number; finished: number; paused: number; favorites?: number };
   filter: "all" | "updated" | "favorites" | MangaStatus;
   setFilter: (filter: "all" | "updated" | "favorites" | MangaStatus) => void;
-  tab: "collection" | "tier";
-  setTab: (tab: "collection" | "tier") => void;
+  tab: "collection" | "tier" | "dashboard";
+  setTab: (tab: "collection" | "tier" | "dashboard") => void;
   onAdd: () => void;
   onLogout: () => void;
   isWideLandscape: boolean;
@@ -1221,7 +1346,7 @@ function MangaPassIntro({
                   dragConstraints={{ left: -135, right: 135 }}
                   onDragEnd={(_, info) => tryEnter(info.offset.x)}
                   onClick={() => loaded && onEnter()}
-                  className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-white shadow-lg ${loaded ? "bg-purple-600 shadow-purple-600/30" : "bg-zinc-400"}`}
+                  className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-white shadow-lg ${loaded ? "bg-red-600 shadow-purple-600/30" : "bg-zinc-400"}`}
                   whileTap={{ scale: 0.92 }}
                 >
                   <Scissors size={22} />
@@ -1261,7 +1386,7 @@ function MangaPassIntro({
                         dragConstraints={{ left: -160, right: 160 }}
                         onDragEnd={(_, info) => tryEnter(info.offset.x)}
                         onClick={() => loaded && onEnter()}
-                        className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-white shadow-lg ${loaded ? "bg-purple-600 shadow-purple-600/30" : "bg-white/20"}`}
+                        className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-white shadow-lg ${loaded ? "bg-red-600 shadow-purple-600/30" : "bg-white/20"}`}
                         whileTap={{ scale: 0.92 }}
                       >
                         <Scissors size={22} />
@@ -1301,7 +1426,7 @@ export default function App() {
   const [showMangaPass, setShowMangaPass] = useState(true);
   const [historyIds, setHistoryIds] = useState<string[]>([]);
   const [filter, setFilter] = useState<"all" | "updated" | "favorites" | MangaStatus>("all");
-  const [tab, setTab] = useState<"collection" | "tier">("tier");
+  const [tab, setTab] = useState<"collection" | "tier" | "dashboard">("tier");
   const [form, setForm] = useState<Omit<MangaItem, "id" | "user_id">>(emptyForm);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [openForm, setOpenForm] = useState(false);
@@ -1747,7 +1872,7 @@ export default function App() {
   const passLoaded = loaded && (!supabase || !syncing);
 
   return (
-    <main className="min-h-screen bg-zinc-100 pb-28 text-zinc-950 xl:p-6 xl:pb-6">
+    <main className="min-h-screen bg-[#0B0B0B] pb-28 text-zinc-950 xl:p-6 xl:pb-6">
       <div className={`app-shell mx-auto grid gap-4 ${isWideLandscape ? "max-w-7xl px-0 pb-4 pt-0" : "max-w-md px-4 pb-28 pt-3 sm:max-w-xl md:max-w-3xl"} xl:max-w-7xl xl:px-0 xl:pt-0`}>
 
         <section className="min-w-0">
@@ -1763,7 +1888,7 @@ export default function App() {
 
           {syncing && <p className="mb-3 rounded-2xl bg-white p-3 text-center text-sm text-zinc-500">กำลัง sync ข้อมูล...</p>}
 
-          <div className={`app-sticky-bar sticky z-20 bg-zinc-100/90 px-4 py-3 backdrop-blur ${tab === "collection" && !isWideLandscape ? "hidden md:block" : ""} ${isWideLandscape ? "top-4 mx-0 rounded-[2rem] bg-white px-3 shadow-sm" : "top-0 -mx-4"} xl:top-6 xl:mx-0 xl:rounded-[2rem] xl:bg-white xl:px-3 xl:shadow-sm`}>
+          <div className={`app-sticky-bar sticky z-20 bg-[#0B0B0B]/90 px-4 py-3 backdrop-blur ${tab === "collection" && !isWideLandscape ? "hidden md:block" : ""} ${isWideLandscape ? "top-4 mx-0 rounded-[2rem] bg-white px-3 shadow-sm" : "top-0 -mx-4"} xl:top-6 xl:mx-0 xl:rounded-[2rem] xl:bg-white xl:px-3 xl:shadow-sm`}>
             <div className="hidden rounded-3xl bg-white p-1 shadow-sm">
               <button onClick={() => user && setTab("collection")} disabled={!user} className={`flex flex-1 items-center justify-center gap-2 rounded-[1.1rem] px-3 py-2 text-sm font-bold ${tab === "collection" ? "bg-zinc-950 text-white" : "text-zinc-500"}`}>
                 <BookOpen size={16} /> Collection
@@ -1781,7 +1906,9 @@ export default function App() {
             )}
           </div>
 
-          {tab === "collection" ? (
+          {tab === "dashboard" ? (
+            <DashboardView items={progressItems || items} favoriteIds={favoriteIds} onOpen={openDetail} />
+          ) : tab === "collection" ? (
             <>
               <HeroCarousel
                 items={filtered.length ? filtered : progressItems}
@@ -1827,7 +1954,7 @@ export default function App() {
                   <p className="text-xs font-black uppercase tracking-[0.2em] text-zinc-400">Login</p>
                   <h2 className="text-2xl font-black text-zinc-950">เข้าสู่ระบบ</h2>
                 </div>
-                <button onClick={() => setAuthOpen(false)} className="rounded-full bg-zinc-100 p-2 text-zinc-600">
+                <button onClick={() => setAuthOpen(false)} className="rounded-full bg-[#0B0B0B] p-2 text-zinc-600">
                   <X size={20} />
                 </button>
               </div>
@@ -1929,7 +2056,7 @@ export default function App() {
                   <h2 className="text-xl font-black">แหล่งอ่านหลัก</h2>
                   <p className="text-sm text-zinc-500">{!user ? "Login ก่อนถึงจะเปิดเว็บอ่านได้" : "เลือกเว็บที่ต้องการเปิด"}</p>
                 </div>
-                <button onClick={() => setSourcesOpen(false)} className="rounded-full bg-zinc-100 p-2 text-zinc-600">
+                <button onClick={() => setSourcesOpen(false)} className="rounded-full bg-[#0B0B0B] p-2 text-zinc-600">
                   <X size={20} />
                 </button>
               </div>
