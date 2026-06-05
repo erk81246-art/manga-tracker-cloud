@@ -63,6 +63,16 @@ const PASS_INDEX_KEY = "manga-tracker-pass-index-v1";
 const HISTORY_STORAGE_KEY = "manga-tracker-reading-history-v1";
 const ADMIN_EMAILS = ["erk81246@gmail.com"];
 
+
+type UserMangaProgress = {
+  user_id: string;
+  manga_id: string;
+  read_chapter?: string | null;
+  last_read_url?: string | null;
+  last_read_chapter?: string | null;
+  last_read_at?: string | null;
+};
+
 const emptyForm: Omit<MangaItem, "id" | "user_id"> = {
   title: "",
   cover: "",
@@ -373,8 +383,10 @@ function DetailModal({
   canManage?: boolean;
 }) {
   const [checking, setChecking] = useState(false);
+  const [localReadChapter, setLocalReadChapter] = useState(item.read_chapter || "");
   const hasUpdate = chapterNumber(item.latest_chapter) > chapterNumber(item.read_chapter);
-  const readUrl = item.last_read_url || item.source_url || "";
+  const readUrl = item.last_read_url || "";
+  const mainSourceUrl = item.source_url || "";
 
   async function handleCheckLatest() {
     if (isGuest) return;
@@ -466,14 +478,32 @@ function DetailModal({
 
               <div className="grid grid-cols-2 gap-3 pt-2">
                 <div className="rounded-[1.6rem] bg-zinc-900 p-4 text-left backdrop-blur-xl">
-                  <p className="text-xs font-bold text-zinc-500">อ่านถึง</p>
-                  <p className="mt-1 text-2xl font-black">ตอน {item.read_chapter || "-"}</p>
+                  <p className="text-xs font-bold text-zinc-500">อ่านถึงของฉัน</p>
+                  <div className="mt-2 flex items-center gap-2">
+                    <span className="text-xl font-black">ตอน</span>
+                    <input
+                      value={localReadChapter}
+                      onChange={(e) => setLocalReadChapter(e.target.value)}
+                      disabled={isGuest}
+                      className="min-w-0 flex-1 rounded-xl bg-black px-3 py-2 text-xl font-black text-white outline-none ring-1 ring-white/10 disabled:opacity-50"
+                      placeholder="-"
+                    />
+                  </div>
                 </div>
                 <div className="rounded-[1.6rem] bg-zinc-900 p-4 text-left backdrop-blur-xl">
-                  <p className="text-xs font-bold text-zinc-500">ล่าสุด</p>
+                  <p className="text-xs font-bold text-zinc-500">ล่าสุดของเรื่อง</p>
                   <p className="mt-1 text-2xl font-black">ตอน {item.latest_chapter || "-"}</p>
                 </div>
               </div>
+
+              {!isGuest && (
+                <button
+                  onClick={() => onSaveProgress?.(item, localReadChapter)}
+                  className="w-full rounded-2xl bg-white px-4 py-3 text-sm font-black text-zinc-950 active:scale-95"
+                >
+                  บันทึกตอนที่อ่าน
+                </button>
+              )}
 
               <div className="grid grid-cols-2 gap-2 pt-2">
                 <button
@@ -483,6 +513,24 @@ function DetailModal({
                 >
                   <Heart size={18} className="mx-auto mb-1" fill={isFavorite ? "currentColor" : "none"} />
                   Favorite
+                </button>
+
+                <button
+                  onClick={openMain}
+                  disabled={!mainSourceUrl}
+                  className="rounded-2xl bg-zinc-900 px-4 py-3 text-sm font-black text-white active:scale-95 disabled:opacity-50"
+                >
+                  <ExternalLink size={18} className="mx-auto mb-1" />
+                  กดอ่าน
+                </button>
+
+                <button
+                  onClick={openRead}
+                  disabled={!readUrl}
+                  className="rounded-2xl bg-white px-4 py-3 text-sm font-black text-zinc-950 active:scale-95 disabled:opacity-50"
+                >
+                  <ExternalLink size={18} className="mx-auto mb-1" />
+                  อ่านตอนล่าสุด
                 </button>
 
                 <button
@@ -520,10 +568,10 @@ function DetailModal({
           <div className="absolute inset-x-0 bottom-0 z-20 overflow-hidden border-t border-white/10 bg-black p-3 md:p-4">
             <div className="mx-auto grid w-full max-w-[520px] grid-cols-[1fr_1fr_auto] gap-2">
               <button
-                onClick={readUrl ? openRead : () => canManage && onEdit(item)}
+                onClick={readUrl ? openRead : openMain}
                 className="rounded-2xl bg-white px-4 py-3 text-sm font-black text-zinc-950 active:scale-95"
               >
-                {readUrl ? "อ่านต่อ" : "เพิ่มลิงก์อ่าน"}
+                {readUrl ? "อ่านตอนล่าสุด" : "เพิ่มลิงก์อ่าน"}
               </button>
 
               {canManage ? (
@@ -1238,6 +1286,7 @@ export default function App() {
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [items, setItems] = useState<MangaItem[]>([]);
   const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
+  const [progressMap, setProgressMap] = useState<Record<string, UserMangaProgress>>({});
   const [loaded, setLoaded] = useState(false);
   const [query, setQuery] = useState("");
   const [heroIndex, setHeroIndex] = useState(0);
@@ -1356,16 +1405,114 @@ export default function App() {
     }
   }, [items, selectedItem]);
 
+
+  useEffect(() => {
+    async function loadProgress() {
+      if (!supabase || !user) {
+        setProgressMap({});
+        return;
+      }
+      const { data, error } = await supabase.from("user_manga_progress").select("*");
+      if (!error && data) {
+        const map: Record<string, UserMangaProgress> = {};
+        (data as UserMangaProgress[]).forEach((row) => {
+          map[row.manga_id] = row;
+        });
+        setProgressMap(map);
+      }
+    }
+    loadProgress();
+  }, [user]);
+
+
+  function buildProgressUrl(item: MangaItem, chapter: string) {
+    const source = (item.source_url || "").trim();
+    if (!source || !chapter) return source;
+    const cleanChapter = String(chapter).trim().replace(/^chapter[-\s]*/i, "");
+    const trimmed = source.replace(/\/$/, "");
+
+    try {
+      const url = new URL(trimmed);
+      const host = url.hostname.replace(/^www\./, "");
+      const path = url.pathname.replace(/\/$/, "");
+
+      if (host.includes("go-manga.com") || host.includes("dark-manga.com")) {
+        return `${url.origin}${path}-ตอนที่-${encodeURIComponent(cleanChapter)}/`;
+      }
+
+      if (host.includes("xn--72cas2cj6a4hf4b5a8oc.com")) {
+        const parts = path.split("/").filter(Boolean);
+        const slug = parts[parts.length - 1] || "";
+        return `${url.origin}/${slug}-ตอนที่-${encodeURIComponent(cleanChapter)}/`;
+      }
+
+      if (host.includes("mangashonen.club")) {
+        const parts = path.split("/").filter(Boolean);
+        const rawSlug = parts[parts.length - 1] || "";
+        const slug = decodeURIComponent(rawSlug);
+        return `${url.origin}/${encodeURIComponent(slug)}/ตอนที่-${encodeURIComponent(cleanChapter)}-${encodeURIComponent(slug)}-${encodeURIComponent(cleanChapter)}/`;
+      }
+
+      return `${trimmed}/chapter-${encodeURIComponent(cleanChapter)}`;
+    } catch {
+      return `${trimmed}/chapter-${encodeURIComponent(cleanChapter)}`;
+    }
+  }
+
+  function getProgressItem(item: MangaItem): MangaItem {
+    const progress = progressMap[item.id];
+    if (!progress) return item;
+    return {
+      ...item,
+      read_chapter: progress.read_chapter || item.read_chapter || "",
+      last_read_chapter: progress.last_read_chapter || progress.read_chapter || item.last_read_chapter || item.read_chapter || "",
+      last_read_url: progress.last_read_url || item.last_read_url || "",
+      last_read_at: progress.last_read_at || item.last_read_at || "",
+    };
+  }
+
+  async function saveProgress(item: MangaItem, chapter: string) {
+    if (!user) {
+      alert("ต้องเข้าสู่ระบบก่อนบันทึกตอนที่อ่าน");
+      return;
+    }
+    const cleanChapter = String(chapter || "").trim();
+    const lastUrl = buildProgressUrl(item, cleanChapter);
+    const payload: UserMangaProgress = {
+      user_id: user.id,
+      manga_id: item.id,
+      read_chapter: cleanChapter || null,
+      last_read_chapter: cleanChapter || null,
+      last_read_url: lastUrl || null,
+      last_read_at: new Date().toISOString(),
+    };
+
+    setProgressMap((prev) => ({ ...prev, [item.id]: payload }));
+
+    if (supabase) {
+      const { error } = await supabase.from("user_manga_progress").upsert(payload, {
+        onConflict: "user_id,manga_id",
+      });
+      if (error) alert(error.message);
+    }
+  }
+
+  function openMainSource(item: MangaItem) {
+    if (item.source_url) window.open(item.source_url, "_blank", "noopener,noreferrer");
+  }
+
+  const progressItems = useMemo(() => items.map((item) => getProgressItem(item)), [items, progressMap]);
+
   const filtered = useMemo(
     () =>
-      items.filter((item) => {
+      progressItems.filter((item) => {
         if (!item) return false;
         const matchesQuery = item.title.toLowerCase().includes(query.toLowerCase());
         const hasUpdate = chapterNumber(item.latest_chapter) > chapterNumber(item.read_chapter);
         const matchesFilter = filter === "all" || (filter === "updated" && hasUpdate) || (filter === "favorites" && favoriteIds.includes(item.id)) || item.status === filter;
         return matchesQuery && matchesFilter;
       }),
-    [items, query, filter, favoriteIds]
+    [progressItems, query, filter, favoriteIds]
   );
 
   const stats = useMemo(
@@ -1628,7 +1775,7 @@ export default function App() {
           {tab === "collection" ? (
             <>
               <HeroCarousel
-                items={filtered.length ? filtered : items}
+                items={filtered.length ? filtered : progressItems}
                 activeIndex={heroIndex}
                 setActiveIndex={setHeroIndex}
                 onOpen={openDetail}
@@ -1637,8 +1784,8 @@ export default function App() {
                                     onRead={openReading}
                 user={user}
               />
-              <ReadingHistoryRow items={items} historyIds={historyIds} onOpen={openDetail} onRead={openReading} />
-              <div className="hidden md:block"><NewChapterRow items={items} onOpen={openDetail} /></div>
+              <ReadingHistoryRow items={progressItems} historyIds={historyIds} onOpen={openDetail} onRead={openReading} />
+              <div className="hidden md:block"><NewChapterRow items={progressItems} onOpen={openDetail} /></div>
               <div className="mb-4 mt-4 flex gap-2 overflow-x-auto pb-1 xl:hidden">
                 {filters.map(([key, label]) => (
                   <button key={key} onClick={() => setFilter(key)} className={`shrink-0 rounded-full px-4 py-2 text-sm font-bold ${filter === key ? "bg-zinc-950 text-white" : "bg-white text-zinc-500"}`}>
@@ -1942,7 +2089,7 @@ export default function App() {
 
         {selectedItem && (
           <DetailModal
-            item={selectedItem}
+            item={getProgressItem(selectedItem)}
             onClose={() => setSelectedItem(null)}
             onEdit={openEdit}
             onDelete={deleteItem}

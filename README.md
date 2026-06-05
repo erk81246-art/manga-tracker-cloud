@@ -1,8 +1,23 @@
-# Manga Tracker Guest Login Bottom Scope Fix
+# Manga Tracker User Progress Phase
 
-แก้ build error:
-- Cannot find name 'authOpen'
-- ใส่ const [authOpen, setAuthOpen] ใน App component แล้ว
-- ย้าย auth modal ให้อยู่ใน scope ของ App
-- Guest ยังเข้าแอปได้ก่อน แล้วค่อยกดเข้าสู่ระบบจากแถบล่าง/เมนู
-- ไม่ต้องรัน SQL ใหม่
+ทำตามที่ขอ:
+1. แยกปุ่มในหน้ารายละเอียด
+- กดอ่าน = เปิด source_url หน้าหลักของเรื่อง
+- อ่านตอนล่าสุด = เปิด last_read_url ของบัญชีตัวเอง
+
+2. อ่านล่าสุดของแต่ละคนไม่เท่ากัน
+- เพิ่มตาราง user_manga_progress แยกตาม user_id + manga_id
+
+3. แก้เลขอ่านถึงได้ในหน้ารายละเอียด
+- มีช่อง "อ่านถึงของฉัน"
+- กด "บันทึกตอนที่อ่าน"
+- ไม่ต้องกดปุ่มแก้ไขเรื่อง
+
+4. สร้าง URL ตอนอัตโนมัติ
+- go-manga/dark-manga: source-slug-ตอนที่-{เลข}/
+- เว็บมังงะญี่ปุ่น: พยายามสร้างจาก slug + ตอนที่-{เลข}
+- mangashonen: พยายามสร้างจาก slug + ตอนที่-{เลข}
+- เว็บอื่น fallback เป็น /chapter-{เลข}
+
+ต้องรัน SQL 1 ครั้ง:
+supabase/user_progress.sql
