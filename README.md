@@ -1,8 +1,12 @@
-# Manga Tracker Netflix Sprint 2 History Merge
+# Manga Tracker Netflix Sprint 3
 
-แก้ตามที่ขอ:
-- เอาแถบ History / อ่านล่าสุด แยกออกจากหน้า Home
-- รวมฟังก์ชัน History เข้าไปใน Continue Reading
-- Continue Reading ยังใช้หน้าตาแบบ Netflix Continue เหมือนเดิม
-- เรื่องที่เพิ่งกดอ่านจะถูกเรียงขึ้นก่อนใน Continue
+Sprint 3:
+- Dashboard upgraded เป็น Reading Stats
+- เพิ่ม total read chapters
+- เพิ่ม reading streak แบบง่าย
+- เพิ่ม 35-day reading heatmap แบบ lightweight
+- เพิ่ม Last Read card
+- เพิ่ม Top Progress ranking
+- เพิ่ม Recently Active row บนหน้า Home
+- ไม่ใช้ chart library / animation หนัก
 - ไม่ต้องรัน SQL ใหม่

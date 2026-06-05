@@ -741,6 +741,43 @@ function MangaForm({
 
 
 
+
+function RecentlyActiveRow({
+  items,
+  onOpen,
+}: {
+  items: MangaItem[];
+  onOpen: (item: MangaItem) => void;
+}) {
+  const list = [...items]
+    .filter((item) => item.last_read_at)
+    .sort((a, b) => new Date(b.last_read_at || 0).getTime() - new Date(a.last_read_at || 0).getTime())
+    .slice(0, 10);
+
+  if (list.length === 0) return null;
+
+  return (
+    <section className="mb-8">
+      <div className="mb-4 flex items-end justify-between">
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.25em] text-red-500">Recently Active</p>
+          <h2 className="text-2xl font-black text-white md:text-3xl">เพิ่งอ่านไป</h2>
+        </div>
+      </div>
+
+      <div className="flex gap-3 overflow-x-auto pb-3">
+        {list.map((item) => (
+          <button key={item.id} onClick={() => onOpen(item)} className="min-w-[220px] rounded-[1.4rem] bg-[#151515] p-3 text-left text-white ring-1 ring-white/10 active:scale-[0.99]">
+            <p className="line-clamp-1 text-sm font-black">{item.title}</p>
+            <p className="mt-1 text-xs font-bold text-red-400">ตอน {item.read_chapter || "-"}</p>
+            <p className="text-xs text-zinc-500">{daysAgoLabel(item.last_read_at)}</p>
+          </button>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function PremiumContinueReading({
   items,
   onOpen,
@@ -857,6 +894,26 @@ function NetflixUpdatesRow({
   );
 }
 
+
+function daysAgoLabel(dateValue?: string | null) {
+  if (!dateValue) return "ยังไม่เคยอ่าน";
+  const time = new Date(dateValue).getTime();
+  if (Number.isNaN(time)) return "ยังไม่เคยอ่าน";
+  const diff = Math.max(0, Date.now() - time);
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  if (days === 0) return "วันนี้";
+  if (days === 1) return "เมื่อวาน";
+  return `${days} วันที่แล้ว`;
+}
+
+function dateKey(dateValue?: string | null) {
+  if (!dateValue) return "";
+  const date = new Date(dateValue);
+  if (Number.isNaN(date.getTime())) return "";
+  return date.toISOString().slice(0, 10);
+}
+
+
 function DashboardView({
   items,
   favoriteIds,
@@ -873,17 +930,48 @@ function DashboardView({
   const updatedItems = items.filter((item) => chapterNumber(item.latest_chapter) > chapterNumber(item.read_chapter));
   const caughtUp = total - updatedItems.length;
   const caughtPercent = total ? Math.round((caughtUp / total) * 100) : 0;
+
+  const totalReadChapters = items.reduce((sum, item) => sum + chapterNumber(item.read_chapter), 0);
+  const activeItems = items.filter((item) => item.last_read_at);
+  const lastReadItem = [...activeItems].sort((a, b) => new Date(b.last_read_at || 0).getTime() - new Date(a.last_read_at || 0).getTime())[0];
+
   const tierCounts = tiers.map((tier) => ({ tier, count: items.filter((item) => item.tier === tier).length }));
-  const favorites = items.filter((item) => favoriteIds.includes(item.id)).slice(0, 8);
+  const favorites = items.filter((item) => favoriteIds.includes(item.id)).slice(0, 10);
+
+  const topProgress = [...items]
+    .sort((a, b) => chapterNumber(b.read_chapter) - chapterNumber(a.read_chapter))
+    .slice(0, 7);
+
+  const heatmapDays = Array.from({ length: 35 }, (_, index) => {
+    const date = new Date();
+    date.setDate(date.getDate() - (34 - index));
+    const key = date.toISOString().slice(0, 10);
+    const count = items.filter((item) => dateKey(item.last_read_at) === key).length;
+    return { key, count };
+  });
+
+  const activeDayKeys = new Set(heatmapDays.filter((day) => day.count > 0).map((day) => day.key));
+  let streak = 0;
+  for (let i = 0; i < 365; i++) {
+    const date = new Date();
+    date.setDate(date.getDate() - i);
+    const key = date.toISOString().slice(0, 10);
+    if (activeDayKeys.has(key)) streak += 1;
+    else if (i === 0) continue;
+    else break;
+  }
 
   return (
     <section className="space-y-6">
       <div className="relative overflow-hidden rounded-[2rem] bg-[#111111] p-6 text-white ring-1 ring-white/10 md:p-8">
         <div className="absolute -right-16 -top-16 h-52 w-52 rounded-full bg-red-600/20 blur-3xl" />
+        <div className="absolute -bottom-24 left-10 h-56 w-56 rounded-full bg-white/5 blur-3xl" />
         <div className="relative">
           <p className="text-xs font-black uppercase tracking-[0.28em] text-red-500">Dashboard</p>
-          <h2 className="mt-2 text-4xl font-black tracking-tight md:text-6xl">Manga Library</h2>
-          <p className="mt-2 max-w-xl text-sm font-semibold text-zinc-400">สรุปคลังมังงะของคุณแบบ Netflix style เบา ลื่น และไม่รก</p>
+          <h2 className="mt-2 text-4xl font-black tracking-tight md:text-6xl">Reading Stats</h2>
+          <p className="mt-2 max-w-xl text-sm font-semibold text-zinc-400">
+            ภาพรวมการอ่านและคลังมังงะของคุณแบบ premium dashboard
+          </p>
         </div>
       </div>
 
@@ -891,12 +979,12 @@ function DashboardView({
         {[
           ["ทั้งหมด", total],
           ["กำลังอ่าน", reading],
-          ["จบแล้ว", finished],
-          ["พักไว้", paused],
+          ["ตอนที่อ่านแล้ว", totalReadChapters],
+          ["Streak", `${streak} วัน`],
         ].map(([label, value]) => (
           <div key={label} className="rounded-[1.6rem] bg-[#151515] p-5 text-white ring-1 ring-white/10">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-zinc-500">{label}</p>
-            <p className="mt-3 text-4xl font-black">{value}</p>
+            <p className="mt-3 text-3xl font-black md:text-4xl">{value}</p>
           </div>
         ))}
       </div>
@@ -913,11 +1001,75 @@ function DashboardView({
           <div className="mt-5 h-3 overflow-hidden rounded-full bg-zinc-800">
             <div className="h-full rounded-full bg-red-600" style={{ width: `${caughtPercent}%` }} />
           </div>
-          <p className="mt-3 text-sm font-semibold text-zinc-400">ตามทันแล้ว {caughtUp} เรื่อง · มีตอนใหม่ {updatedItems.length} เรื่อง</p>
+          <p className="mt-3 text-sm font-semibold text-zinc-400">
+            ตามทันแล้ว {caughtUp} เรื่อง · มีตอนใหม่ {updatedItems.length} เรื่อง
+          </p>
         </div>
 
         <div className="rounded-[1.8rem] bg-[#151515] p-5 text-white ring-1 ring-white/10">
-          <p className="text-xs font-black uppercase tracking-[0.18em] text-zinc-500">Tier Distribution</p>
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-zinc-500">Reading Heatmap</p>
+          <h3 className="mt-1 text-2xl font-black">35 วันที่ผ่านมา</h3>
+          <div className="mt-5 grid grid-cols-7 gap-2">
+            {heatmapDays.map((day) => (
+              <div
+                key={day.key}
+                title={`${day.key}: ${day.count} เรื่อง`}
+                className={`aspect-square rounded-md ${
+                  day.count >= 3
+                    ? "bg-red-600"
+                    : day.count === 2
+                    ? "bg-red-500/70"
+                    : day.count === 1
+                    ? "bg-red-500/35"
+                    : "bg-zinc-800"
+                }`}
+              />
+            ))}
+          </div>
+          <p className="mt-3 text-xs font-semibold text-zinc-500">
+            ยิ่งแดงเข้ม = วันนั้นมีการบันทึกการอ่านมากขึ้น
+          </p>
+        </div>
+      </div>
+
+      <div className="grid gap-4 xl:grid-cols-3">
+        <div className="rounded-[1.8rem] bg-[#151515] p-5 text-white ring-1 ring-white/10 xl:col-span-1">
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-red-500">Last Read</p>
+          <h3 className="text-2xl font-black">อ่านล่าสุด</h3>
+          {lastReadItem ? (
+            <button onClick={() => onOpen(lastReadItem)} className="mt-4 flex w-full gap-3 rounded-2xl bg-black/50 p-3 text-left active:scale-[0.99]">
+              <div className="h-24 w-16 shrink-0 overflow-hidden rounded-xl bg-zinc-800">
+                {lastReadItem.cover ? <img src={lastReadItem.cover} alt={lastReadItem.title} className="h-full w-full object-cover" loading="lazy" /> : null}
+              </div>
+              <div className="min-w-0">
+                <p className="line-clamp-2 text-sm font-black">{lastReadItem.title}</p>
+                <p className="mt-1 text-xs font-bold text-red-400">ตอน {lastReadItem.read_chapter || "-"}</p>
+                <p className="text-xs text-zinc-500">{daysAgoLabel(lastReadItem.last_read_at)}</p>
+              </div>
+            </button>
+          ) : (
+            <p className="mt-4 rounded-2xl bg-black/50 p-4 text-sm font-semibold text-zinc-500">ยังไม่มีประวัติอ่าน</p>
+          )}
+        </div>
+
+        <div className="rounded-[1.8rem] bg-[#151515] p-5 text-white ring-1 ring-white/10 xl:col-span-2">
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-red-500">Top Progress</p>
+          <h3 className="text-2xl font-black">อ่านไปไกลที่สุด</h3>
+          <div className="mt-4 space-y-2">
+            {topProgress.map((item, index) => (
+              <button key={item.id} onClick={() => onOpen(item)} className="grid w-full grid-cols-[32px_1fr_auto] items-center gap-3 rounded-2xl bg-black/50 px-4 py-3 text-left active:scale-[0.99]">
+                <span className="text-sm font-black text-zinc-500">#{index + 1}</span>
+                <span className="line-clamp-1 text-sm font-black">{item.title}</span>
+                <span className="ml-3 shrink-0 text-xs font-black text-red-400">ตอน {item.read_chapter || "-"}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="grid gap-4 xl:grid-cols-2">
+        <div className="rounded-[1.8rem] bg-[#151515] p-5 text-white ring-1 ring-white/10">
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-red-500">Tier Distribution</p>
           <div className="mt-4 space-y-3">
             {tierCounts.map(({ tier, count }) => {
               const percent = total ? Math.max(6, Math.round((count / total) * 100)) : 6;
@@ -933,68 +1085,28 @@ function DashboardView({
             })}
           </div>
         </div>
-      </div>
-
-      <div className="grid gap-4 xl:grid-cols-2">
-        <div className="rounded-[1.8rem] bg-[#151515] p-5 text-white ring-1 ring-white/10">
-          <div className="mb-4 flex items-center justify-between">
-            <div>
-              <p className="text-xs font-black uppercase tracking-[0.18em] text-red-500">New Updates</p>
-              <h3 className="text-2xl font-black">ตอนใหม่มาแล้ว</h3>
-            </div>
-            <span className="rounded-full bg-red-600 px-3 py-1 text-xs font-black">{updatedItems.length}</span>
-          </div>
-          <div className="space-y-2">
-            {updatedItems.slice(0, 8).map((item) => (
-              <button key={item.id} onClick={() => onOpen(item)} className="flex w-full items-center gap-3 rounded-2xl bg-black/50 p-2 text-left active:scale-[0.99]">
-                <div className="h-16 w-12 overflow-hidden rounded-xl bg-zinc-800">
-                  {item.cover ? <img loading="lazy" src={item.cover} alt={item.title} className="h-full w-full object-cover" /> : null}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="line-clamp-1 text-sm font-black">{item.title}</p>
-                  <p className="text-xs font-bold text-red-400">+{chapterNumber(item.latest_chapter) - chapterNumber(item.read_chapter)} ตอน</p>
-                </div>
-              </button>
-            ))}
-            {updatedItems.length === 0 && <p className="rounded-2xl bg-black/50 p-4 text-sm font-semibold text-zinc-500">ยังไม่มีตอนใหม่</p>}
-          </div>
-        </div>
 
         <div className="rounded-[1.8rem] bg-[#151515] p-5 text-white ring-1 ring-white/10">
           <p className="text-xs font-black uppercase tracking-[0.18em] text-red-500">Favorites</p>
           <h3 className="text-2xl font-black">เรื่องที่ติดตาม</h3>
           <div className="mt-4 flex gap-3 overflow-x-auto pb-2">
-            {favorites.map((item) => (
+            {favorites.length ? favorites.map((item) => (
               <button key={item.id} onClick={() => onOpen(item)} className="min-w-[120px] text-left active:scale-[0.99]">
                 <div className="aspect-[3/4] overflow-hidden rounded-2xl bg-zinc-800">
-                  {item.cover ? <img loading="lazy" src={item.cover} alt={item.title} className="h-full w-full object-cover" /> : null}
+                  {item.cover ? <img src={item.cover} alt={item.title} className="h-full w-full object-cover" loading="lazy" /> : null}
                 </div>
                 <p className="mt-2 line-clamp-2 text-xs font-black">{item.title}</p>
               </button>
-            ))}
-            {favorites.length === 0 && <p className="rounded-2xl bg-black/50 p-4 text-sm font-semibold text-zinc-500">ยังไม่มี Favorite</p>}
+            )) : (
+              <p className="rounded-2xl bg-black/50 p-4 text-sm font-semibold text-zinc-500">ยังไม่มี Favorite</p>
+            )}
           </div>
         </div>
       </div>
-    
-      <div className="rounded-[1.8rem] bg-[#151515] p-5 text-white ring-1 ring-white/10">
-        <p className="text-xs font-black uppercase tracking-[0.18em] text-red-500">Top Progress</p>
-        <h3 className="text-2xl font-black">อ่านไปไกลที่สุด</h3>
-        <div className="mt-4 space-y-2">
-          {[...items]
-            .sort((a, b) => chapterNumber(b.read_chapter) - chapterNumber(a.read_chapter))
-            .slice(0, 6)
-            .map((item) => (
-              <button key={item.id} onClick={() => onOpen(item)} className="flex w-full items-center justify-between rounded-2xl bg-black/50 px-4 py-3 text-left active:scale-[0.99]">
-                <span className="line-clamp-1 text-sm font-black">{item.title}</span>
-                <span className="ml-3 shrink-0 text-xs font-black text-red-400">ตอน {item.read_chapter || "-"}</span>
-              </button>
-            ))}
-        </div>
-      </div>
-</section>
+    </section>
   );
 }
+
 
 function HeroCarousel({
   items,
@@ -2054,6 +2166,7 @@ export default function App() {
                 user={user}
              />
               <PremiumContinueReading items={filtered.length ? filtered : progressItems || items} historyIds={historyIds} onOpen={openDetail} onRead={openReading} />
+              <RecentlyActiveRow items={filtered.length ? filtered : progressItems || items} onOpen={openDetail} />
               <NetflixUpdatesRow items={filtered.length ? filtered : progressItems || items} onOpen={openDetail} />
               <div className="hidden md:block"><NewChapterRow items={progressItems} onOpen={openDetail} /></div>
               <div className="mb-4 mt-4 flex gap-2 overflow-x-auto pb-1 xl:hidden">
