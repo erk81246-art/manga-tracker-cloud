@@ -1,7 +1,15 @@
-# Manga Tracker User Progress Props Fix
+# Manga Tracker Progress Read Chapter Fix
 
-แก้ build error:
-- Cannot find name 'onSaveProgress'
-- เพิ่ม onSaveProgress / onOpenMainSource เข้า DetailModal props แล้ว
-- ส่ง saveProgress / openMainSource ตอนเรียก DetailModal แล้ว
-- ยังต้องรัน SQL: supabase/user_progress.sql
+แก้ตามที่ขอ:
+1. รวม "อ่านถึงตอน" กับ "อ่านล่าสุดถึงตอน" ให้เป็นค่าเดียวกัน
+- เอาช่องอ่านล่าสุดถึงตอนในหน้าแก้ไขออก
+- ใช้ read_chapter เป็นเลขตอนเดียว
+- saveProgress จะบันทึกทั้ง read_chapter และ last_read_chapter เป็นเลขเดียวกัน
+
+2. แก้ "อ่านถึงของฉัน" ในหน้ารายละเอียดให้บันทึกได้
+- กรอกเลขตอนใน Detail ได้เลย
+- กด "บันทึกตอนที่อ่าน"
+- บันทึกลง user_manga_progress ของบัญชีตัวเอง
+- สร้าง last_read_url จากเลขตอนและ source_url ให้อัตโนมัติ
+
+ต้องรัน SQL user_progress.sql ก่อน ถ้ายังไม่ได้รัน

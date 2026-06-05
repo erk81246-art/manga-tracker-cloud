@@ -388,6 +388,10 @@ function DetailModal({
 }) {
   const [checking, setChecking] = useState(false);
   const [localReadChapter, setLocalReadChapter] = useState(item.read_chapter || "");
+
+  useEffect(() => {
+    setLocalReadChapter(item.read_chapter || "");
+  }, [item.id, item.read_chapter]);
   const hasUpdate = chapterNumber(item.latest_chapter) > chapterNumber(item.read_chapter);
   const readUrl = item.last_read_url || "";
   const mainSourceUrl = item.source_url || "";
@@ -686,14 +690,9 @@ function MangaForm({
             <input value={value.last_read_url || ""} onChange={(e) => set("last_read_url" as any, e.target.value)} placeholder="เช่น https://speed-manga.net/manga/solo-leveling/chapter-124" className="mt-1 w-full rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-3 outline-none focus:border-zinc-950" />
           </label>
 
-          <label className="block">
-            <span className="text-sm font-bold text-zinc-700">อ่านล่าสุดถึงตอน</span>
-            <input value={value.last_read_chapter || ""} onChange={(e) => set("last_read_chapter" as any, e.target.value)} placeholder="เช่น 124" className="mt-1 w-full rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-3 outline-none focus:border-zinc-950" />
-          </label>
-
           <div className="grid grid-cols-2 gap-3">
             <label className="block">
-              <span className="text-sm font-bold text-zinc-700">อ่านถึงตอน</span>
+              <span className="text-sm font-bold text-zinc-700">อ่านถึงตอน / อ่านล่าสุดถึงตอน</span>
               <input inputMode="decimal" value={value.read_chapter} onChange={(e) => set("read_chapter", e.target.value)} placeholder="12" className="mt-1 w-full rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-3 outline-none focus:border-zinc-950" />
             </label>
             <label className="block">
@@ -1506,6 +1505,7 @@ export default function App() {
     }
   }
 
+
   function openMainSource(item: MangaItem) {
     if (item.source_url) window.open(item.source_url, "_blank", "noopener,noreferrer");
   }
@@ -2107,7 +2107,8 @@ export default function App() {
             isGuest={!user}
             isFavorite={selectedItem ? favoriteIds.includes(selectedItem.id) : false}
             onToggleFavorite={toggleFavorite}
-            onRead={openReading}
+            onSaveProgress={saveProgress}
+            onOpenMainSource={openMainSource}
             canManage={canManageItem(selectedItem)}
           />
         )}
