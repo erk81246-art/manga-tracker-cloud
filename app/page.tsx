@@ -177,14 +177,14 @@ function AuthBox() {
           onChange={(e) => setEmail(e.target.value)}
           placeholder="อีเมล"
           className="w-full rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-3 outline-none focus:border-zinc-950"
-        />
+       />
         <input
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           type="password"
           placeholder="รหัสผ่าน อย่างน้อย 6 ตัว"
           className="w-full rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-3 outline-none focus:border-zinc-950"
-        />
+       />
 
         <button onClick={handleSubmit} disabled={busy} className="w-full rounded-2xl bg-zinc-950 px-3 py-2.5 text-sm font-bold text-white disabled:opacity-50">
           {busy ? "กำลังทำงาน..." : mode === "login" ? "Login" : "Sign up"}
@@ -501,7 +501,7 @@ function DetailModal({
                       disabled={isGuest}
                       className="min-w-0 flex-1 rounded-xl bg-black px-3 py-2 text-xl font-black text-white outline-none ring-1 ring-white/10 disabled:opacity-50"
                       placeholder="-"
-                    />
+                   />
                   </div>
                 </div>
                 <div className="rounded-[1.6rem] bg-zinc-900 p-4 text-left backdrop-blur-xl">
@@ -831,7 +831,7 @@ function DashboardView({
             {updatedItems.slice(0, 8).map((item) => (
               <button key={item.id} onClick={() => onOpen(item)} className="flex w-full items-center gap-3 rounded-2xl bg-black/50 p-2 text-left active:scale-[0.99]">
                 <div className="h-16 w-12 overflow-hidden rounded-xl bg-zinc-800">
-                  {item.cover ? <img loading="lazy" src={item.cover} alt={item.title} className="h-full w-full object-cover" loading="lazy" /> : null}
+                  {item.cover ? <img loading="lazy" src={item.cover} alt={item.title} className="h-full w-full object-cover" /> : null}
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="line-clamp-1 text-sm font-black">{item.title}</p>
@@ -850,7 +850,7 @@ function DashboardView({
             {favorites.map((item) => (
               <button key={item.id} onClick={() => onOpen(item)} className="min-w-[120px] text-left active:scale-[0.99]">
                 <div className="aspect-[3/4] overflow-hidden rounded-2xl bg-zinc-800">
-                  {item.cover ? <img loading="lazy" src={item.cover} alt={item.title} className="h-full w-full object-cover" loading="lazy" /> : null}
+                  {item.cover ? <img loading="lazy" src={item.cover} alt={item.title} className="h-full w-full object-cover" /> : null}
                 </div>
                 <p className="mt-2 line-clamp-2 text-xs font-black">{item.title}</p>
               </button>
@@ -1919,7 +1919,7 @@ export default function App() {
                 onToggleFavorite={toggleFavorite}
                                     onRead={openReading}
                 user={user}
-              />
+             />
               <ReadingHistoryRow items={progressItems} historyIds={historyIds} onOpen={openDetail} onRead={openReading} />
               <div className="hidden md:block"><NewChapterRow items={progressItems} onOpen={openDetail} /></div>
               <div className="mb-4 mt-4 flex gap-2 overflow-x-auto pb-1 xl:hidden">
@@ -2103,13 +2103,13 @@ export default function App() {
                         onChange={(e) => setNewSourceName(e.target.value)}
                         placeholder="ชื่อเว็บ เช่น Manga ABC"
                         className="w-full rounded-2xl border border-zinc-200 bg-white px-4 py-3 text-sm outline-none focus:border-zinc-950"
-                      />
+                     />
                       <input
                         value={newSourceUrl}
                         onChange={(e) => setNewSourceUrl(e.target.value)}
                         placeholder="URL เช่น https://example.com"
                         className="w-full rounded-2xl border border-zinc-200 bg-white px-4 py-3 text-sm outline-none focus:border-zinc-950"
-                      />
+                     />
                       <button
                         onClick={submitNewReadingSource}
                         className="w-full rounded-2xl bg-zinc-900 px-4 py-3 text-sm font-bold text-white"
@@ -2170,7 +2170,7 @@ export default function App() {
                   }}
                   placeholder="ค้นหามังงะ..."
                   className="w-full bg-transparent text-sm font-semibold text-white placeholder:text-zinc-500 outline-none"
-                />
+               />
               </div>
 
               <div className="mt-4 grid grid-cols-1 gap-2 rounded-[1.5rem] bg-white/10 p-1">
@@ -2220,7 +2220,7 @@ export default function App() {
             favoriteIds={favoriteIds}
             loaded={passLoaded}
             onEnter={() => setShowMangaPass(false)}
-          />
+         />
         )}
 
         {selectedItem && (
@@ -2237,7 +2237,7 @@ export default function App() {
             onSaveProgress={saveProgress}
             onOpenMainSource={openMainSource}
             canManage={canManageItem(selectedItem)}
-          />
+         />
         )}
         {openForm && (
           <MangaForm
@@ -2247,7 +2247,7 @@ export default function App() {
             onClose={() => setOpenForm(false)}
             editing={Boolean(editingId)}
             user={user}
-          />
+         />
         )}
       </AnimatePresence>
     </main>
