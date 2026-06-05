@@ -745,13 +745,20 @@ function PremiumContinueReading({
   items,
   onOpen,
   onRead,
+  historyIds = [],
 }: {
   items: MangaItem[];
   onOpen: (item: MangaItem) => void;
   onRead?: (item: MangaItem) => void;
+  historyIds?: string[];
 }) {
-  const list = items
-    .filter((item) => item && (item.last_read_chapter || item.read_chapter || item.last_read_url))
+  const historyList = historyIds
+    .map((id) => items.find((item) => item && item.id === id))
+    .filter(Boolean) as MangaItem[];
+
+  const fallbackList = items.filter((item) => item && (item.last_read_chapter || item.read_chapter || item.last_read_url));
+
+  const list = [...historyList, ...fallbackList.filter((item) => !historyList.some((history) => history.id === item.id))]
     .slice(0, 10);
 
   if (list.length === 0) return null;
@@ -761,7 +768,7 @@ function PremiumContinueReading({
       <div className="mb-4 flex items-end justify-between">
         <div>
           <p className="text-xs font-black uppercase tracking-[0.25em] text-red-500">Continue</p>
-          <h2 className="text-2xl font-black text-white md:text-3xl">อ่านต่อจากที่ค้างไว้</h2>
+          <h2 className="text-2xl font-black text-white md:text-3xl">อ่านล่าสุด / อ่านต่อ</h2>
         </div>
         <span className="text-xs font-bold text-zinc-500">{list.length} เรื่อง</span>
       </div>
@@ -2046,9 +2053,8 @@ export default function App() {
                                     onRead={openReading}
                 user={user}
              />
-              <PremiumContinueReading items={filtered.length ? filtered : progressItems || items} onOpen={openDetail} onRead={openReading} />
+              <PremiumContinueReading items={filtered.length ? filtered : progressItems || items} historyIds={historyIds} onOpen={openDetail} onRead={openReading} />
               <NetflixUpdatesRow items={filtered.length ? filtered : progressItems || items} onOpen={openDetail} />
-              <ReadingHistoryRow items={progressItems} historyIds={historyIds} onOpen={openDetail} onRead={openReading} />
               <div className="hidden md:block"><NewChapterRow items={progressItems} onOpen={openDetail} /></div>
               <div className="mb-4 mt-4 flex gap-2 overflow-x-auto pb-1 xl:hidden">
                 {filters.map(([key, label]) => (

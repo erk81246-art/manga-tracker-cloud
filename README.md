@@ -1,15 +1,8 @@
-# Manga Tracker Netflix Sprint 2
+# Manga Tracker Netflix Sprint 2 History Merge
 
-Sprint 2:
-- เพิ่ม Premium Continue Reading บนหน้า Home
-- เพิ่ม Netflix Updates Row สำหรับตอนใหม่
-- Dashboard เพิ่ม Top Progress
-- ยังใช้ layout lightweight ไม่เพิ่ม animation หนัก
-- รูปใช้ loading lazy และ dedupe แล้ว
+แก้ตามที่ขอ:
+- เอาแถบ History / อ่านล่าสุด แยกออกจากหน้า Home
+- รวมฟังก์ชัน History เข้าไปใน Continue Reading
+- Continue Reading ยังใช้หน้าตาแบบ Netflix Continue เหมือนเดิม
+- เรื่องที่เพิ่งกดอ่านจะถูกเรียงขึ้นก่อนใน Continue
 - ไม่ต้องรัน SQL ใหม่
-
-เป้าหมาย:
-- หน้าแรกดูเป็น Product มากขึ้น
-- อ่านต่อเด่นขึ้น
-- ตอนใหม่ดูชัดขึ้น
-- ไม่เพิ่ม logic หนักเกินไป
