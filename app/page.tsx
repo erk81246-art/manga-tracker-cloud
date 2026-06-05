@@ -742,41 +742,6 @@ function MangaForm({
 
 
 
-function RecentlyActiveRow({
-  items,
-  onOpen,
-}: {
-  items: MangaItem[];
-  onOpen: (item: MangaItem) => void;
-}) {
-  const list = [...items]
-    .filter((item) => item.last_read_at)
-    .sort((a, b) => new Date(b.last_read_at || 0).getTime() - new Date(a.last_read_at || 0).getTime())
-    .slice(0, 10);
-
-  if (list.length === 0) return null;
-
-  return (
-    <section className="mb-8">
-      <div className="mb-4 flex items-end justify-between">
-        <div>
-          <p className="text-xs font-black uppercase tracking-[0.25em] text-red-500">Recently Active</p>
-          <h2 className="text-2xl font-black text-white md:text-3xl">เพิ่งอ่านไป</h2>
-        </div>
-      </div>
-
-      <div className="flex gap-3 overflow-x-auto pb-3">
-        {list.map((item) => (
-          <button key={item.id} onClick={() => onOpen(item)} className="min-w-[220px] rounded-[1.4rem] bg-[#151515] p-3 text-left text-white ring-1 ring-white/10 active:scale-[0.99]">
-            <p className="line-clamp-1 text-sm font-black">{item.title}</p>
-            <p className="mt-1 text-xs font-bold text-red-400">ตอน {item.read_chapter || "-"}</p>
-            <p className="text-xs text-zinc-500">{daysAgoLabel(item.last_read_at)}</p>
-          </button>
-        ))}
-      </div>
-    </section>
-  );
-}
 
 function PremiumContinueReading({
   items,
@@ -913,6 +878,92 @@ function dateKey(dateValue?: string | null) {
   return date.toISOString().slice(0, 10);
 }
 
+
+
+function TopNetflixNav({
+  tab,
+  setTab,
+  query,
+  setQuery,
+  onOpenMenu,
+  onOpenSources,
+  user,
+  onLogin,
+  onLogout,
+}: {
+  tab: "collection" | "tier" | "dashboard";
+  setTab: (tab: "collection" | "tier" | "dashboard") => void;
+  query: string;
+  setQuery: (value: string) => void;
+  onOpenMenu: () => void;
+  onOpenSources: () => void;
+  user: SupabaseUser | null;
+  onLogin: () => void;
+  onLogout: () => void;
+}) {
+  const tabs: { key: "collection" | "tier" | "dashboard"; label: string }[] = [
+    { key: "collection", label: "Collection" },
+    { key: "tier", label: "Tier" },
+    { key: "dashboard", label: "Dashboard" },
+  ];
+
+  return (
+    <div className="sticky top-3 z-50 mb-5 px-3 md:px-0">
+      <div className="mx-auto flex max-w-7xl items-center gap-2 rounded-[1.4rem] border border-white/10 bg-black/80 p-2 shadow-2xl backdrop-blur-xl">
+        <button onClick={onOpenMenu} className="hidden rounded-2xl bg-zinc-900 px-4 py-3 text-sm font-black text-white active:scale-95 md:block">
+          เมนู
+        </button>
+
+        <div className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto">
+          {tabs.map((item) => (
+            <button
+              key={item.key}
+              onClick={() => setTab(item.key)}
+              className={`shrink-0 rounded-2xl px-4 py-3 text-xs font-black active:scale-95 md:text-sm ${
+                tab === item.key ? "bg-red-600 text-white" : "text-zinc-400 hover:bg-zinc-900 hover:text-white"
+              }`}
+            >
+              {item.label}
+            </button>
+          ))}
+          <button onClick={onOpenSources} className="shrink-0 rounded-2xl px-4 py-3 text-xs font-black text-zinc-400 hover:bg-zinc-900 hover:text-white md:text-sm">
+            เว็บอ่าน
+          </button>
+        </div>
+
+        <div className="hidden min-w-[220px] max-w-[360px] flex-1 items-center gap-2 rounded-2xl bg-zinc-900 px-3 py-2 md:flex">
+          <Search size={18} className="shrink-0 text-zinc-500" />
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="ค้นหามังงะ..."
+            className="min-w-0 flex-1 bg-transparent text-sm font-semibold text-white outline-none placeholder:text-zinc-600"
+          />
+        </div>
+
+        {user ? (
+          <button onClick={onLogout} className="hidden rounded-2xl px-4 py-3 text-sm font-black text-zinc-400 hover:bg-zinc-900 hover:text-white md:block">
+            Logout
+          </button>
+        ) : (
+          <button onClick={onLogin} className="hidden rounded-2xl bg-white px-4 py-3 text-sm font-black text-black md:block">
+            เข้าสู่ระบบ
+          </button>
+        )}
+      </div>
+
+      <div className="mt-2 flex items-center gap-2 rounded-2xl border border-white/10 bg-black/80 px-3 py-2 backdrop-blur-xl md:hidden">
+        <Search size={18} className="shrink-0 text-zinc-500" />
+        <input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="ค้นหามังงะ..."
+          className="min-w-0 flex-1 bg-transparent text-sm font-semibold text-white outline-none placeholder:text-zinc-600"
+        />
+      </div>
+    </div>
+  );
+}
 
 function DashboardView({
   items,
@@ -2118,12 +2169,23 @@ export default function App() {
 
   return (
     <main className="min-h-screen bg-[#0B0B0B] pb-28 text-zinc-950 xl:p-6 xl:pb-6">
+      <TopNetflixNav
+        tab={tab}
+        setTab={setTab}
+        query={query}
+        setQuery={setQuery}
+        onOpenMenu={() => setMenuOpen(true)}
+        onOpenSources={() => setSourcesOpen(true)}
+        user={user}
+        onLogin={() => setAuthOpen(true)}
+        onLogout={logout}
+      />
+
       <div className={`app-shell mx-auto grid gap-4 ${isWideLandscape ? "max-w-7xl px-0 pb-4 pt-0" : "max-w-md px-4 pb-28 pt-3 sm:max-w-xl md:max-w-3xl"} xl:max-w-7xl xl:px-0 xl:pt-0`}>
 
         <section className="min-w-0">
           <div className="mb-3 flex items-center justify-between gap-2 md:mb-4">
-            <button onClick={() => setMenuOpen(true)} className="fixed left-4 top-4 z-50 flex items-center gap-2 rounded-2xl bg-zinc-950 px-4 py-3 text-sm font-bold text-white shadow-sm"><Menu size={18} /> เมนู
-            </button>
+            
             <p className="text-sm font-bold text-zinc-400">{user ? (isAdmin ? "Admin" : "User") : "Guest"} · ทั้งหมด {stats.total} เรื่อง</p>
           </div>
 
@@ -2166,7 +2228,6 @@ export default function App() {
                 user={user}
              />
               <PremiumContinueReading items={filtered.length ? filtered : progressItems || items} historyIds={historyIds} onOpen={openDetail} onRead={openReading} />
-              <RecentlyActiveRow items={filtered.length ? filtered : progressItems || items} onOpen={openDetail} />
               <NetflixUpdatesRow items={filtered.length ? filtered : progressItems || items} onOpen={openDetail} />
               <div className="hidden md:block"><NewChapterRow items={progressItems} onOpen={openDetail} /></div>
               <div className="mb-4 mt-4 flex gap-2 overflow-x-auto pb-1 xl:hidden">
@@ -2481,6 +2542,7 @@ export default function App() {
             isGuest={!user}
             isFavorite={selectedItem ? favoriteIds.includes(selectedItem.id) : false}
             onToggleFavorite={toggleFavorite}
+            onRead={openReading}
             onSaveProgress={saveProgress}
             onOpenMainSource={openMainSource}
             canManage={canManageItem(selectedItem)}
