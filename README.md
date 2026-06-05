@@ -1,23 +1,7 @@
-# Manga Tracker User Progress Phase
+# Manga Tracker User Progress Props Fix
 
-ทำตามที่ขอ:
-1. แยกปุ่มในหน้ารายละเอียด
-- กดอ่าน = เปิด source_url หน้าหลักของเรื่อง
-- อ่านตอนล่าสุด = เปิด last_read_url ของบัญชีตัวเอง
-
-2. อ่านล่าสุดของแต่ละคนไม่เท่ากัน
-- เพิ่มตาราง user_manga_progress แยกตาม user_id + manga_id
-
-3. แก้เลขอ่านถึงได้ในหน้ารายละเอียด
-- มีช่อง "อ่านถึงของฉัน"
-- กด "บันทึกตอนที่อ่าน"
-- ไม่ต้องกดปุ่มแก้ไขเรื่อง
-
-4. สร้าง URL ตอนอัตโนมัติ
-- go-manga/dark-manga: source-slug-ตอนที่-{เลข}/
-- เว็บมังงะญี่ปุ่น: พยายามสร้างจาก slug + ตอนที่-{เลข}
-- mangashonen: พยายามสร้างจาก slug + ตอนที่-{เลข}
-- เว็บอื่น fallback เป็น /chapter-{เลข}
-
-ต้องรัน SQL 1 ครั้ง:
-supabase/user_progress.sql
+แก้ build error:
+- Cannot find name 'onSaveProgress'
+- เพิ่ม onSaveProgress / onOpenMainSource เข้า DetailModal props แล้ว
+- ส่ง saveProgress / openMainSource ตอนเรียก DetailModal แล้ว
+- ยังต้องรัน SQL: supabase/user_progress.sql

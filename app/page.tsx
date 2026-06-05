@@ -367,6 +367,8 @@ function DetailModal({
   isGuest = false,
   isFavorite = false,
   onToggleFavorite,
+  onSaveProgress,
+  onOpenMainSource,
   onRead,
   canManage = false,
 }: {
@@ -379,6 +381,8 @@ function DetailModal({
   isGuest?: boolean;
   isFavorite?: boolean;
   onToggleFavorite?: (item: MangaItem) => void;
+  onSaveProgress?: (item: MangaItem, chapter: string) => void | Promise<void>;
+  onOpenMainSource?: (item: MangaItem) => void;
   onRead?: (item: MangaItem) => void;
   canManage?: boolean;
 }) {
@@ -405,6 +409,11 @@ function DetailModal({
       onRead?.(item);
       if (!onRead) window.open(readUrl, "_blank", "noopener,noreferrer");
     }
+  }
+
+  function openMain() {
+    if (onOpenMainSource) onOpenMainSource(item);
+    else if (mainSourceUrl) window.open(mainSourceUrl, "_blank", "noopener,noreferrer");
   }
 
   return (
