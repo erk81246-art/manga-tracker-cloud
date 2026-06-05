@@ -7,7 +7,6 @@ import {
   ChevronRight,
   ChevronLeft,
   BookOpen,
-  BarChart3,
   Cloud,
   ExternalLink,
   Heart,
@@ -418,6 +417,7 @@ function DetailModal({
 
   function openMain() {
     if (onOpenMainSource) onOpenMainSource(item);
+    else if (onRead) onRead({ ...item, last_read_url: mainSourceUrl || item.last_read_url });
     else if (mainSourceUrl) window.open(mainSourceUrl, "_blank", "noopener,noreferrer");
   }
 
@@ -891,8 +891,8 @@ function TopNetflixNav({
   onLogin,
   onLogout,
 }: {
-  tab: "collection" | "tier" | "dashboard";
-  setTab: (tab: "collection" | "tier" | "dashboard") => void;
+  tab: "collection" | "tier";
+  setTab: (tab: "collection" | "tier") => void;
   query: string;
   setQuery: (value: string) => void;
   onOpenMenu: () => void;
@@ -901,14 +901,12 @@ function TopNetflixNav({
   onLogin: () => void;
   onLogout: () => void;
 }) {
-  const tabs: { key: "collection" | "tier" | "dashboard"; label: string }[] = [
+  const tabs: { key: "collection" | "tier"; label: string }[] = [
     { key: "collection", label: "Collection" },
-    { key: "tier", label: "Tier" },
-    { key: "dashboard", label: "Dashboard" },
-  ];
+    { key: "tier", label: "Tier" },  ];
 
   return (
-    <div className="sticky top-3 z-50 mb-5 px-3 md:px-0">
+    <div className="sticky top-3 z-50 mb-5 hidden px-3 md:block md:px-0">
       <div className="mx-auto flex max-w-7xl items-center gap-2 rounded-[1.4rem] border border-white/10 bg-black/80 p-2 shadow-2xl backdrop-blur-xl">
         <button onClick={onOpenMenu} className="hidden rounded-2xl bg-zinc-900 px-4 py-3 text-sm font-black text-white active:scale-95 md:block">
           เมนู
@@ -951,210 +949,7 @@ function TopNetflixNav({
           </button>
         )}
       </div>
-
-      <div className="mt-2 flex items-center gap-2 rounded-2xl border border-white/10 bg-black/80 px-3 py-2 backdrop-blur-xl md:hidden">
-        <Search size={18} className="shrink-0 text-zinc-500" />
-        <input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="ค้นหามังงะ..."
-          className="min-w-0 flex-1 bg-transparent text-sm font-semibold text-white outline-none placeholder:text-zinc-600"
-        />
-      </div>
     </div>
-  );
-}
-
-function DashboardView({
-  items,
-  favoriteIds,
-  onOpen,
-}: {
-  items: MangaItem[];
-  favoriteIds: string[];
-  onOpen: (item: MangaItem) => void;
-}) {
-  const total = items.length;
-  const reading = items.filter((item) => item.status === "reading").length;
-  const finished = items.filter((item) => item.status === "finished").length;
-  const paused = items.filter((item) => item.status === "paused").length;
-  const updatedItems = items.filter((item) => chapterNumber(item.latest_chapter) > chapterNumber(item.read_chapter));
-  const caughtUp = total - updatedItems.length;
-  const caughtPercent = total ? Math.round((caughtUp / total) * 100) : 0;
-
-  const totalReadChapters = items.reduce((sum, item) => sum + chapterNumber(item.read_chapter), 0);
-  const activeItems = items.filter((item) => item.last_read_at);
-  const lastReadItem = [...activeItems].sort((a, b) => new Date(b.last_read_at || 0).getTime() - new Date(a.last_read_at || 0).getTime())[0];
-
-  const tierCounts = tiers.map((tier) => ({ tier, count: items.filter((item) => item.tier === tier).length }));
-  const favorites = items.filter((item) => favoriteIds.includes(item.id)).slice(0, 10);
-
-  const topProgress = [...items]
-    .sort((a, b) => chapterNumber(b.read_chapter) - chapterNumber(a.read_chapter))
-    .slice(0, 7);
-
-  const heatmapDays = Array.from({ length: 35 }, (_, index) => {
-    const date = new Date();
-    date.setDate(date.getDate() - (34 - index));
-    const key = date.toISOString().slice(0, 10);
-    const count = items.filter((item) => dateKey(item.last_read_at) === key).length;
-    return { key, count };
-  });
-
-  const activeDayKeys = new Set(heatmapDays.filter((day) => day.count > 0).map((day) => day.key));
-  let streak = 0;
-  for (let i = 0; i < 365; i++) {
-    const date = new Date();
-    date.setDate(date.getDate() - i);
-    const key = date.toISOString().slice(0, 10);
-    if (activeDayKeys.has(key)) streak += 1;
-    else if (i === 0) continue;
-    else break;
-  }
-
-  return (
-    <section className="space-y-6">
-      <div className="relative overflow-hidden rounded-[2rem] bg-[#111111] p-6 text-white ring-1 ring-white/10 md:p-8">
-        <div className="absolute -right-16 -top-16 h-52 w-52 rounded-full bg-red-600/20 blur-3xl" />
-        <div className="absolute -bottom-24 left-10 h-56 w-56 rounded-full bg-white/5 blur-3xl" />
-        <div className="relative">
-          <p className="text-xs font-black uppercase tracking-[0.28em] text-red-500">Dashboard</p>
-          <h2 className="mt-2 text-4xl font-black tracking-tight md:text-6xl">Reading Stats</h2>
-          <p className="mt-2 max-w-xl text-sm font-semibold text-zinc-400">
-            ภาพรวมการอ่านและคลังมังงะของคุณแบบ premium dashboard
-          </p>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        {[
-          ["ทั้งหมด", total],
-          ["กำลังอ่าน", reading],
-          ["ตอนที่อ่านแล้ว", totalReadChapters],
-          ["Streak", `${streak} วัน`],
-        ].map(([label, value]) => (
-          <div key={label} className="rounded-[1.6rem] bg-[#151515] p-5 text-white ring-1 ring-white/10">
-            <p className="text-xs font-black uppercase tracking-[0.18em] text-zinc-500">{label}</p>
-            <p className="mt-3 text-3xl font-black md:text-4xl">{value}</p>
-          </div>
-        ))}
-      </div>
-
-      <div className="grid gap-4 xl:grid-cols-[1fr_1.2fr]">
-        <div className="rounded-[1.8rem] bg-[#151515] p-5 text-white ring-1 ring-white/10">
-          <div className="flex items-end justify-between">
-            <div>
-              <p className="text-xs font-black uppercase tracking-[0.18em] text-zinc-500">Progress</p>
-              <h3 className="mt-1 text-2xl font-black">อ่านตามทัน</h3>
-            </div>
-            <p className="text-4xl font-black text-red-500">{caughtPercent}%</p>
-          </div>
-          <div className="mt-5 h-3 overflow-hidden rounded-full bg-zinc-800">
-            <div className="h-full rounded-full bg-red-600" style={{ width: `${caughtPercent}%` }} />
-          </div>
-          <p className="mt-3 text-sm font-semibold text-zinc-400">
-            ตามทันแล้ว {caughtUp} เรื่อง · มีตอนใหม่ {updatedItems.length} เรื่อง
-          </p>
-        </div>
-
-        <div className="rounded-[1.8rem] bg-[#151515] p-5 text-white ring-1 ring-white/10">
-          <p className="text-xs font-black uppercase tracking-[0.18em] text-zinc-500">Reading Heatmap</p>
-          <h3 className="mt-1 text-2xl font-black">35 วันที่ผ่านมา</h3>
-          <div className="mt-5 grid grid-cols-7 gap-2">
-            {heatmapDays.map((day) => (
-              <div
-                key={day.key}
-                title={`${day.key}: ${day.count} เรื่อง`}
-                className={`aspect-square rounded-md ${
-                  day.count >= 3
-                    ? "bg-red-600"
-                    : day.count === 2
-                    ? "bg-red-500/70"
-                    : day.count === 1
-                    ? "bg-red-500/35"
-                    : "bg-zinc-800"
-                }`}
-              />
-            ))}
-          </div>
-          <p className="mt-3 text-xs font-semibold text-zinc-500">
-            ยิ่งแดงเข้ม = วันนั้นมีการบันทึกการอ่านมากขึ้น
-          </p>
-        </div>
-      </div>
-
-      <div className="grid gap-4 xl:grid-cols-3">
-        <div className="rounded-[1.8rem] bg-[#151515] p-5 text-white ring-1 ring-white/10 xl:col-span-1">
-          <p className="text-xs font-black uppercase tracking-[0.18em] text-red-500">Last Read</p>
-          <h3 className="text-2xl font-black">อ่านล่าสุด</h3>
-          {lastReadItem ? (
-            <button onClick={() => onOpen(lastReadItem)} className="mt-4 flex w-full gap-3 rounded-2xl bg-black/50 p-3 text-left active:scale-[0.99]">
-              <div className="h-24 w-16 shrink-0 overflow-hidden rounded-xl bg-zinc-800">
-                {lastReadItem.cover ? <img src={lastReadItem.cover} alt={lastReadItem.title} className="h-full w-full object-cover" loading="lazy" /> : null}
-              </div>
-              <div className="min-w-0">
-                <p className="line-clamp-2 text-sm font-black">{lastReadItem.title}</p>
-                <p className="mt-1 text-xs font-bold text-red-400">ตอน {lastReadItem.read_chapter || "-"}</p>
-                <p className="text-xs text-zinc-500">{daysAgoLabel(lastReadItem.last_read_at)}</p>
-              </div>
-            </button>
-          ) : (
-            <p className="mt-4 rounded-2xl bg-black/50 p-4 text-sm font-semibold text-zinc-500">ยังไม่มีประวัติอ่าน</p>
-          )}
-        </div>
-
-        <div className="rounded-[1.8rem] bg-[#151515] p-5 text-white ring-1 ring-white/10 xl:col-span-2">
-          <p className="text-xs font-black uppercase tracking-[0.18em] text-red-500">Top Progress</p>
-          <h3 className="text-2xl font-black">อ่านไปไกลที่สุด</h3>
-          <div className="mt-4 space-y-2">
-            {topProgress.map((item, index) => (
-              <button key={item.id} onClick={() => onOpen(item)} className="grid w-full grid-cols-[32px_1fr_auto] items-center gap-3 rounded-2xl bg-black/50 px-4 py-3 text-left active:scale-[0.99]">
-                <span className="text-sm font-black text-zinc-500">#{index + 1}</span>
-                <span className="line-clamp-1 text-sm font-black">{item.title}</span>
-                <span className="ml-3 shrink-0 text-xs font-black text-red-400">ตอน {item.read_chapter || "-"}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <div className="grid gap-4 xl:grid-cols-2">
-        <div className="rounded-[1.8rem] bg-[#151515] p-5 text-white ring-1 ring-white/10">
-          <p className="text-xs font-black uppercase tracking-[0.18em] text-red-500">Tier Distribution</p>
-          <div className="mt-4 space-y-3">
-            {tierCounts.map(({ tier, count }) => {
-              const percent = total ? Math.max(6, Math.round((count / total) * 100)) : 6;
-              return (
-                <div key={tier} className="grid grid-cols-[32px_1fr_40px] items-center gap-3">
-                  <span className="text-lg font-black">{tier}</span>
-                  <div className="h-3 overflow-hidden rounded-full bg-zinc-800">
-                    <div className="h-full rounded-full bg-white" style={{ width: `${percent}%` }} />
-                  </div>
-                  <span className="text-right text-sm font-black text-zinc-400">{count}</span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        <div className="rounded-[1.8rem] bg-[#151515] p-5 text-white ring-1 ring-white/10">
-          <p className="text-xs font-black uppercase tracking-[0.18em] text-red-500">Favorites</p>
-          <h3 className="text-2xl font-black">เรื่องที่ติดตาม</h3>
-          <div className="mt-4 flex gap-3 overflow-x-auto pb-2">
-            {favorites.length ? favorites.map((item) => (
-              <button key={item.id} onClick={() => onOpen(item)} className="min-w-[120px] text-left active:scale-[0.99]">
-                <div className="aspect-[3/4] overflow-hidden rounded-2xl bg-zinc-800">
-                  {item.cover ? <img src={item.cover} alt={item.title} className="h-full w-full object-cover" loading="lazy" /> : null}
-                </div>
-                <p className="mt-2 line-clamp-2 text-xs font-black">{item.title}</p>
-              </button>
-            )) : (
-              <p className="rounded-2xl bg-black/50 p-4 text-sm font-semibold text-zinc-500">ยังไม่มี Favorite</p>
-            )}
-          </div>
-        </div>
-      </div>
-    </section>
   );
 }
 
@@ -1444,8 +1239,8 @@ function Sidebar({
   stats: { total: number; updated: number; reading: number; finished: number; paused: number; favorites?: number };
   filter: "all" | "updated" | "favorites" | MangaStatus;
   setFilter: (filter: "all" | "updated" | "favorites" | MangaStatus) => void;
-  tab: "collection" | "tier" | "dashboard";
-  setTab: (tab: "collection" | "tier" | "dashboard") => void;
+  tab: "collection" | "tier";
+  setTab: (tab: "collection" | "tier") => void;
   onAdd: () => void;
   onLogout: () => void;
   isWideLandscape: boolean;
@@ -1722,7 +1517,7 @@ export default function App() {
   const [showMangaPass, setShowMangaPass] = useState(true);
   const [historyIds, setHistoryIds] = useState<string[]>([]);
   const [filter, setFilter] = useState<"all" | "updated" | "favorites" | MangaStatus>("all");
-  const [tab, setTab] = useState<"collection" | "tier" | "dashboard">("tier");
+  const [tab, setTab] = useState<"collection" | "tier">("tier");
   const [form, setForm] = useState<Omit<MangaItem, "id" | "user_id">>(emptyForm);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [openForm, setOpenForm] = useState(false);
@@ -1928,6 +1723,7 @@ export default function App() {
 
 
   function openMainSource(item: MangaItem) {
+    rememberHistory(item);
     if (item.source_url) window.open(item.source_url, "_blank", "noopener,noreferrer");
   }
 
@@ -2189,33 +1985,9 @@ export default function App() {
             <p className="text-sm font-bold text-zinc-400">{user ? (isAdmin ? "Admin" : "User") : "Guest"} · ทั้งหมด {stats.total} เรื่อง</p>
           </div>
 
-          <div className="sticky top-4 z-40 mb-4 hidden md:block">
-            <SourceIconBar isGuest={!user} sources={readingSources} onAddSource={addReadingSource} onDeleteSource={deleteReadingSource} />
-          </div>
-
           {syncing && <p className="mb-3 rounded-2xl bg-white p-3 text-center text-sm text-zinc-500">กำลัง sync ข้อมูล...</p>}
 
-          <div className={`app-sticky-bar sticky z-20 bg-[#0B0B0B]/90 px-4 py-3 backdrop-blur ${tab === "collection" && !isWideLandscape ? "hidden md:block" : ""} ${isWideLandscape ? "top-4 mx-0 rounded-[2rem] bg-white px-3 shadow-sm" : "top-0 -mx-4"} xl:top-6 xl:mx-0 xl:rounded-[2rem] xl:bg-white xl:px-3 xl:shadow-sm`}>
-            <div className="hidden rounded-3xl bg-white p-1 shadow-sm">
-              <button onClick={() => user && setTab("collection")} disabled={!user} className={`flex flex-1 items-center justify-center gap-2 rounded-[1.1rem] px-3 py-2 text-sm font-bold ${tab === "collection" ? "bg-zinc-950 text-white" : "text-zinc-500"}`}>
-                <BookOpen size={16} /> Collection
-              </button>
-              <button onClick={() => setTab("tier")} className={`flex flex-1 items-center justify-center gap-2 rounded-[1.1rem] px-3 py-2 text-sm font-bold ${tab === "tier" ? "bg-zinc-950 text-white" : "text-zinc-500"}`}>
-                <Layers size={16} /> Tier List
-              </button>
-            </div>
-
-            {tab === "collection" && (
-              <div className="mt-3 flex items-center gap-2 rounded-3xl bg-white px-4 py-3 shadow-sm xl:mt-0 xl:bg-zinc-50 xl:shadow-none">
-                <Search size={18} className="text-zinc-400" />
-                <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="ค้นหาชื่อมังงะ..." className="w-full bg-transparent text-sm outline-none" />
-              </div>
-            )}
-          </div>
-
-          {tab === "dashboard" ? (
-            <DashboardView items={progressItems || items} favoriteIds={favoriteIds} onOpen={openDetail} />
-          ) : tab === "collection" ? (
+          {tab === "collection" ? (
             <>
               <HeroCarousel
                 items={filtered.length ? filtered : progressItems}
@@ -2327,9 +2099,9 @@ export default function App() {
         </button>
         {user ? (
           <>
-            <button onClick={openAdd} className="flex flex-1 flex-col items-center justify-center rounded-3xl bg-white px-2 py-2 text-[11px] font-black text-zinc-950">
-              <Plus size={20} />
-              เพิ่ม
+            <button onClick={() => setMenuOpen(true)} className="flex flex-1 flex-col items-center justify-center rounded-3xl bg-white px-2 py-2 text-[11px] font-black text-zinc-950">
+              <Menu size={20} />
+              เมนู
             </button>
             <button onClick={logout} className="flex flex-1 flex-col items-center justify-center rounded-3xl px-2 py-2 text-[11px] font-bold text-zinc-400">
               <LogOut size={18} />
