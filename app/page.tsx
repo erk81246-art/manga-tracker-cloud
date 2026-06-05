@@ -740,6 +740,116 @@ function MangaForm({
 
 
 
+
+function PremiumContinueReading({
+  items,
+  onOpen,
+  onRead,
+}: {
+  items: MangaItem[];
+  onOpen: (item: MangaItem) => void;
+  onRead?: (item: MangaItem) => void;
+}) {
+  const list = items
+    .filter((item) => item && (item.last_read_chapter || item.read_chapter || item.last_read_url))
+    .slice(0, 10);
+
+  if (list.length === 0) return null;
+
+  return (
+    <section className="mb-8">
+      <div className="mb-4 flex items-end justify-between">
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.25em] text-red-500">Continue</p>
+          <h2 className="text-2xl font-black text-white md:text-3xl">อ่านต่อจากที่ค้างไว้</h2>
+        </div>
+        <span className="text-xs font-bold text-zinc-500">{list.length} เรื่อง</span>
+      </div>
+
+      <div className="flex gap-4 overflow-x-auto pb-3">
+        {list.map((item) => {
+          const diff = Math.max(0, chapterNumber(item.latest_chapter) - chapterNumber(item.read_chapter));
+          const percent = chapterNumber(item.latest_chapter)
+            ? Math.min(100, Math.round((chapterNumber(item.read_chapter) / chapterNumber(item.latest_chapter)) * 100))
+            : 0;
+
+          return (
+            <div key={item.id} className="min-w-[260px] overflow-hidden rounded-[1.7rem] bg-[#151515] text-white ring-1 ring-white/10 md:min-w-[320px]">
+              <button onClick={() => onOpen(item)} className="relative block w-full text-left">
+                <div className="relative h-36 overflow-hidden bg-zinc-900">
+                  {item.cover ? <img src={item.cover} alt={item.title} className="h-full w-full object-cover opacity-80" loading="lazy" /> : null}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+                  <div className="absolute bottom-3 left-3 right-3">
+                    <p className="line-clamp-1 text-lg font-black">{item.title}</p>
+                    <p className="text-xs font-bold text-zinc-300">อ่านถึง {item.read_chapter || "-"} · ล่าสุด {item.latest_chapter || "-"}</p>
+                  </div>
+                </div>
+              </button>
+
+              <div className="p-4">
+                <div className="h-2 overflow-hidden rounded-full bg-zinc-800">
+                  <div className="h-full rounded-full bg-red-600" style={{ width: `${percent}%` }} />
+                </div>
+                <div className="mt-3 flex items-center justify-between gap-2">
+                  <p className="text-xs font-bold text-zinc-400">{diff > 0 ? `เหลือ ${diff} ตอน` : "อ่านตามทันแล้ว"}</p>
+                  <button
+                    onClick={() => onRead ? onRead(item) : onOpen(item)}
+                    className="rounded-full bg-red-600 px-4 py-2 text-xs font-black text-white active:scale-95"
+                  >
+                    อ่านต่อ
+                  </button>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+function NetflixUpdatesRow({
+  items,
+  onOpen,
+}: {
+  items: MangaItem[];
+  onOpen: (item: MangaItem) => void;
+}) {
+  const list = items
+    .filter((item) => chapterNumber(item.latest_chapter) > chapterNumber(item.read_chapter))
+    .sort((a, b) => (chapterNumber(b.latest_chapter) - chapterNumber(b.read_chapter)) - (chapterNumber(a.latest_chapter) - chapterNumber(a.read_chapter)))
+    .slice(0, 12);
+
+  if (list.length === 0) return null;
+
+  return (
+    <section className="mb-8">
+      <div className="mb-4 flex items-end justify-between">
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.25em] text-red-500">Updates</p>
+          <h2 className="text-2xl font-black text-white md:text-3xl">ตอนใหม่มาแล้ว</h2>
+        </div>
+        <span className="rounded-full bg-red-600 px-3 py-1 text-xs font-black text-white">{list.length}</span>
+      </div>
+
+      <div className="flex gap-3 overflow-x-auto pb-3">
+        {list.map((item) => (
+          <button key={item.id} onClick={() => onOpen(item)} className="group min-w-[150px] text-left active:scale-[0.99] md:min-w-[180px]">
+            <div className="relative aspect-[3/4] overflow-hidden rounded-[1.4rem] bg-[#151515] ring-1 ring-white/10">
+              {item.cover ? <img src={item.cover} alt={item.title} className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105" loading="lazy" /> : null}
+              <div className="absolute left-2 top-2 rounded-full bg-red-600 px-2 py-1 text-[10px] font-black text-white">
+                +{chapterNumber(item.latest_chapter) - chapterNumber(item.read_chapter)}
+              </div>
+            </div>
+            <p className="mt-2 line-clamp-2 text-sm font-black text-white">{item.title}</p>
+            <p className="text-xs font-bold text-zinc-500">ล่าสุด {item.latest_chapter || "-"}</p>
+          </button>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function DashboardView({
   items,
   favoriteIds,
@@ -859,7 +969,23 @@ function DashboardView({
           </div>
         </div>
       </div>
-    </section>
+    
+      <div className="rounded-[1.8rem] bg-[#151515] p-5 text-white ring-1 ring-white/10">
+        <p className="text-xs font-black uppercase tracking-[0.18em] text-red-500">Top Progress</p>
+        <h3 className="text-2xl font-black">อ่านไปไกลที่สุด</h3>
+        <div className="mt-4 space-y-2">
+          {[...items]
+            .sort((a, b) => chapterNumber(b.read_chapter) - chapterNumber(a.read_chapter))
+            .slice(0, 6)
+            .map((item) => (
+              <button key={item.id} onClick={() => onOpen(item)} className="flex w-full items-center justify-between rounded-2xl bg-black/50 px-4 py-3 text-left active:scale-[0.99]">
+                <span className="line-clamp-1 text-sm font-black">{item.title}</span>
+                <span className="ml-3 shrink-0 text-xs font-black text-red-400">ตอน {item.read_chapter || "-"}</span>
+              </button>
+            ))}
+        </div>
+      </div>
+</section>
   );
 }
 
@@ -1920,6 +2046,8 @@ export default function App() {
                                     onRead={openReading}
                 user={user}
              />
+              <PremiumContinueReading items={filtered.length ? filtered : progressItems || items} onOpen={openDetail} onRead={openReading} />
+              <NetflixUpdatesRow items={filtered.length ? filtered : progressItems || items} onOpen={openDetail} />
               <ReadingHistoryRow items={progressItems} historyIds={historyIds} onOpen={openDetail} onRead={openReading} />
               <div className="hidden md:block"><NewChapterRow items={progressItems} onOpen={openDetail} /></div>
               <div className="mb-4 mt-4 flex gap-2 overflow-x-auto pb-1 xl:hidden">

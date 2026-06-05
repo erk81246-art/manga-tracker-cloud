@@ -1,7 +1,15 @@
-# Manga Tracker Netflix Sprint 1 Lazy Fix
+# Manga Tracker Netflix Sprint 2
 
-แก้ build error:
-- JSX elements cannot have multiple attributes with the same name
-- ลบ loading="lazy" ที่ซ้ำใน img tag แล้ว
-- ยังเป็น Sprint 1 Netflix theme + Dashboard เหมือนเดิม
+Sprint 2:
+- เพิ่ม Premium Continue Reading บนหน้า Home
+- เพิ่ม Netflix Updates Row สำหรับตอนใหม่
+- Dashboard เพิ่ม Top Progress
+- ยังใช้ layout lightweight ไม่เพิ่ม animation หนัก
+- รูปใช้ loading lazy และ dedupe แล้ว
 - ไม่ต้องรัน SQL ใหม่
+
+เป้าหมาย:
+- หน้าแรกดูเป็น Product มากขึ้น
+- อ่านต่อเด่นขึ้น
+- ตอนใหม่ดูชัดขึ้น
+- ไม่เพิ่ม logic หนักเกินไป
