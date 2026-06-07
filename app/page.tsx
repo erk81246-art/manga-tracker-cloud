@@ -112,6 +112,16 @@ function makeId() {
   return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
+function shuffleMangaItems(list: MangaItem[]) {
+  const shuffled = [...list];
+  for (let i = shuffled.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
+
 function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return <div className={`rounded-3xl bg-white shadow-sm ${className}`}>{children}</div>;
 }
@@ -963,6 +973,7 @@ function HeroCarousel({
   onToggleFavorite,
   onRead,
   user,
+  randomSeed,
 }: {
   items: MangaItem[];
   activeIndex: number;
@@ -972,8 +983,9 @@ function HeroCarousel({
   onToggleFavorite: (item: MangaItem) => void;
   onRead: (item: MangaItem) => void;
   user: SupabaseUser | null;
+  randomSeed: number;
 }) {
-  const featured = items.slice(0, 8);
+  const featured = useMemo(() => shuffleMangaItems(items).slice(0, 8), [items, randomSeed]);
   if (featured.length === 0) return null;
 
   const index = Math.min(activeIndex, featured.length - 1);
@@ -1514,6 +1526,7 @@ export default function App() {
   const [loaded, setLoaded] = useState(false);
   const [query, setQuery] = useState("");
   const [heroIndex, setHeroIndex] = useState(0);
+  const [highlightSeed, setHighlightSeed] = useState(() => Date.now());
   const [showMangaPass, setShowMangaPass] = useState(true);
   const [historyIds, setHistoryIds] = useState<string[]>([]);
   const [filter, setFilter] = useState<"all" | "updated" | "favorites" | MangaStatus>("all");
@@ -1728,6 +1741,11 @@ export default function App() {
   }
 
   const progressItems = useMemo(() => items.map((item) => getProgressItem(item)), [items, progressMap]);
+
+
+  useEffect(() => {
+    setHeroIndex(0);
+  }, [highlightSeed, items.length]);
 
   const filtered = useMemo(
     () =>
@@ -1998,6 +2016,7 @@ export default function App() {
                 onToggleFavorite={toggleFavorite}
                                     onRead={openReading}
                 user={user}
+                randomSeed={highlightSeed}
              />
               <PremiumContinueReading items={filtered.length ? filtered : progressItems || items} historyIds={historyIds} onOpen={openDetail} onRead={openReading} />
               <NetflixUpdatesRow items={filtered.length ? filtered : progressItems || items} onOpen={openDetail} />
