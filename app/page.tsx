@@ -1049,7 +1049,7 @@ function HeroCarousel({
               )}
             </div>
 
-            <h1 className="max-w-xl text-5xl font-black leading-none tracking-tight md:text-6xl">{active.title}</h1>
+            <h1 className="line-clamp-2 max-w-[92%] text-4xl font-black leading-[0.95] tracking-tight text-white drop-shadow-2xl md:max-w-[78%] md:text-5xl lg:text-6xl">{active.title}</h1>
             <div className="mt-4 flex flex-wrap gap-2">
               <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-white">อ่านถึง {active.read_chapter || "-"}</span>
               <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-white">ล่าสุด {active.latest_chapter || "-"}</span>
@@ -1057,7 +1057,7 @@ function HeroCarousel({
             </div>
             <p className="mt-4 line-clamp-2 max-w-xl text-sm font-medium text-white/75">{active.note || "กดรายละเอียดเพื่อดูข้อมูลและจัดการเรื่องนี้"}</p>
             <div className="mt-5 flex flex-wrap gap-3">
-              <button onClick={() => onOpen(active)} className="flex items-center gap-2 rounded-2xl bg-red-600 px-5 py-3 text-sm font-black text-white shadow-lg shadow-purple-600/25 active:scale-95">
+              <button onClick={() => onOpen(active)} className="flex items-center gap-2 rounded-2xl bg-red-600 px-5 py-3 text-sm font-black text-white shadow-lg shadow-red-600/25 active:scale-95">
                 <BookOpen size={18} /> รายละเอียด
               </button>
               {(active.last_read_url || active.source_url) && (
