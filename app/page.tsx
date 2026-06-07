@@ -1049,7 +1049,7 @@ function HeroCarousel({
               )}
             </div>
 
-            <h1 className="line-clamp-2 max-w-[92%] text-4xl font-black leading-[0.95] tracking-tight text-white drop-shadow-2xl md:max-w-[78%] md:text-5xl lg:text-6xl">{active.title}</h1>
+            <h1 className="line-clamp-2 max-w-full break-words text-[2.35rem] font-black leading-[1.02] tracking-tight text-white drop-shadow-2xl sm:text-4xl md:max-w-[88%] md:text-5xl lg:text-6xl">{active.title}</h1>
             <div className="mt-4 flex flex-wrap gap-2">
               <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-white">อ่านถึง {active.read_chapter || "-"}</span>
               <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-white">ล่าสุด {active.latest_chapter || "-"}</span>
