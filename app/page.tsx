@@ -2050,7 +2050,6 @@ export default function App() {
              />
               <PremiumContinueReading items={filtered.length ? filtered : progressItems || items} historyIds={historyIds} onOpen={openDetail} onRead={openReading} />
               <NetflixUpdatesRow items={filtered.length ? filtered : progressItems || items} onOpen={openDetail} />
-              <div className="hidden md:block"><NewChapterRow items={progressItems} onOpen={openDetail} /></div>
               <div className="mb-4 mt-4 flex gap-2 overflow-x-auto pb-1 xl:hidden">
                 {filters.map(([key, label]) => (
                   <button key={key} onClick={() => setFilter(key)} className={`shrink-0 rounded-full px-4 py-2 text-sm font-bold ${filter === key ? "bg-zinc-950 text-white" : "bg-white text-zinc-500"}`}>
