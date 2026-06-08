@@ -1051,12 +1051,12 @@ function HeroCarousel({
           animate={{ opacity: 1, scale: 1, y: 0 }}
           className="relative z-10 mx-auto min-h-[540px] overflow-hidden rounded-[2rem] border border-purple-400/40 bg-zinc-900 shadow-[0_0_32px_rgba(168,85,247,0.25)] md:min-h-[410px] md:w-[72%]"
         >
-          {active.cover ? <img src={active.cover} alt={active.title} className="absolute inset-0 h-full w-full object-cover opacity-85 md:scale-110 md:opacity-25 md:blur-xl" /> : <div className="absolute inset-0 bg-zinc-800" />}
-          <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/55 to-black/20 md:from-black md:via-black/80 md:to-black/45" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/25 to-transparent" />
+          {active.cover ? <img src={active.cover} alt={active.title} className="absolute inset-0 h-full w-full object-cover object-top opacity-90 md:scale-110 md:object-center md:opacity-25 md:blur-xl" /> : <div className="absolute inset-0 bg-zinc-800" />}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/25 via-black/20 to-black/10 md:from-black md:via-black/80 md:to-black/45" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-transparent" />
 
-          <div className="relative z-10 flex min-h-[540px] flex-col justify-end gap-5 p-5 md:min-h-[410px] md:flex-row md:items-center md:justify-start md:p-7">
-            <div className="mb-auto flex items-center justify-between md:hidden">
+          <div className="relative z-10 flex min-h-[540px] flex-col justify-end gap-4 p-5 pt-6 md:min-h-[410px] md:flex-row md:items-center md:justify-start md:gap-5 md:p-7">
+            <div className="absolute left-5 right-5 top-5 z-20 flex items-center justify-between md:hidden">
               <span className="rounded-full bg-red-600 px-4 py-2 text-xs font-black text-white">
                 {hasUpdate ? "NEW CHAPTER" : `TIER ${active.tier}`}
               </span>
@@ -1071,7 +1071,7 @@ function HeroCarousel({
               {active.cover ? <img src={active.cover} alt={active.title} className="h-full w-full object-cover" /> : <div className="h-full w-full bg-zinc-800" />}
             </div>
 
-            <div className="min-w-0 flex-1 md:max-w-[560px]">
+            <div className="min-w-0 flex-1 rounded-[1.6rem] bg-black/15 p-0 backdrop-blur-[1px] md:max-w-[560px] md:bg-transparent md:p-0 md:backdrop-blur-0">
               <div className="hidden items-center justify-between md:flex">
                 <span className="rounded-full bg-red-600 px-4 py-2 text-xs font-black text-white shadow-lg shadow-red-600/20">
                   {hasUpdate ? "NEW CHAPTER" : `TIER ${active.tier}`}
@@ -1083,7 +1083,7 @@ function HeroCarousel({
                 )}
               </div>
 
-              <h1 className="line-clamp-2 max-w-full break-words text-[2.35rem] font-black leading-[1.02] tracking-tight text-white drop-shadow-2xl sm:text-4xl md:mt-6 md:line-clamp-3 md:text-5xl lg:text-6xl">
+              <h1 className="line-clamp-2 max-w-full break-words text-[2.15rem] font-black leading-[1.02] tracking-tight text-white drop-shadow-2xl sm:text-4xl md:mt-6 md:line-clamp-3 md:text-5xl lg:text-6xl">
                 {active.title}
               </h1>
 
@@ -1093,11 +1093,11 @@ function HeroCarousel({
                 <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-white">Tier {active.tier}</span>
               </div>
 
-              <p className="mt-4 line-clamp-2 max-w-xl text-sm font-medium text-white/75 md:line-clamp-3">
+              <p className="mt-3 line-clamp-2 max-w-xl text-sm font-medium text-white/75 md:mt-4 md:line-clamp-3">
                 {active.note || "กดรายละเอียดเพื่อดูข้อมูลและจัดการเรื่องนี้"}
               </p>
 
-              <div className="mt-5 flex flex-wrap gap-3">
+              <div className="mt-4 flex flex-wrap gap-3 md:mt-5">
                 <button onClick={() => onOpen(active)} className="flex items-center gap-2 rounded-2xl bg-red-600 px-5 py-3 text-sm font-black text-white shadow-lg shadow-red-600/25 active:scale-95">
                   <BookOpen size={18} /> รายละเอียด
                 </button>
