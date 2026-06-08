@@ -1018,17 +1018,23 @@ function HeroCarousel({
 
       <div className="relative min-h-[560px] md:min-h-[430px]">
         {featured.length > 1 && (
-          <button onClick={() => move(-1)} className="absolute left-0 top-12 hidden h-[310px] w-[170px] overflow-hidden rounded-[1.7rem] opacity-45 md:block">
+          <button
+            onClick={() => move(-1)}
+            className="absolute left-0 top-12 hidden h-[310px] w-[170px] overflow-hidden rounded-[1.7rem] opacity-40 transition hover:opacity-70 md:block"
+          >
             {prev.cover ? <img src={prev.cover} alt={prev.title} className="h-full w-full object-cover" /> : <div className="h-full w-full bg-zinc-800" />}
-            <div className="absolute inset-0 bg-black/45" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-black/20" />
             <p className="absolute bottom-4 left-4 right-4 line-clamp-2 text-left text-xl font-black">{prev.title}</p>
           </button>
         )}
 
         {featured.length > 1 && (
-          <button onClick={() => move(1)} className="absolute right-0 top-12 hidden h-[310px] w-[170px] overflow-hidden rounded-[1.7rem] opacity-45 md:block">
+          <button
+            onClick={() => move(1)}
+            className="absolute right-0 top-12 hidden h-[310px] w-[170px] overflow-hidden rounded-[1.7rem] opacity-40 transition hover:opacity-70 md:block"
+          >
             {next.cover ? <img src={next.cover} alt={next.title} className="h-full w-full object-cover" /> : <div className="h-full w-full bg-zinc-800" />}
-            <div className="absolute inset-0 bg-black/45" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-black/20" />
             <p className="absolute bottom-4 left-4 right-4 line-clamp-2 text-left text-xl font-black">{next.title}</p>
           </button>
         )}
@@ -1045,12 +1051,12 @@ function HeroCarousel({
           animate={{ opacity: 1, scale: 1, y: 0 }}
           className="relative z-10 mx-auto min-h-[540px] overflow-hidden rounded-[2rem] border border-purple-400/40 bg-zinc-900 shadow-[0_0_32px_rgba(168,85,247,0.25)] md:min-h-[410px] md:w-[72%]"
         >
-          {active.cover ? <img src={active.cover} alt={active.title} className="absolute inset-0 h-full w-full object-cover" /> : <div className="absolute inset-0 bg-zinc-800" />}
-          <div className="absolute inset-0 bg-gradient-to-r from-black via-black/70 to-black/10" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+          {active.cover ? <img src={active.cover} alt={active.title} className="absolute inset-0 h-full w-full scale-110 object-cover opacity-25 blur-xl" /> : <div className="absolute inset-0 bg-zinc-800" />}
+          <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-black/45" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
 
-          <div className="relative z-10 flex min-h-[540px] flex-col justify-end p-5 md:min-h-[410px] md:p-8">
-            <div className="mb-auto flex items-center justify-between">
+          <div className="relative z-10 flex min-h-[540px] flex-col justify-end gap-5 p-5 md:min-h-[410px] md:flex-row md:items-center md:justify-start md:p-7">
+            <div className="mb-auto flex items-center justify-between md:hidden">
               <span className="rounded-full bg-red-600 px-4 py-2 text-xs font-black text-white">
                 {hasUpdate ? "NEW CHAPTER" : `TIER ${active.tier}`}
               </span>
@@ -1061,22 +1067,46 @@ function HeroCarousel({
               )}
             </div>
 
-            <h1 className="line-clamp-2 max-w-full break-words text-[2.35rem] font-black leading-[1.02] tracking-tight text-white drop-shadow-2xl sm:text-4xl md:max-w-[88%] md:text-5xl lg:text-6xl">{active.title}</h1>
-            <div className="mt-4 flex flex-wrap gap-2">
-              <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-white">อ่านถึง {active.read_chapter || "-"}</span>
-              <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-white">ล่าสุด {active.latest_chapter || "-"}</span>
-              <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-white">Tier {active.tier}</span>
+            <div className="hidden shrink-0 overflow-hidden rounded-[1.6rem] bg-zinc-950 shadow-2xl ring-1 ring-white/10 md:block md:h-[360px] md:w-[250px] xl:h-[380px] xl:w-[265px]">
+              {active.cover ? <img src={active.cover} alt={active.title} className="h-full w-full object-cover" /> : <div className="h-full w-full bg-zinc-800" />}
             </div>
-            <p className="mt-4 line-clamp-2 max-w-xl text-sm font-medium text-white/75">{active.note || "กดรายละเอียดเพื่อดูข้อมูลและจัดการเรื่องนี้"}</p>
-            <div className="mt-5 flex flex-wrap gap-3">
-              <button onClick={() => onOpen(active)} className="flex items-center gap-2 rounded-2xl bg-red-600 px-5 py-3 text-sm font-black text-white shadow-lg shadow-red-600/25 active:scale-95">
-                <BookOpen size={18} /> รายละเอียด
-              </button>
-              {(active.last_read_url || active.source_url) && (
-                <button onClick={() => onRead(active)} className="flex items-center gap-2 rounded-2xl bg-white/10 px-5 py-3 text-sm font-black text-white active:scale-95">
-                  <Play size={18} /> อ่านต่อ
+
+            <div className="min-w-0 flex-1 md:max-w-[560px]">
+              <div className="hidden items-center justify-between md:flex">
+                <span className="rounded-full bg-red-600 px-4 py-2 text-xs font-black text-white shadow-lg shadow-red-600/20">
+                  {hasUpdate ? "NEW CHAPTER" : `TIER ${active.tier}`}
+                </span>
+                {user && (
+                  <button onClick={() => onToggleFavorite(active)} className={`rounded-full p-3 ${isFavorite ? "bg-red-600 text-white" : "bg-zinc-900/90 text-white"}`}>
+                    <Heart size={22} fill={isFavorite ? "currentColor" : "none"} />
+                  </button>
+                )}
+              </div>
+
+              <h1 className="line-clamp-2 max-w-full break-words text-[2.35rem] font-black leading-[1.02] tracking-tight text-white drop-shadow-2xl sm:text-4xl md:mt-6 md:line-clamp-3 md:text-5xl lg:text-6xl">
+                {active.title}
+              </h1>
+
+              <div className="mt-4 flex flex-wrap gap-2">
+                <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-white">อ่านถึง {active.read_chapter || "-"}</span>
+                <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-white">ล่าสุด {active.latest_chapter || "-"}</span>
+                <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-white">Tier {active.tier}</span>
+              </div>
+
+              <p className="mt-4 line-clamp-2 max-w-xl text-sm font-medium text-white/75 md:line-clamp-3">
+                {active.note || "กดรายละเอียดเพื่อดูข้อมูลและจัดการเรื่องนี้"}
+              </p>
+
+              <div className="mt-5 flex flex-wrap gap-3">
+                <button onClick={() => onOpen(active)} className="flex items-center gap-2 rounded-2xl bg-red-600 px-5 py-3 text-sm font-black text-white shadow-lg shadow-red-600/25 active:scale-95">
+                  <BookOpen size={18} /> รายละเอียด
                 </button>
-              )}
+                {(active.last_read_url || active.source_url) && (
+                  <button onClick={() => onRead(active)} className="flex items-center gap-2 rounded-2xl bg-white/10 px-5 py-3 text-sm font-black text-white active:scale-95">
+                    <Play size={18} /> อ่านต่อ
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </motion.div>
