@@ -1051,9 +1051,9 @@ function HeroCarousel({
           animate={{ opacity: 1, scale: 1, y: 0 }}
           className="relative z-10 mx-auto min-h-[540px] overflow-hidden rounded-[2rem] border border-purple-400/40 bg-zinc-900 shadow-[0_0_32px_rgba(168,85,247,0.25)] md:min-h-[410px] md:w-[72%]"
         >
-          {active.cover ? <img src={active.cover} alt={active.title} className="absolute inset-0 h-full w-full scale-110 object-cover opacity-25 blur-xl" /> : <div className="absolute inset-0 bg-zinc-800" />}
-          <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-black/45" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
+          {active.cover ? <img src={active.cover} alt={active.title} className="absolute inset-0 h-full w-full object-cover opacity-85 md:scale-110 md:opacity-25 md:blur-xl" /> : <div className="absolute inset-0 bg-zinc-800" />}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/55 to-black/20 md:from-black md:via-black/80 md:to-black/45" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/25 to-transparent" />
 
           <div className="relative z-10 flex min-h-[540px] flex-col justify-end gap-5 p-5 md:min-h-[410px] md:flex-row md:items-center md:justify-start md:p-7">
             <div className="mb-auto flex items-center justify-between md:hidden">
