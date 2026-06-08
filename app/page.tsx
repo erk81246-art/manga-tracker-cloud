@@ -1051,17 +1051,35 @@ function HeroCarousel({
           animate={{ opacity: 1, scale: 1, y: 0 }}
           className="relative z-10 mx-auto min-h-[540px] overflow-hidden rounded-[2rem] border border-purple-400/40 bg-zinc-900 shadow-[0_0_32px_rgba(168,85,247,0.25)] md:min-h-[410px] md:w-[72%]"
         >
-          {active.cover ? <img src={active.cover} alt={active.title} className="absolute inset-0 h-full w-full object-cover object-top opacity-90 md:scale-110 md:object-center md:opacity-25 md:blur-xl" /> : <div className="absolute inset-0 bg-zinc-800" />}
-          <div className="absolute inset-0 bg-gradient-to-r from-black/25 via-black/20 to-black/10 md:from-black md:via-black/80 md:to-black/45" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-transparent" />
+          {/* Mobile: full cover, text locked at bottom */}
+          <div className="absolute inset-0 md:hidden">
+            {active.cover ? (
+              <img src={active.cover} alt={active.title} className="h-full w-full object-cover object-center" />
+            ) : (
+              <div className="h-full w-full bg-zinc-800" />
+            )}
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/65 to-black/10" />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-transparent" />
+          </div>
 
-          <div className="relative z-10 flex min-h-[540px] flex-col justify-end gap-4 p-5 pt-6 md:min-h-[410px] md:flex-row md:items-center md:justify-start md:gap-5 md:p-7">
-            <div className="absolute left-5 right-5 top-5 z-20 flex items-center justify-between md:hidden">
-              <span className="rounded-full bg-red-600 px-4 py-2 text-xs font-black text-white">
+          {/* Desktop / landscape: cinematic background + portrait cover */}
+          <div className="absolute inset-0 hidden md:block">
+            {active.cover ? (
+              <img src={active.cover} alt={active.title} className="h-full w-full scale-110 object-cover opacity-25 blur-xl" />
+            ) : (
+              <div className="h-full w-full bg-zinc-800" />
+            )}
+            <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-black/45" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
+          </div>
+
+          <div className="relative z-10 flex min-h-[540px] flex-col justify-end p-5 md:min-h-[410px] md:flex-row md:items-center md:justify-start md:gap-5 md:p-7">
+            <div className="absolute left-5 right-5 top-5 z-20 flex items-center justify-between">
+              <span className="rounded-full bg-red-600 px-4 py-2 text-xs font-black text-white shadow-lg shadow-red-600/20">
                 {hasUpdate ? "NEW CHAPTER" : `TIER ${active.tier}`}
               </span>
               {user && (
-                <button onClick={() => onToggleFavorite(active)} className={`rounded-full p-3 ${isFavorite ? "bg-red-600 text-white" : "bg-zinc-900 text-white"}`}>
+                <button onClick={() => onToggleFavorite(active)} className={`rounded-full p-3 ${isFavorite ? "bg-red-600 text-white" : "bg-zinc-900/90 text-white"}`}>
                   <Heart size={22} fill={isFavorite ? "currentColor" : "none"} />
                 </button>
               )}
@@ -1071,19 +1089,8 @@ function HeroCarousel({
               {active.cover ? <img src={active.cover} alt={active.title} className="h-full w-full object-cover" /> : <div className="h-full w-full bg-zinc-800" />}
             </div>
 
-            <div className="min-w-0 flex-1 rounded-[1.6rem] bg-black/15 p-0 backdrop-blur-[1px] md:max-w-[560px] md:bg-transparent md:p-0 md:backdrop-blur-0">
-              <div className="hidden items-center justify-between md:flex">
-                <span className="rounded-full bg-red-600 px-4 py-2 text-xs font-black text-white shadow-lg shadow-red-600/20">
-                  {hasUpdate ? "NEW CHAPTER" : `TIER ${active.tier}`}
-                </span>
-                {user && (
-                  <button onClick={() => onToggleFavorite(active)} className={`rounded-full p-3 ${isFavorite ? "bg-red-600 text-white" : "bg-zinc-900/90 text-white"}`}>
-                    <Heart size={22} fill={isFavorite ? "currentColor" : "none"} />
-                  </button>
-                )}
-              </div>
-
-              <h1 className="line-clamp-2 max-w-full break-words text-[2.15rem] font-black leading-[1.02] tracking-tight text-white drop-shadow-2xl sm:text-4xl md:mt-6 md:line-clamp-3 md:text-5xl lg:text-6xl">
+            <div className="min-w-0 flex-1 md:max-w-[560px]">
+              <h1 className="line-clamp-2 max-w-full break-words text-[2.05rem] font-black leading-[1.02] tracking-tight text-white drop-shadow-2xl sm:text-4xl md:mt-6 md:line-clamp-3 md:text-5xl lg:text-6xl">
                 {active.title}
               </h1>
 
