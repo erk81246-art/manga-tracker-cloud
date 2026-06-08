@@ -1016,7 +1016,7 @@ function HeroCarousel({
         </div>
       </div>
 
-      <div className="relative min-h-[560px] md:min-h-[430px]">
+      <div className="relative md:min-h-[430px]">
         {featured.length > 1 && (
           <button
             onClick={() => move(-1)}
@@ -1049,48 +1049,31 @@ function HeroCarousel({
           }}
           initial={{ opacity: 0, scale: 0.96, y: 12 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          className="relative z-10 mx-auto min-h-[540px] overflow-hidden rounded-[2rem] border border-purple-400/40 bg-zinc-900 shadow-[0_0_32px_rgba(168,85,247,0.25)] md:min-h-[410px] md:w-[72%]"
+          className="relative z-10 mx-auto overflow-hidden rounded-[2rem] border border-purple-400/40 bg-zinc-950 shadow-[0_0_32px_rgba(168,85,247,0.25)] md:min-h-[410px] md:w-[72%]"
         >
-          {/* Mobile: full cover, text locked at bottom */}
-          <div className="absolute inset-0 md:hidden">
-            {active.cover ? (
-              <img src={active.cover} alt={active.title} className="h-full w-full object-cover object-center" />
-            ) : (
-              <div className="h-full w-full bg-zinc-800" />
-            )}
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/65 to-black/10" />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-transparent" />
-          </div>
-
-          {/* Desktop / landscape: cinematic background + portrait cover */}
-          <div className="absolute inset-0 hidden md:block">
-            {active.cover ? (
-              <img src={active.cover} alt={active.title} className="h-full w-full scale-110 object-cover opacity-25 blur-xl" />
-            ) : (
-              <div className="h-full w-full bg-zinc-800" />
-            )}
-            <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-black/45" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
-          </div>
-
-          <div className="relative z-10 flex min-h-[540px] flex-col justify-end p-5 md:min-h-[410px] md:flex-row md:items-center md:justify-start md:gap-5 md:p-7">
-            <div className="absolute left-5 right-5 top-5 z-20 flex items-center justify-between">
-              <span className="rounded-full bg-red-600 px-4 py-2 text-xs font-black text-white shadow-lg shadow-red-600/20">
-                {hasUpdate ? "NEW CHAPTER" : `TIER ${active.tier}`}
-              </span>
-              {user && (
-                <button onClick={() => onToggleFavorite(active)} className={`rounded-full p-3 ${isFavorite ? "bg-red-600 text-white" : "bg-zinc-900/90 text-white"}`}>
-                  <Heart size={22} fill={isFavorite ? "currentColor" : "none"} />
-                </button>
+          {/* Mobile: no text overlay on cover */}
+          <div className="md:hidden">
+            <div className="relative aspect-[3/4] w-full overflow-hidden bg-zinc-900">
+              {active.cover ? (
+                <img src={active.cover} alt={active.title} className="h-full w-full object-cover object-center" />
+              ) : (
+                <div className="h-full w-full bg-zinc-800" />
               )}
+              <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/55 to-transparent" />
+              <div className="absolute left-5 right-5 top-5 z-20 flex items-center justify-between">
+                <span className="rounded-full bg-red-600 px-4 py-2 text-xs font-black text-white shadow-lg shadow-red-600/20">
+                  {hasUpdate ? "NEW CHAPTER" : `TIER ${active.tier}`}
+                </span>
+                {user && (
+                  <button onClick={() => onToggleFavorite(active)} className={`rounded-full p-3 ${isFavorite ? "bg-red-600 text-white" : "bg-zinc-900/90 text-white"}`}>
+                    <Heart size={22} fill={isFavorite ? "currentColor" : "none"} />
+                  </button>
+                )}
+              </div>
             </div>
 
-            <div className="hidden shrink-0 overflow-hidden rounded-[1.6rem] bg-zinc-950 shadow-2xl ring-1 ring-white/10 md:block md:h-[360px] md:w-[250px] xl:h-[380px] xl:w-[265px]">
-              {active.cover ? <img src={active.cover} alt={active.title} className="h-full w-full object-cover" /> : <div className="h-full w-full bg-zinc-800" />}
-            </div>
-
-            <div className="min-w-0 flex-1 md:max-w-[560px]">
-              <h1 className="line-clamp-2 max-w-full break-words text-[2.05rem] font-black leading-[1.02] tracking-tight text-white drop-shadow-2xl sm:text-4xl md:mt-6 md:line-clamp-3 md:text-5xl lg:text-6xl">
+            <div className="bg-zinc-950 p-5">
+              <h1 className="line-clamp-2 break-words text-[2.05rem] font-black leading-[1.02] tracking-tight text-white">
                 {active.title}
               </h1>
 
@@ -1100,11 +1083,66 @@ function HeroCarousel({
                 <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-white">Tier {active.tier}</span>
               </div>
 
-              <p className="mt-3 line-clamp-2 max-w-xl text-sm font-medium text-white/75 md:mt-4 md:line-clamp-3">
+              <p className="mt-3 line-clamp-2 text-sm font-medium text-white/70">
                 {active.note || "กดรายละเอียดเพื่อดูข้อมูลและจัดการเรื่องนี้"}
               </p>
 
-              <div className="mt-4 flex flex-wrap gap-3 md:mt-5">
+              <div className="mt-4 flex flex-wrap gap-3">
+                <button onClick={() => onOpen(active)} className="flex items-center gap-2 rounded-2xl bg-red-600 px-5 py-3 text-sm font-black text-white shadow-lg shadow-red-600/25 active:scale-95">
+                  <BookOpen size={18} /> รายละเอียด
+                </button>
+                {(active.last_read_url || active.source_url) && (
+                  <button onClick={() => onRead(active)} className="flex items-center gap-2 rounded-2xl bg-white/10 px-5 py-3 text-sm font-black text-white active:scale-95">
+                    <Play size={18} /> อ่านต่อ
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Desktop / landscape: cinematic background + portrait cover */}
+          <div className="relative z-10 hidden min-h-[410px] flex-row items-center justify-start gap-5 p-7 md:flex">
+            <div className="absolute inset-0">
+              {active.cover ? (
+                <img src={active.cover} alt={active.title} className="h-full w-full scale-110 object-cover opacity-25 blur-xl" />
+              ) : (
+                <div className="h-full w-full bg-zinc-800" />
+              )}
+              <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-black/45" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
+            </div>
+
+            <div className="relative z-10 hidden shrink-0 overflow-hidden rounded-[1.6rem] bg-zinc-950 shadow-2xl ring-1 ring-white/10 md:block md:h-[360px] md:w-[250px] xl:h-[380px] xl:w-[265px]">
+              {active.cover ? <img src={active.cover} alt={active.title} className="h-full w-full object-cover" /> : <div className="h-full w-full bg-zinc-800" />}
+            </div>
+
+            <div className="relative z-10 min-w-0 flex-1 md:max-w-[560px]">
+              <div className="flex items-center justify-between">
+                <span className="rounded-full bg-red-600 px-4 py-2 text-xs font-black text-white shadow-lg shadow-red-600/20">
+                  {hasUpdate ? "NEW CHAPTER" : `TIER ${active.tier}`}
+                </span>
+                {user && (
+                  <button onClick={() => onToggleFavorite(active)} className={`rounded-full p-3 ${isFavorite ? "bg-red-600 text-white" : "bg-zinc-900/90 text-white"}`}>
+                    <Heart size={22} fill={isFavorite ? "currentColor" : "none"} />
+                  </button>
+                )}
+              </div>
+
+              <h1 className="mt-6 line-clamp-3 max-w-full break-words text-5xl font-black leading-[1.02] tracking-tight text-white drop-shadow-2xl lg:text-6xl">
+                {active.title}
+              </h1>
+
+              <div className="mt-4 flex flex-wrap gap-2">
+                <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-white">อ่านถึง {active.read_chapter || "-"}</span>
+                <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-white">ล่าสุด {active.latest_chapter || "-"}</span>
+                <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-white">Tier {active.tier}</span>
+              </div>
+
+              <p className="mt-4 line-clamp-3 max-w-xl text-sm font-medium text-white/75">
+                {active.note || "กดรายละเอียดเพื่อดูข้อมูลและจัดการเรื่องนี้"}
+              </p>
+
+              <div className="mt-5 flex flex-wrap gap-3">
                 <button onClick={() => onOpen(active)} className="flex items-center gap-2 rounded-2xl bg-red-600 px-5 py-3 text-sm font-black text-white shadow-lg shadow-red-600/25 active:scale-95">
                   <BookOpen size={18} /> รายละเอียด
                 </button>
