@@ -465,18 +465,32 @@ function DetailModal({
           <X size={20} />
         </button>
 
-        <div className="relative z-10 grid h-full grid-cols-[34%_1fr] gap-3 p-3 pr-2 sm:grid-cols-[36%_1fr] sm:gap-5 sm:p-5 sm:pr-4 md:grid-cols-[320px_1fr] md:gap-7 md:p-7">
-          <div className="min-w-0 self-center overflow-hidden rounded-[1.4rem] bg-zinc-950 shadow-2xl ring-1 ring-white/10 sm:rounded-[1.8rem]">
-            {item.cover ? (
-              <img loading="lazy" src={item.cover} alt={item.title} className="h-auto max-h-[68dvh] w-full object-cover" />
-            ) : (
-              <div className="aspect-[3/4] grid place-items-center text-zinc-500">ไม่มีรูป</div>
-            )}
+        <div className="relative z-10 flex h-full flex-col gap-2 p-3 pt-12 sm:grid sm:grid-cols-[36%_1fr] sm:gap-5 sm:p-5 sm:pr-4 md:grid-cols-[320px_1fr] md:gap-7 md:p-7">
+          <div className="flex min-w-0 items-start gap-3 sm:block sm:self-center sm:overflow-hidden sm:rounded-[1.8rem] sm:bg-zinc-950 sm:shadow-2xl sm:ring-1 sm:ring-white/10">
+            <div className="w-[34%] shrink-0 overflow-hidden rounded-2xl bg-zinc-950 shadow-xl ring-1 ring-white/10 sm:w-full sm:rounded-[1.8rem]">
+              {item.cover ? (
+                <img loading="lazy" src={item.cover} alt={item.title} className="h-auto max-h-[25dvh] w-full object-cover sm:max-h-[68dvh]" />
+              ) : (
+                <div className="aspect-[3/4] grid place-items-center text-zinc-500">ไม่มีรูป</div>
+              )}
+            </div>
+            <div className="min-w-0 flex-1 sm:hidden">
+              <div className="flex flex-wrap items-center gap-1.5">
+                <span className="rounded-full bg-zinc-900 px-2 py-1 text-[10px] font-black text-white">Tier {item.tier}</span>
+                <span className="rounded-full bg-zinc-900 px-2 py-1 text-[10px] font-black text-white">
+                  {item.status === "reading" ? "กำลังอ่าน" : item.status === "finished" ? "จบแล้ว" : "รอ"}
+                </span>
+                {hasUpdate && <span className="rounded-full bg-red-600 px-2 py-1 text-[10px] font-black text-white">NEW</span>}
+              </div>
+              <h2 className="mt-2 line-clamp-3 break-words text-2xl font-black leading-[1.05] tracking-tight text-white">
+                {item.title}
+              </h2>
+            </div>
           </div>
 
-          <div className="flex min-w-0 flex-col overflow-hidden py-8 sm:py-5 md:py-2">
+          <div className="flex min-w-0 flex-1 flex-col overflow-hidden py-0 sm:py-5 md:py-2">
             <div className="flex min-w-0 flex-1 flex-col gap-2 overflow-hidden sm:gap-3">
-              <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+              <div className="hidden flex-wrap items-center gap-1.5 sm:flex sm:gap-2">
                 <span className="rounded-full bg-zinc-900 px-2 py-1 text-[10px] font-black text-white sm:px-3 sm:text-xs">Tier {item.tier}</span>
                 <span className="rounded-full bg-zinc-900 px-2 py-1 text-[10px] font-black text-white sm:px-3 sm:text-xs">
                   {item.status === "reading" ? "กำลังอ่าน" : item.status === "finished" ? "จบแล้ว" : "รอ"}
@@ -484,13 +498,13 @@ function DetailModal({
                 {hasUpdate && <span className="rounded-full bg-red-600 px-2 py-1 text-[10px] font-black text-white sm:px-3 sm:text-xs">NEW</span>}
               </div>
 
-              <h2 className="line-clamp-3 break-words text-xl font-black leading-[1.05] tracking-tight text-white sm:text-3xl md:text-4xl lg:text-5xl">
+              <h2 className="hidden line-clamp-3 break-words text-xl font-black leading-[1.05] tracking-tight text-white sm:block sm:text-3xl md:text-4xl lg:text-5xl">
                 {item.title}
               </h2>
 
-              <div className="min-h-0 flex-1 overflow-hidden rounded-2xl bg-white/5 p-2.5 backdrop-blur sm:p-4">
+              <div className="min-h-0 rounded-2xl bg-white/5 p-2.5 backdrop-blur sm:flex-1 sm:overflow-hidden sm:p-4">
                 <p className="mb-1 text-[10px] font-black uppercase tracking-[0.18em] text-zinc-500 sm:mb-2 sm:text-xs">เรื่องย่อ</p>
-                <p className="line-clamp-5 whitespace-pre-line break-words text-[11px] font-medium leading-5 text-white/70 sm:text-sm sm:leading-6 md:line-clamp-6">
+                <p className="line-clamp-3 whitespace-pre-line break-words text-[11px] font-medium leading-4 text-white/70 sm:line-clamp-5 sm:leading-6 sm:text-sm md:line-clamp-6">
                   {item.note || "ยังไม่มีเรื่องย่อสำหรับเรื่องนี้"}
                 </p>
               </div>
@@ -1001,7 +1015,7 @@ function HeroCarousel({
             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
           </div>
 
-          <div className="relative z-10 flex min-h-[540px] flex-col justify-end p-5 md:min-h-[410px] md:flex-row md:items-center md:justify-start md:gap-5 md:p-7">
+          <div className="relative z-10 flex min-h-[540px] flex-col justify-end px-5 pb-9 pt-[300px] md:min-h-[410px] md:flex-row md:items-center md:justify-start md:gap-5 md:p-7">
             <div className="absolute left-5 right-5 top-5 z-20 flex items-center justify-between">
               <span className="rounded-full bg-red-600 px-4 py-2 text-xs font-black text-white shadow-lg shadow-red-600/20">
                 {hasUpdate ? "NEW CHAPTER" : `TIER ${active.tier}`}
@@ -1028,7 +1042,7 @@ function HeroCarousel({
                 <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-white">Tier {active.tier}</span>
               </div>
 
-              <p className="mt-2 line-clamp-2 max-w-xl text-xs font-medium leading-5 text-white/75 md:mt-4 md:text-sm md:leading-normal md:line-clamp-3">
+              <p className="mt-3 line-clamp-2 max-w-xl text-xs font-medium leading-5 text-white/75 md:mt-4 md:text-sm md:leading-normal md:line-clamp-3">
                 {active.note || "กดรายละเอียดเพื่อดูข้อมูลและจัดการเรื่องนี้"}
               </p>
 
