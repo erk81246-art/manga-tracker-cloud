@@ -402,6 +402,7 @@ function DetailModal({
   useEffect(() => {
     setLocalReadChapter(item.read_chapter || "");
   }, [item.id, item.read_chapter]);
+
   const hasUpdate = chapterNumber(item.latest_chapter) > chapterNumber(item.read_chapter);
   const readUrl = item.last_read_url || "";
   const mainSourceUrl = item.source_url || "";
@@ -433,7 +434,7 @@ function DetailModal({
 
   return (
     <motion.div
-      className="fixed inset-0 z-[80] flex touch-none items-end justify-center overflow-hidden bg-black/80 p-0 md:items-center md:p-6"
+      className="fixed inset-0 z-[80] flex items-center justify-center overflow-hidden bg-black/80 p-2 sm:p-4 md:p-6"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -441,186 +442,113 @@ function DetailModal({
     >
       <motion.div
         onClick={(e) => e.stopPropagation()}
-        className="relative flex touch-auto h-[92dvh] w-[100vw] max-w-[100vw] flex-col overflow-hidden rounded-t-[2.5rem] bg-black text-white shadow-2xl md:h-[88vh] md:w-full md:max-w-[520px] md:rounded-[2.5rem] xl:max-w-[760px]"
-        initial={{ y: 60, scale: 0.97, opacity: 0 }}
+        className="relative h-[min(92dvh,760px)] w-full max-w-[980px] overflow-hidden rounded-[1.8rem] bg-black text-white shadow-2xl sm:rounded-[2.2rem]"
+        initial={{ y: 30, scale: 0.98, opacity: 0 }}
         animate={{ y: 0, scale: 1, opacity: 1 }}
-        exit={{ y: 60, scale: 0.97, opacity: 0 }}
+        exit={{ y: 30, scale: 0.98, opacity: 0 }}
         transition={{ type: "spring", stiffness: 260, damping: 25 }}
       >
-        <div className="relative h-full overflow-y-auto overflow-x-hidden overscroll-contain pb-28">
-          <div className="absolute inset-0">
+        <div className="absolute inset-0">
+          {item.cover ? (
+            <img loading="lazy" src={item.cover} alt="" className="h-full w-full scale-110 object-cover opacity-20 blur-3xl" />
+          ) : (
+            <div className="h-full w-full bg-zinc-900" />
+          )}
+          <div className="absolute inset-0 bg-gradient-to-br from-zinc-950/70 via-black/95 to-black" />
+        </div>
+
+        <button
+          onClick={onClose}
+          className="absolute right-3 top-3 z-30 grid h-9 w-9 place-items-center rounded-full bg-zinc-900/95 text-white shadow-xl sm:right-5 sm:top-5 sm:h-11 sm:w-11"
+          aria-label="close"
+        >
+          <X size={20} />
+        </button>
+
+        <div className="relative z-10 grid h-full grid-cols-[34%_1fr] gap-3 p-3 pr-2 sm:grid-cols-[36%_1fr] sm:gap-5 sm:p-5 sm:pr-4 md:grid-cols-[320px_1fr] md:gap-7 md:p-7">
+          <div className="min-w-0 self-center overflow-hidden rounded-[1.4rem] bg-zinc-950 shadow-2xl ring-1 ring-white/10 sm:rounded-[1.8rem]">
             {item.cover ? (
-              <img loading="lazy" src={item.cover} alt={item.title} className="h-full w-full scale-110 object-cover opacity-25 blur-2xl" />
+              <img loading="lazy" src={item.cover} alt={item.title} className="h-auto max-h-[68dvh] w-full object-cover" />
             ) : (
-              <div className="h-full w-full bg-zinc-900" />
+              <div className="aspect-[3/4] grid place-items-center text-zinc-500">ไม่มีรูป</div>
             )}
-            <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/80 to-black" />
-            <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black via-black to-transparent" />
           </div>
 
-          <button
-            onClick={onClose}
-            className="absolute right-5 top-5 z-20 grid h-12 w-12 place-items-center rounded-full bg-zinc-900/95 text-white shadow-xl active:scale-95"
-            aria-label="close"
-          >
-            <X size={26} />
-          </button>
-
-          <div className="relative z-10 w-full max-w-full overflow-x-hidden px-4 pb-8 pt-16 md:px-8">
-            <div className="mx-auto mb-5 w-[68%] max-w-[280px] overflow-hidden rounded-[2.2rem] bg-black shadow-2xl ring-1 ring-white/10 md:w-[46%] xl:w-[260px]">
-              {item.cover ? (
-                <img loading="lazy" src={item.cover} alt={item.title} className="aspect-[3/4] w-full object-cover" />
-              ) : (
-                <div className="aspect-[3/4] grid place-items-center text-zinc-500">ไม่มีรูป</div>
-              )}
-            </div>
-
-            <div className="space-y-4 text-center xl:text-left">
-              <div className="flex items-center justify-center gap-2 xl:justify-start">
-                <span className="rounded-full bg-zinc-900 px-3 py-1 text-xs font-black text-white backdrop-blur">
-                  Tier {item.tier}
-                </span>
-                <span className="rounded-full bg-zinc-900 px-3 py-1 text-xs font-black text-white backdrop-blur">
+          <div className="flex min-w-0 flex-col overflow-hidden py-8 sm:py-5 md:py-2">
+            <div className="flex min-w-0 flex-1 flex-col gap-2 overflow-hidden sm:gap-3">
+              <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                <span className="rounded-full bg-zinc-900 px-2 py-1 text-[10px] font-black text-white sm:px-3 sm:text-xs">Tier {item.tier}</span>
+                <span className="rounded-full bg-zinc-900 px-2 py-1 text-[10px] font-black text-white sm:px-3 sm:text-xs">
                   {item.status === "reading" ? "กำลังอ่าน" : item.status === "finished" ? "จบแล้ว" : "รอ"}
                 </span>
-                {hasUpdate && (
-                  <span className="rounded-full bg-red-600 px-3 py-1 text-xs font-black text-white">
-                    NEW +{chapterNumber(item.latest_chapter) - chapterNumber(item.read_chapter)}
-                  </span>
-                )}
+                {hasUpdate && <span className="rounded-full bg-red-600 px-2 py-1 text-[10px] font-black text-white sm:px-3 sm:text-xs">NEW</span>}
               </div>
 
-              <h2 className="max-w-full break-words text-3xl font-black leading-tight tracking-tight text-white md:text-5xl">
+              <h2 className="line-clamp-3 break-words text-xl font-black leading-[1.05] tracking-tight text-white sm:text-3xl md:text-4xl lg:text-5xl">
                 {item.title}
               </h2>
 
-              {item.note && (
-                <p className="mx-auto max-w-full whitespace-pre-line break-words text-sm font-semibold leading-7 text-white/60 md:text-base xl:max-w-xl">
-                  {item.note}
+              <div className="min-h-0 flex-1 overflow-hidden rounded-2xl bg-white/5 p-2.5 backdrop-blur sm:p-4">
+                <p className="mb-1 text-[10px] font-black uppercase tracking-[0.18em] text-zinc-500 sm:mb-2 sm:text-xs">เรื่องย่อ</p>
+                <p className="line-clamp-5 whitespace-pre-line break-words text-[11px] font-medium leading-5 text-white/70 sm:text-sm sm:leading-6 md:line-clamp-6">
+                  {item.note || "ยังไม่มีเรื่องย่อสำหรับเรื่องนี้"}
                 </p>
-              )}
+              </div>
 
-              <div className="grid grid-cols-2 gap-3 pt-2">
-                <div className="rounded-[1.6rem] bg-zinc-900 p-4 text-left backdrop-blur-xl">
-                  <p className="text-xs font-bold text-zinc-500">อ่านถึงของฉัน</p>
-                  <div className="mt-2 flex items-center gap-2">
-                    <span className="text-xl font-black">ตอน</span>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="rounded-xl bg-zinc-900/90 p-2 sm:rounded-2xl sm:p-3">
+                  <p className="text-[9px] font-bold text-zinc-500 sm:text-xs">อ่านถึงของฉัน</p>
+                  <div className="mt-1 flex items-center gap-1">
+                    <span className="text-sm font-black sm:text-lg">ตอน</span>
                     <input
                       value={localReadChapter}
                       onChange={(e) => setLocalReadChapter(e.target.value)}
                       disabled={isGuest}
-                      className="min-w-0 flex-1 rounded-xl bg-black px-3 py-2 text-xl font-black text-white outline-none ring-1 ring-white/10 disabled:opacity-50"
+                      className="min-w-0 flex-1 rounded-lg bg-black px-2 py-1 text-sm font-black text-white outline-none ring-1 ring-white/10 sm:rounded-xl sm:py-2 sm:text-lg"
                       placeholder="-"
-                   />
+                    />
                   </div>
                 </div>
-                <div className="rounded-[1.6rem] bg-zinc-900 p-4 text-left backdrop-blur-xl">
-                  <p className="text-xs font-bold text-zinc-500">ล่าสุดของเรื่อง</p>
-                  <p className="mt-1 text-2xl font-black">ตอน {item.latest_chapter || "-"}</p>
+                <div className="rounded-xl bg-zinc-900/90 p-2 sm:rounded-2xl sm:p-3">
+                  <p className="text-[9px] font-bold text-zinc-500 sm:text-xs">ล่าสุดของเรื่อง</p>
+                  <p className="mt-1 text-base font-black sm:text-2xl">ตอน {item.latest_chapter || "-"}</p>
                 </div>
               </div>
 
               {!isGuest && (
-                <button
-                  onClick={() => onSaveProgress?.(item, localReadChapter)}
-                  className="w-full rounded-2xl bg-white px-4 py-3 text-sm font-black text-zinc-950 active:scale-95"
-                >
+                <button onClick={() => onSaveProgress?.(item, localReadChapter)} className="rounded-xl bg-white px-3 py-2 text-[10px] font-black text-zinc-950 active:scale-95 sm:rounded-2xl sm:py-3 sm:text-sm">
                   บันทึกตอนที่อ่าน
                 </button>
               )}
-
-              <div className="grid grid-cols-2 gap-2 pt-2">
-                <button
-                  onClick={() => onToggleFavorite?.(item)}
-                  disabled={isGuest}
-                  className={`rounded-2xl px-4 py-3 text-sm font-black active:scale-95 ${isFavorite ? "bg-red-600 text-white" : "bg-zinc-900 text-white"}`}
-                >
-                  <Heart size={18} className="mx-auto mb-1" fill={isFavorite ? "currentColor" : "none"} />
-                  Favorite
-                </button>
-
-                <button
-                  onClick={openMain}
-                  disabled={!mainSourceUrl}
-                  className="rounded-2xl bg-zinc-900 px-4 py-3 text-sm font-black text-white active:scale-95 disabled:opacity-50"
-                >
-                  <ExternalLink size={18} className="mx-auto mb-1" />
-                  กดอ่าน
-                </button>
-
-                <button
-                  onClick={openRead}
-                  disabled={!readUrl}
-                  className="rounded-2xl bg-white px-4 py-3 text-sm font-black text-zinc-950 active:scale-95 disabled:opacity-50"
-                >
-                  <ExternalLink size={18} className="mx-auto mb-1" />
-                  อ่านตอนล่าสุด
-                </button>
-
-                <button
-                  onClick={handleCheckLatest}
-                  disabled={checking || isGuest}
-                  className="rounded-2xl bg-zinc-900 px-4 py-3 text-sm font-black text-white active:scale-95 disabled:opacity-50"
-                >
-                  <RefreshCw size={18} className={`mx-auto mb-1 ${checking ? "animate-spin" : ""}`} />
-                  เช็กตอน
-                </button>
-              </div>
-
-              <div className="rounded-[1.8rem] bg-zinc-900 p-4 text-left backdrop-blur-xl">
-                <p className="mb-3 text-sm font-black text-zinc-300">จัด Tier</p>
-                <div className="grid grid-cols-5 gap-2">
-                  {tiers.map((tier) => (
-                    <button
-                      key={tier}
-                      onClick={() => canManage && onTierChange(item.id, tier)}
-                      disabled={!canManage}
-                      className={`h-12 rounded-2xl text-sm font-black active:scale-95 disabled:opacity-50 ${
-                        item.tier === tier ? "bg-white text-zinc-950" : "bg-zinc-900 text-white"
-                      }`}
-                    >
-                      {tier}
-                    </button>
-                  ))}
-                </div>
-              </div>
             </div>
+
+            <div className="mt-2 grid grid-cols-2 gap-1.5 sm:mt-3 sm:gap-2">
+              <button onClick={() => onToggleFavorite?.(item)} disabled={isGuest} className={`rounded-xl px-2 py-2 text-[10px] font-black active:scale-95 sm:rounded-2xl sm:py-3 sm:text-sm ${isFavorite ? "bg-red-600 text-white" : "bg-zinc-900 text-white"}`}>
+                <Heart size={14} className="mx-auto mb-0.5 sm:mb-1 sm:h-[18px] sm:w-[18px]" fill={isFavorite ? "currentColor" : "none"} /> Favorite
+              </button>
+              <button onClick={openMain} disabled={!mainSourceUrl} className="rounded-xl bg-zinc-900 px-2 py-2 text-[10px] font-black text-white active:scale-95 disabled:opacity-50 sm:rounded-2xl sm:py-3 sm:text-sm">
+                <ExternalLink size={14} className="mx-auto mb-0.5 sm:mb-1 sm:h-[18px] sm:w-[18px]" /> กดอ่าน
+              </button>
+              <button onClick={readUrl ? openRead : openMain} disabled={!readUrl && !mainSourceUrl} className="rounded-xl bg-white px-2 py-2 text-[10px] font-black text-zinc-950 active:scale-95 disabled:opacity-50 sm:rounded-2xl sm:py-3 sm:text-sm">
+                <Play size={14} className="mx-auto mb-0.5 sm:mb-1 sm:h-[18px] sm:w-[18px]" /> อ่านต่อ
+              </button>
+              <button onClick={handleCheckLatest} disabled={checking || isGuest} className="rounded-xl bg-zinc-900 px-2 py-2 text-[10px] font-black text-white active:scale-95 disabled:opacity-50 sm:rounded-2xl sm:py-3 sm:text-sm">
+                <RefreshCw size={14} className={`mx-auto mb-0.5 sm:mb-1 sm:h-[18px] sm:w-[18px] ${checking ? "animate-spin" : ""}`} /> เช็กตอน
+              </button>
+            </div>
+
+            {canManage && (
+              <div className="mt-1.5 grid grid-cols-[1fr_auto] gap-1.5 sm:mt-2 sm:gap-2">
+                <button onClick={() => onEdit(item)} className="rounded-xl bg-zinc-800 px-3 py-2 text-[10px] font-black text-white active:scale-95 sm:rounded-2xl sm:py-3 sm:text-sm">แก้ไข</button>
+                <button onClick={() => onDelete(item.id)} className="grid h-8 w-8 place-items-center rounded-xl bg-red-600/20 text-rose-300 active:scale-95 sm:h-11 sm:w-11 sm:rounded-2xl"><Trash2 size={16} /></button>
+              </div>
+            )}
           </div>
         </div>
-
-        {!isGuest && (
-          <div className="absolute inset-x-0 bottom-0 z-20 overflow-hidden border-t border-white/10 bg-black p-3 md:p-4">
-            <div className="mx-auto grid w-full max-w-[520px] grid-cols-[1fr_1fr_auto] gap-2">
-              <button
-                onClick={readUrl ? openRead : openMain}
-                className="rounded-2xl bg-white px-4 py-3 text-sm font-black text-zinc-950 active:scale-95"
-              >
-                {readUrl ? "อ่านตอนล่าสุด" : "เพิ่มลิงก์อ่าน"}
-              </button>
-
-              {canManage ? (
-                <button onClick={() => onEdit(item)} className="rounded-2xl bg-zinc-900 px-4 py-3 text-sm font-black text-white active:scale-95">
-                  แก้ไข
-                </button>
-              ) : (
-                <button className="rounded-2xl bg-zinc-900 px-4 py-3 text-sm font-black text-white/50" disabled>
-                  ดูอย่างเดียว
-                </button>
-              )}
-
-              {canManage && (
-                <button onClick={() => onDelete(item.id)} className="grid h-12 w-12 place-items-center rounded-2xl bg-red-600/20 text-rose-300 active:scale-95">
-                  <Trash2 size={20} />
-                </button>
-              )}
-            </div>
-          </div>
-        )}
       </motion.div>
     </motion.div>
   );
 }
-
 
 function MangaForm({
   value,
@@ -1090,7 +1018,7 @@ function HeroCarousel({
             </div>
 
             <div className="min-w-0 flex-1 md:max-w-[560px]">
-              <h1 className="line-clamp-2 max-w-full break-words text-[2.05rem] font-black leading-[1.02] tracking-tight text-white drop-shadow-2xl sm:text-4xl md:mt-6 md:line-clamp-3 md:text-5xl lg:text-6xl">
+              <h1 className="line-clamp-2 max-w-full break-words text-[1.7rem] font-black leading-[1.02] tracking-tight text-white drop-shadow-2xl sm:text-4xl md:mt-6 md:line-clamp-3 md:text-5xl lg:text-6xl">
                 {active.title}
               </h1>
 
@@ -1100,11 +1028,11 @@ function HeroCarousel({
                 <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-white">Tier {active.tier}</span>
               </div>
 
-              <p className="mt-3 line-clamp-2 max-w-xl text-sm font-medium text-white/75 md:mt-4 md:line-clamp-3">
+              <p className="mt-2 line-clamp-2 max-w-xl text-xs font-medium leading-5 text-white/75 md:mt-4 md:text-sm md:leading-normal md:line-clamp-3">
                 {active.note || "กดรายละเอียดเพื่อดูข้อมูลและจัดการเรื่องนี้"}
               </p>
 
-              <div className="mt-4 flex flex-wrap gap-3 md:mt-5">
+              <div className="mt-3 flex flex-wrap gap-2 md:mt-5 md:gap-3">
                 <button onClick={() => onOpen(active)} className="flex items-center gap-2 rounded-2xl bg-red-600 px-5 py-3 text-sm font-black text-white shadow-lg shadow-red-600/25 active:scale-95">
                   <BookOpen size={18} /> รายละเอียด
                 </button>
@@ -1457,7 +1385,7 @@ function MangaPassIntro({
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.55 }}
       >
-        <div className="md:hidden">
+        <div className="landscape:hidden">
           <div className="relative overflow-hidden rounded-[2.2rem] bg-white text-zinc-950 shadow-2xl">
             <div className="relative h-[62vh] min-h-[500px] overflow-hidden">
               {cover ? (
@@ -1498,7 +1426,7 @@ function MangaPassIntro({
           </div>
         </div>
 
-        <div className="hidden md:block">
+        <div className="hidden landscape:block">
           <div className="relative overflow-hidden rounded-[2.5rem] bg-white text-zinc-950 shadow-2xl">
             <div className="grid min-h-[430px] grid-cols-[1fr_180px]">
               <div className="relative overflow-hidden">
@@ -2056,7 +1984,6 @@ export default function App() {
                 randomSeed={highlightSeed}
              />
               <PremiumContinueReading items={filtered.length ? filtered : progressItems || items} historyIds={historyIds} onOpen={openDetail} onRead={openReading} />
-              <NetflixUpdatesRow items={filtered.length ? filtered : progressItems || items} onOpen={openDetail} />
               <div className="mb-4 mt-4 flex gap-2 overflow-x-auto pb-1 xl:hidden">
                 {filters.map(([key, label]) => (
                   <button key={key} onClick={() => setFilter(key)} className={`shrink-0 rounded-full px-4 py-2 text-sm font-bold ${filter === key ? "bg-zinc-950 text-white" : "bg-white text-zinc-500"}`}>
