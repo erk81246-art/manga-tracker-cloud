@@ -993,16 +993,16 @@ function HeroCarousel({
           animate={{ opacity: 1, scale: 1, y: 0 }}
           className="relative z-10 mx-auto min-h-[570px] overflow-hidden rounded-[2rem] border border-purple-400/40 bg-zinc-950 shadow-[0_0_32px_rgba(168,85,247,0.25)] md:min-h-[410px] md:w-[72%]"
         >
-          {/* Mobile: full cover, text locked at bottom */}
+          {/* Mobile: cover fills the entire card, with readable content overlays */}
           <div className="absolute inset-0 md:hidden">
             {active.cover ? (
-              <img src={active.cover} alt={active.title} className="h-[58%] w-full object-cover object-center" />
+              <img src={active.cover} alt={active.title} className="h-full w-full object-cover object-center" />
             ) : (
               <div className="h-full w-full bg-zinc-800" />
             )}
-            <div className="absolute inset-x-0 top-[46%] bottom-0 bg-gradient-to-b from-transparent via-zinc-950/80 to-zinc-950" />
-            <div className="absolute inset-x-0 bottom-0 h-[58%] bg-gradient-to-t from-zinc-950 via-zinc-950/95 to-transparent" />
-            <div className="absolute inset-x-0 top-0 h-[34%] bg-gradient-to-b from-black/35 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/25 via-black/10 to-zinc-950/95" />
+            <div className="absolute inset-x-0 bottom-0 h-[64%] bg-gradient-to-t from-zinc-950 via-zinc-950/88 to-transparent" />
+            <div className="absolute inset-x-0 top-0 h-[30%] bg-gradient-to-b from-black/45 to-transparent" />
           </div>
 
           {/* Desktop / landscape: cinematic background + portrait cover */}
