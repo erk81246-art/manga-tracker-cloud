@@ -442,7 +442,7 @@ function DetailModal({
     >
       <motion.div
         onClick={(e) => e.stopPropagation()}
-        className="relative h-[min(92dvh,760px)] w-full max-w-[980px] overflow-hidden rounded-[1.8rem] bg-black text-white shadow-2xl sm:rounded-[2.2rem]"
+        className="relative w-full max-w-[980px] overflow-hidden rounded-[1.8rem] bg-black text-white shadow-2xl sm:h-[min(92dvh,760px)] sm:rounded-[2.2rem]"
         initial={{ y: 30, scale: 0.98, opacity: 0 }}
         animate={{ y: 0, scale: 1, opacity: 1 }}
         exit={{ y: 30, scale: 0.98, opacity: 0 }}
@@ -465,7 +465,7 @@ function DetailModal({
           <X size={20} />
         </button>
 
-        <div className="relative z-10 flex h-full flex-col gap-2 p-3 pt-12 sm:grid sm:grid-cols-[36%_1fr] sm:gap-5 sm:p-5 sm:pr-4 md:grid-cols-[320px_1fr] md:gap-7 md:p-7">
+        <div className="relative z-10 flex max-h-[88dvh] flex-col gap-3 overflow-y-auto overscroll-contain p-3 pt-12 sm:h-full sm:max-h-none sm:grid sm:grid-cols-[36%_1fr] sm:gap-5 sm:overflow-hidden sm:p-5 sm:pr-4 md:grid-cols-[320px_1fr] md:gap-7 md:p-7">
           <div className="flex min-w-0 items-start gap-3 sm:block sm:self-center sm:overflow-hidden sm:rounded-[1.8rem] sm:bg-zinc-950 sm:shadow-2xl sm:ring-1 sm:ring-white/10">
             <div className="w-[34%] shrink-0 overflow-hidden rounded-2xl bg-zinc-950 shadow-xl ring-1 ring-white/10 sm:w-full sm:rounded-[1.8rem]">
               {item.cover ? (
@@ -488,8 +488,8 @@ function DetailModal({
             </div>
           </div>
 
-          <div className="flex min-w-0 flex-1 flex-col overflow-hidden py-0 sm:py-5 md:py-2">
-            <div className="flex min-w-0 flex-1 flex-col gap-2 overflow-hidden sm:gap-3">
+          <div className="flex min-w-0 flex-1 flex-col py-0 sm:overflow-hidden sm:py-5 md:py-2">
+            <div className="flex min-w-0 flex-1 flex-col gap-2 sm:overflow-hidden sm:gap-3">
               <div className="hidden flex-wrap items-center gap-1.5 sm:flex sm:gap-2">
                 <span className="rounded-full bg-zinc-900 px-2 py-1 text-[10px] font-black text-white sm:px-3 sm:text-xs">Tier {item.tier}</span>
                 <span className="rounded-full bg-zinc-900 px-2 py-1 text-[10px] font-black text-white sm:px-3 sm:text-xs">
@@ -958,7 +958,7 @@ function HeroCarousel({
         </div>
       </div>
 
-      <div className="relative min-h-[560px] md:min-h-[430px]">
+      <div className="relative min-h-[590px] md:min-h-[430px]">
         {featured.length > 1 && (
           <button
             onClick={() => move(-1)}
@@ -991,17 +991,18 @@ function HeroCarousel({
           }}
           initial={{ opacity: 0, scale: 0.96, y: 12 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          className="relative z-10 mx-auto min-h-[540px] overflow-hidden rounded-[2rem] border border-purple-400/40 bg-zinc-900 shadow-[0_0_32px_rgba(168,85,247,0.25)] md:min-h-[410px] md:w-[72%]"
+          className="relative z-10 mx-auto min-h-[570px] overflow-hidden rounded-[2rem] border border-purple-400/40 bg-zinc-950 shadow-[0_0_32px_rgba(168,85,247,0.25)] md:min-h-[410px] md:w-[72%]"
         >
           {/* Mobile: full cover, text locked at bottom */}
           <div className="absolute inset-0 md:hidden">
             {active.cover ? (
-              <img src={active.cover} alt={active.title} className="h-full w-full object-cover object-center" />
+              <img src={active.cover} alt={active.title} className="h-[58%] w-full object-cover object-center" />
             ) : (
               <div className="h-full w-full bg-zinc-800" />
             )}
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/65 to-black/10" />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-transparent" />
+            <div className="absolute inset-x-0 top-[46%] bottom-0 bg-gradient-to-b from-transparent via-zinc-950/80 to-zinc-950" />
+            <div className="absolute inset-x-0 bottom-0 h-[58%] bg-gradient-to-t from-zinc-950 via-zinc-950/95 to-transparent" />
+            <div className="absolute inset-x-0 top-0 h-[34%] bg-gradient-to-b from-black/35 to-transparent" />
           </div>
 
           {/* Desktop / landscape: cinematic background + portrait cover */}
@@ -1015,7 +1016,7 @@ function HeroCarousel({
             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
           </div>
 
-          <div className="relative z-10 flex min-h-[540px] flex-col justify-end px-5 pb-9 pt-[300px] md:min-h-[410px] md:flex-row md:items-center md:justify-start md:gap-5 md:p-7">
+          <div className="relative z-10 flex min-h-[570px] flex-col justify-end px-5 pb-7 pt-[270px] md:min-h-[410px] md:flex-row md:items-center md:justify-start md:gap-5 md:p-7">
             <div className="absolute left-5 right-5 top-5 z-20 flex items-center justify-between">
               <span className="rounded-full bg-red-600 px-4 py-2 text-xs font-black text-white shadow-lg shadow-red-600/20">
                 {hasUpdate ? "NEW CHAPTER" : `TIER ${active.tier}`}
@@ -1032,17 +1033,17 @@ function HeroCarousel({
             </div>
 
             <div className="min-w-0 flex-1 md:max-w-[560px]">
-              <h1 className="line-clamp-2 max-w-full break-words text-[1.7rem] font-black leading-[1.02] tracking-tight text-white drop-shadow-2xl sm:text-4xl md:mt-6 md:line-clamp-3 md:text-5xl lg:text-6xl">
+              <h1 className="line-clamp-2 max-w-full break-words text-[1.65rem] font-black leading-[1.05] tracking-tight text-white sm:text-4xl md:mt-6 md:line-clamp-3 md:text-5xl lg:text-6xl">
                 {active.title}
               </h1>
 
-              <div className="mt-4 flex flex-wrap gap-2">
+              <div className="mt-3 flex flex-wrap gap-2">
                 <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-white">อ่านถึง {active.read_chapter || "-"}</span>
                 <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-white">ล่าสุด {active.latest_chapter || "-"}</span>
                 <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-white">Tier {active.tier}</span>
               </div>
 
-              <p className="mt-3 line-clamp-2 max-w-xl text-xs font-medium leading-5 text-white/75 md:mt-4 md:text-sm md:leading-normal md:line-clamp-3">
+              <p className="mt-3 line-clamp-2 max-w-xl text-xs font-medium leading-5 text-zinc-300 md:mt-4 md:text-sm md:leading-normal md:line-clamp-3">
                 {active.note || "กดรายละเอียดเพื่อดูข้อมูลและจัดการเรื่องนี้"}
               </p>
 
